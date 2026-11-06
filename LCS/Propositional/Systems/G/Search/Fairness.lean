@@ -324,35 +324,6 @@ theorem expandLeaf_open_fair {s t : Sequent} {ps}
   cases s with
   | mk as bs => exact frozen_schedule_fair as bs [] [] h ho
 
-/-- A branch of the textbook expansion either closes or processes all of its
-    original nonatomic occurrences. -/
-theorem expandLeaf_fair {s t : Sequent} {ps}
-    (h : LeafPath (expandLeaf .systematic s) t ps) :
-    isAxiom t ∨
-      ((∀ A ∈ s.antecedent, isNonatomicFormula A → (false, A) ∈ ps) ∧
-       (∀ B ∈ s.succedent, isNonatomicFormula B → (true, B) ∈ ps)) := by
-  by_cases ho : isAxiom t
-  · exact .inl ho
-  · exact .inr (expandLeaf_open_fair h ho)
-
-/-- Every leaf occurrence admits an actual constructor path. -/
-theorem leafPath_of_mem_leaves {s t : Sequent} (tree : DeductionTree s)
-    (h : t ∈ tree.leaves) : ∃ ps, LeafPath tree t ps := by
-  induction tree with
-  | leaf s =>
-    simp only [DeductionTree.leaves, List.mem_singleton] at h
-    subst t
-    exact ⟨[], .leaf s⟩
-  | onePremise r child ih =>
-    obtain ⟨ps, hp⟩ := ih h
-    exact ⟨rulePrincipal1 r :: ps, .down hp⟩
-  | twoPremise r l rgt ihl ihr =>
-    rcases List.mem_append.mp h with hl | hr
-    · obtain ⟨ps, hp⟩ := ihl hl
-      exact ⟨rulePrincipal2 r :: ps, .left hp⟩
-    · obtain ⟨ps, hp⟩ := ihr hr
-      exact ⟨rulePrincipal2 r :: ps, .right hp⟩
-
 /-- Closed nodes are leaves: every node carrying a rule is nonaxiomatic. -/
 def AllInnerOpen : {s : Sequent} → DeductionTree s → Prop
   | _, .leaf _ => True

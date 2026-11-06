@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Herbrand.NNFHauptsatz.Soundness : UInt64 := 800798816018253233
+def AttachStamp.LCS.Herbrand.NNFHauptsatz.Soundness : UInt64 := 3938243570257330115

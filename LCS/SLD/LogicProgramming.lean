@@ -124,12 +124,6 @@ namespace AntiHornClause
 def bodyVarSet {L : Language} (hNoEq : L.withoutEquality) (a : AntiHornClause L hNoEq) : Set Nat :=
   a.toAntiHornClauseCore.bodyVarSet
 
-/-- Definition 9.5.1 (companion): Free variables of an anti-Horn clause:
-    variables in the body not bound by an existential quantifier. -/
-@[blueprint "chap9__definition_9_5_1"]
-def freeVars {L : Language} (hNoEq : L.withoutEquality) (a : AntiHornClause L hNoEq) : Set Nat :=
-  fun v => (a.bodyVarSet (hNoEq := by all_goals exact hNoEq)) v ∧ v ∉ a.existVars
-
 /-- The conjunction matrix, with the optional negative literal retaining its sign. -/
 @[blueprint "chap9__definition_9_5_1"]
 def matrix {L : Language} {hNoEq : L.withoutEquality} (a : AntiHornClause L hNoEq) : FormulaN L :=
@@ -159,20 +153,6 @@ def negatedClause {L : Language} {hNoEq : L.withoutEquality}
   | some n, [] => FOHornClause.fact (hNoEq := hNoEq) n
   | some n, ps => FOHornClause.rule (hNoEq := hNoEq) n (LCS.Finset.ofList ps)
 
-/-- The universal closure of the normalized Horn clause dual to the component. -/
-@[blueprint "chap9__definition_9_5_1"]
-def negationSentence {L : Language} {hNoEq : L.withoutEquality}
-    (a : AntiHornClause L hNoEq) : FormulaN L :=
-  a.existVars.foldr FormulaN.all
-    (LCS.FOResolution.Method.Soundness.clauseToFormula hNoEq a.matrix (a.negatedClause.toFOClause hNoEq))
-
-/-- Negating the existential conjunction gives its universal Horn clause
-    (SQ31 and X-1 normalized-category reading). -/
-@[attach_debt, blueprint "chap9__definition_9_5_1"]
-theorem negationIsHorn {L : Language} (hNoEq : L.withoutEquality)
-    (a : AntiHornClause L hNoEq) (M : Structure L) (s : Assignment M) :
-    formulaEvalN M (.neg a.toSentence) s ↔ formulaEvalN M a.negationSentence s
-
 end AntiHornClause
 
 -- ===================================================================
@@ -181,63 +161,12 @@ end AntiHornClause
 
 namespace LogicProgram
 
-/-- Definition 9.5.1 (companion): Extracts the program P, the set of universal
-    Horn clauses. -/
-@[blueprint "chap9__definition_9_5_1"]
-def program {L : Language} (hNoEq : L.withoutEquality) (lp : LogicProgram L hNoEq) : Set (FOHornClause L hNoEq) :=
-  lp.prog
-
-/-- Definition 9.5.1 (companion): Extracts the query G, a disjunction of anti-Horn
-    clauses G_1,...,G_n. -/
-@[blueprint "chap9__definition_9_5_1"]
-def query {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) : List (AntiHornClause L hNoEq) :=
-  lp.qry
-
-/-- Definition 9.5.1 (companion): The property that the query G = G_1 lor ... lor G_n
-    is a nonempty disjunction of anti-Horn clauses. -/
-@[blueprint "chap9__definition_9_5_1"]
-def queryIsDisjunction {L : Language} (hNoEq : L.withoutEquality) (lp : LogicProgram L hNoEq) : Prop :=
-  lp.qry.length ≥ 1
-
-/-- Definition 9.5.1 (companion): For all i != j, 1 <= i, j <= n, the sets of free
-    variables FV(B_i) and FV(B_j) in the anti-Horn clause bodies are
-    pairwise disjoint. -/
-@[blueprint "chap9__definition_9_5_1"]
-def variablesDisjoint {L : Language} (hNoEq : L.withoutEquality) (lp : LogicProgram L hNoEq) : Prop :=
-  ∀ (i j : Fin lp.qry.length),
-    i ≠ j →
-    ∀ v : Nat,
-      ¬ ((AntiHornClause.bodyVarSet (hNoEq := by all_goals exact hNoEq)) (lp.qry.get i) v ∧
-         (AntiHornClause.bodyVarSet (hNoEq := by all_goals exact hNoEq)) (lp.qry.get j) v)
-
-/-- Definition 9.5.1 (companion): The union {z_1,...,z_q} of the sets of free
-    variables from each B_i in the query G. -/
-@[blueprint "chap9__definition_9_5_1"]
-def outputVars {L : Language} (hNoEq : L.withoutEquality) (lp : LogicProgram L hNoEq) : Set Nat :=
-  fun v => ∃ (i : Fin lp.qry.length),
-    (AntiHornClause.bodyVarSet (hNoEq := by all_goals exact hNoEq)) (lp.qry.get i) v
-
 /-- The nonempty finite disjunction of the query's closed components. -/
 @[blueprint "chap9__definition_9_5_1"]
 def toSentence {L : Language} {hNoEq : L.withoutEquality}
     (lp : LogicProgram L hNoEq) : FormulaN L :=
   lp.qry.tail.foldl (fun f a => .disj f a.toSentence)
     (lp.qry.head lp.wellFormed.1).toSentence
-
-/-- The finite conjunction of the universal Horn clauses from this same query. -/
-@[blueprint "chap9__definition_9_5_1"]
-def negationSentence {L : Language} {hNoEq : L.withoutEquality}
-    (lp : LogicProgram L hNoEq) : FormulaN L :=
-  lp.qry.tail.foldl (fun f a => .conj f a.negationSentence)
-    (lp.qry.head lp.wellFormed.1).negationSentence
-
-/-- Negating G gives the conjunction of the universal Horn duals of its
-    own components (SQ31 and X-1). -/
-@[attach_debt, blueprint "chap9__definition_9_5_1"]
-theorem negQueryIsConjOfHorn {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (M : Structure L) (s : Assignment M) :
-    formulaEvalN M (.neg lp.toSentence) s ↔ formulaEvalN M lp.negationSentence s
 
 /-- Definition 9.5.1 (companion): A logic program satisfies the PROLOG restriction
     iff P consists only of definite clauses (each clause is a fact or rule,
@@ -255,17 +184,6 @@ def isPROLOG {L : Language} (hNoEq : L.withoutEquality) (lp : LogicProgram L hNo
 def outputVarList {L : Language} (hNoEq : L.withoutEquality)
     (lp : LogicProgram L hNoEq) : List Nat :=
   (lp.qry.flatMap fun a => a.existVars).eraseDups
-
-/-- The output enumeration contains no repeated coordinate names. -/
-@[blueprint "chap9__definition_9_5_1"]
-theorem outputVarList_nodup {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) : (lp.outputVarList hNoEq).Nodup
-
-/-- The output list and matrix-variable union name exactly the same variables. -/
-@[blueprint "chap9__definition_9_5_1"]
-theorem mem_outputVarList {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (v : Nat) :
-    v ∈ lp.outputVarList hNoEq ↔ lp.outputVars hNoEq v
 
 /-- Definition 9.5.1 (companion): Given a substitution sigma returned by
     SLD-resolution, extracts the components sigma(z_1),...,sigma(z_q)
@@ -837,21 +755,6 @@ def programSemantics {L : Language} (hNoEq : L.withoutEquality)
     Set (DisjunctiveAnswer L (lp.outputVarList hNoEq).length) :=
   validInFreeStructures hNoEq lp hConst
 
-/-- The ground-answer task tests one exact output tuple against universal P. -/
-@[blueprint "chap9__definition_9_5_3"]
-def groundAnswerValid {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (hConst : Nonempty L.constSymbols)
-    (t : GroundAnswerTuple L (lp.outputVarList hNoEq).length) : Prop :=
-  programSemantics hNoEq lp hConst (singletonAnswer t)
-
-/-- The general query task: universal program truth entails the closed query. -/
-@[blueprint "chap9__definition_9_5_3"]
-def queryValid {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (_hConst : Nonempty L.constSymbols) : Prop :=
-  ∀ H : HerbrandStructure L hNoEq,
-    (∀ s c, c ∈ lp.prog → FOHornClause.evalInHerbrand hNoEq H c s) →
-    ∀ s, evalFormulaInHerbrand H s lp.toSentence
-
 namespace programSemantics
 
 /-- Under the PROLOG restriction select singleton answers (SQ35). -/
@@ -861,22 +764,6 @@ def isDefiniteSemantics {L : Language} (hNoEq : L.withoutEquality)
     (_hProlog : lp.isPROLOG hNoEq) :
     Set (DisjunctiveAnswer L (lp.outputVarList hNoEq).length) :=
   fun S => programSemantics hNoEq lp hConst S ∧ ∃ t, S.val = LCS.Finset.singleton t
-
-/-- Membership in the definite specialization is valid singleton membership. -/
-@[blueprint "chap9__definition_9_5_3"]
-theorem mem_isDefiniteSemantics {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (hConst : Nonempty L.constSymbols)
-    (hProlog : lp.isPROLOG hNoEq)
-    (S : DisjunctiveAnswer L (lp.outputVarList hNoEq).length) :
-    isDefiniteSemantics hNoEq lp hConst hProlog S ↔
-      programSemantics hNoEq lp hConst S ∧ ∃ t, S.val = LCS.Finset.singleton t
-
-/-- A valid PROLOG query has a singleton answer, for arbitrary P (SQ30, SQ35). -/
-@[attach_debt, blueprint "chap9__definition_9_5_3"]
-theorem definiteAnswer_exists {L : Language} (hNoEq : L.withoutEquality)
-    (lp : LogicProgram L hNoEq) (hConst : Nonempty L.constSymbols)
-    (hProlog : lp.isPROLOG hNoEq) (hValid : queryValid hNoEq lp hConst) :
-    ∃ S, isDefiniteSemantics hNoEq lp hConst hProlog S
 
 end programSemantics
 
@@ -895,47 +782,6 @@ theorem closedFunc_arg {L : Language}
     (hcl : Term.isClosed (Term.func f args))
     (i : Fin (L.funArity f)) :
     Term.isClosed (args i) 
-
-/-- Lemma 9.5.1 (helper): The homomorphism h : GroundTerm L -> A from
-    the Herbrand universe to an arbitrary model's domain, defined by
-    evaluating each ground term in the model. h(c) = interp(c) for
-    constants, h(f(t_1,...,t_n)) = f_A(h(t_1),...,h(t_n)) for
-    function applications. Here we represent the model's domain as
-    a type A, with interpretations for constants and functions. -/
-@[blueprint "chap9__lemma_9_5_1"]
-noncomputable def herbrandHomomorphism {L : Language}
-    (constInterp : L.constSymbols → α)
-    (funcInterp : (f : L.funSymbols) → (Fin (L.funArity f) → α) → α) :
-    GroundTerm L → α :=
-  fun gt => evalGroundTerm constInterp funcInterp gt.val gt.property
-where
-  evalGroundTerm {L : Language}
-      (ci : L.constSymbols → α)
-      (fi : (f : L.funSymbols) → (Fin (L.funArity f) → α) → α) :
-      (t : Term L) → Term.isClosed t → α
-    | .var v, hcl =>
-        -- Term.isClosed (Term.var v) is termFV (Term.var v) = ∅ = {v} = ∅
-        -- which is absurd since v ∈ {v}.
-        have hv : (termFV (Term.var v)) v := rfl
-        absurd hv (by rw [hcl]; exact id)
-    | .const c, _ => ci c
-    | .func f args, hcl => fi f (fun i =>
-        evalGroundTerm ci fi (args i) (closedFunc_arg hcl i))
-
-/-- Lemma 9.5.1 (helper): Construct a HerbrandStructure from an
-    arbitrary L-structure (represented by its interpretation functions)
-    and the homomorphism h, by defining
-    P_H(t_1,...,t_n) iff P_A(h(t_1),...,h(t_n)). -/
-@[blueprint "chap9__lemma_9_5_1"]
-noncomputable def herbrandModelFromArbitrary {L : Language} {hNoEq : L.withoutEquality}
-    (constI : L.constSymbols → α)
-    (funcI : (f : L.funSymbols) → (Fin (L.funArity f) → α) → α)
-    (predI : L.predSymbols → List α → Prop)
-    (hConst : Nonempty L.constSymbols) :
-    HerbrandStructure L hNoEq where
-  predInterp := fun P ts =>
-    predI P (ts.map (herbrandHomomorphism constI funcI))
-  hasConstant := hConst
 
 -- ===================================================================
 -- Lemma 9.5.1 (helper defs): NNF, universal-only, no-equality
@@ -1383,34 +1229,6 @@ inductive HanoiMoveRelation : Term exHanoiLang → Term exHanoiLang →
       HanoiMoveRelation spare destination source n out2 →
       HanoiAppendRelation out1 (hanoiCons (hanoiTo source destination) out2) output →
       HanoiMoveRelation source destination spare (hanoiSucc n) output
-
-/-- Free interpretation of the three predicates by Hanoi transfer and list
-    concatenation. hanoi fixes the source, destination and spare to a,b,c. -/
-@[blueprint "chap9__example_9_5_2"]
-def exHanoiMoveStructure : HerbrandStructure exHanoiLang rfl where
-  hasConstant := ⟨.zero⟩
-  predInterp := fun p args => match p, args with
-    | .hanoi, [n, output] =>
-        HanoiMoveRelation (hanoiConst .a) (hanoiConst .b) (hanoiConst .c) n.val output.val
-    | .move, [source, destination, spare, n, output] =>
-        HanoiMoveRelation source.val destination.val spare.val n.val output.val
-    | .append, [xs, ys, zs] => HanoiAppendRelation xs.val ys.val zs.val
-    | _, _ => False
-
-/-- The five-clause program has the recursive Hanoi move interpretation,
-    with the printed peg roles and the sole output coordinate Output = 0.
-    The three-disc query is the existing exHanoiQuery (OD-9-5, X-2). -/
-@[attach_debt, blueprint "chap9__example_9_5_2"]
-theorem exHanoiProgram_moveRelation :
-    (exHanoiProgram.outputVarList (show exHanoiLang.withoutEquality from rfl) = [0]) ∧
-    (∀ s c, c ∈ exHanoiProgram.prog →
-      FOHornClause.evalInHerbrand (show exHanoiLang.withoutEquality from rfl) exHanoiMoveStructure c s) ∧
-    (∀ source destination spare n output : GroundTerm exHanoiLang,
-      exHanoiMoveStructure.predInterp .move [source, destination, spare, n, output] ↔
-        HanoiMoveRelation source.val destination.val spare.val n.val output.val) ∧
-    (∀ n output : GroundTerm exHanoiLang,
-      exHanoiMoveStructure.predInterp .hanoi [n, output] ↔
-        HanoiMoveRelation (hanoiConst .a) (hanoiConst .b) (hanoiConst .c) n.val output.val)
 
 end LCS.SLD.LogicProgramming
 end

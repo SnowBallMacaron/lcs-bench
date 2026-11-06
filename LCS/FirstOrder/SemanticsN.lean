@@ -111,29 +111,6 @@ def formulaNoEq {L : Language} : FormulaN L → Prop
   | .all _ A => formulaNoEq A
   | .ex _ A => formulaNoEq A
 
--- retained: used by LCS.CutElim.Interpolation.KeyLemma, LCS.CutElim.Interpolation.QuantifierCases, LCS.FirstOrder.Completeness.InfiniteSearch, LCS.FirstOrder.Gentzen.Hintikka.Construction
-/-- formulaSubstN preserves formulaNoEq. Proof-body helper. -/
-theorem formulaSubstN_noEq {L : Language} (A : FormulaN L) (t : Term L) (x : Nat)
-    (h : formulaNoEq A) : formulaNoEq (formulaSubstN A t x) := by
--- BEGIN PROOF
-  induction A with
-  | predN _ _ => trivial
-  | eq_ _ _ _ => exact h.elim
-  | neg A ih => simp [formulaSubstN, formulaNoEq]; exact ih h
-  | conj A B ihA ihB => simp [formulaSubstN, formulaNoEq]; exact ⟨ihA h.1, ihB h.2⟩
-  | disj A B ihA ihB => simp [formulaSubstN, formulaNoEq]; exact ⟨ihA h.1, ihB h.2⟩
-  | impl A B ihA ihB => simp [formulaSubstN, formulaNoEq]; exact ⟨ihA h.1, ihB h.2⟩
-  | all y A ih =>
-    simp only [formulaSubstN]
-    split
-    · simp only [formulaNoEq]; exact ih h
-    · exact h
-  | ex y A ih =>
-    simp only [formulaSubstN]
-    split
-    · simp only [formulaNoEq]; exact ih h
-    · exact h
-
 /-- Theorem 5.5.1 (companion — N variant): A FormulaN is quantifier-free. -/
 @[blueprint "chap5__theorem_5_5_1"]
 def isQuantifierFree {L : Language} : FormulaN L → Prop

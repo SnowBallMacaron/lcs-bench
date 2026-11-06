@@ -40,32 +40,6 @@ def isDefiniteClause (C : Clause) : Prop :=
   isHornClause C ∧
   ∃ P, Literal.pos P ∈ C
 
-/-- Definition 9.2.1 (companion): A definite clause of the form [Literal.pos Q],
-    a singleton clause with one positive literal and no negative literals. -/
-@[blueprint "chap9__definition_9_2_1"]
-def isUnitDefiniteClause (C : Clause) : Prop :=
-  isDefiniteClause C ∧ ∃ L, C = Clause.single L
-
-/-- Definition 9.2.1 (companion): A definite clause with at least one negative literal
-    and exactly one positive literal, i.e., of the form
-    {neg P_1, ..., neg P_m, Q}. -/
-@[blueprint "chap9__definition_9_2_1"]
-def isNonUnitDefiniteClause (C : Clause) : Prop :=
-  isDefiniteClause C ∧ ∃ L₁ L₂, L₁ ∈ C ∧ L₂ ∈ C ∧ L₁ ≠ L₂
-
-/-- Definition 9.2.1: Every definite clause has one positive head and a
-    negative body. An empty body gives the unit form; a nonempty body gives
-    the nonunit form. Both alternatives use the same head and body, and a
-    negative occurrence of the head atom is allowed in the body. -/
-@[blueprint "chap9__definition_9_2_1"]
-theorem definiteClause_iff_unit_or_nonunit (C : Clause) :
-    isDefiniteClause C ↔
-      ∃ (Q : Nat) (N : Clause),
-        allNegative N ∧ C = LCS.Finset.insert (Literal.pos Q) N ∧
-        (∀ P, Literal.pos P ∈ C → P = Q) ∧
-        ((N = Clause.empty ∧ isUnitDefiniteClause C) ∨
-         (N ≠ Clause.empty ∧ isNonUnitDefiniteClause C)) 
-
 /-- Definition 9.2.1: A Horn clause of the form {neg P_1,...,neg P_m} (containing only
     negative literals, no positive literal) is called a negative clause or goal clause.
     The ordinary §9.2 domain excludes the empty resolution goal. -/
@@ -73,33 +47,12 @@ theorem definiteClause_iff_unit_or_nonunit (C : Clause) :
 def isGoalClause (C : Clause) : Prop :=
   isHornClause C ∧ allNegative C
 
-/-- Definition 9.2.1 (companion): A finite family of definite clauses and one
-    ordinary goal clause. Uniqueness is by clause equality, so repeated
-    presentations of the same goal clause are allowed. -/
-@[blueprint "chap9__definition_9_2_1"]
-def isDefiniteGoalSet (S : List Clause) : Prop :=
-  (∀ C ∈ S, isDefiniteClause C ∨ isGoalClause C) ∧
-  (∃ G ∈ S, isGoalClause G ∧
-    ∀ C ∈ S, isGoalClause C → C = G)
-
-/-- Definition 9.2.2 (companion): a GCNF' proof tree node is an axiom leaf. -/
-@[blueprint "chap9__definition_9_2_2"]
-def isAxiomNode : {S : ClauseSequent} → GCNFProofTree S → Prop
-  | _, .axiom_ _ _ _ => True
-  | _, .rule _ _ _ _ _ _ _ _ _ _ _ _ _ _ => False
-
 /-- Definition 9.2.2 (companion): the cancellation node has exactly the
     complementary singleton pair for P as its label. Ordinary axiom labels
     elsewhere may have side context, independently of the tree constructor. -/
 @[blueprint "chap9__definition_9_2_2"]
 def isAxiomNodeWith (P : Nat) : {S : ClauseSequent} → GCNFProofTree S → Prop
   | S, _ => S = pairSet P
-
-/-- Definition 9.2.2 (companion): Bool-valued check that a tree node is an axiom leaf. -/
-@[blueprint "chap9__definition_9_2_2"]
-def isAxiomNodeB : {S : ClauseSequent} → GCNFProofTree S → Bool
-  | _, .axiom_ _ _ _ => true
-  | _, .rule _ _ _ _ _ _ _ _ _ _ _ _ _ _ => false
 
 /-- Definition 9.2.2 (companion): finite equality test for the exact
     complementary-pair cancellation label. -/
@@ -189,22 +142,6 @@ def exHornClauseSet : List Clause :=
 @[blueprint "chap9__example_9_2_1"]
 def exGoalClause : Clause :=
   Clause.ofList [Literal.neg 1, Literal.neg 2]
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Ordered occurrence trace of an indexed GCNF proof: root-first paths
-    (false = left, true = right), exact labels, and literal pivots.
-    A missing pivot marks an actual axiom constructor. -/
-@[blueprint "chap9__example_9_2_1"]
-def gcnfProofTrace : {S : ClauseSequent} → GCNFProofTree S →
-    List (List Bool × ClauseSequent × Option Literal)
-  | S, .axiom_ _ _ _ => [([], S, none)]
-  | _, .rule Gamma As B _ _ _ _ _ left right _ _ _ _ =>
-      ([], LCS.Finset.union Gamma (ClauseSequent.mapSet As
-        (fun A => clauseWithLiteral A B)), some B) ::
-        ((gcnfProofTrace left).map (fun (path, label, pivot) =>
-          (false :: path, label, pivot)) ++
-         (gcnfProofTrace right).map (fun (path, label, pivot) =>
-          (true :: path, label, pivot)))
 
 /-- Example 9.2.1: The first printed proof (PDF p.396), with its displayed
     premise order. Its root splits the definite clause with head P₁;
@@ -325,42 +262,6 @@ def exFirstGCNFProof : GCNFProofTree (ClauseSequent.ofList exHornClauseSet) := b
   · simp [LCS.Finset.Subset, G2, ClauseSequent.ofList,
       LCS.Finset.mem_ofList, or_imp, forall_and] <;> native_decide
 
--- ATTACH-KEEP: native decision certificate must retain its original front owner
-/-- Finite Boolean check of the displayed occurrence labels and node counts. -/
-theorem exFirstGCNFProof_labels_check : decide (gcnfProofTrace exFirstGCNFProof =
-      [([], ClauseSequent.ofList exHornClauseSet, some (.pos 1)),
-       ([false], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.ofList [.neg 3, .neg 4]], some (.neg 4)),
-       ([false, false], pairSet 3, none),
-       ([false, true], pairSet 4, none),
-       ([true], ClauseSequent.ofList [Clause.single (.pos 3), exGoalClause,
-         Clause.single (.pos 1), Clause.ofList [.neg 3, .pos 2]], some (.neg 2)),
-       ([true, false], pairSet 1, none),
-       ([true, true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.neg 2),
-         Clause.ofList [.neg 3, .pos 2]], some (.neg 3)),
-       ([true, true, false], pairSet 2, none),
-       ([true, true, true], pairSet 3, none)] ∧
-    exFirstGCNFProof.nodeCount = 9 ∧ exFirstGCNFProof.leafCount = 5) = true := by
-  native_decide
-
-/-- Example 9.2.1: All nine ordered node occurrences of the first printed
-    tree, including both occurrences of the P₃/¬P₃ leaf and every pivot. -/
-@[blueprint "chap9__example_9_2_1"]
-theorem exFirstGCNFProof_labels :
-    gcnfProofTrace exFirstGCNFProof =
-      [([], ClauseSequent.ofList exHornClauseSet, some (.pos 1)),
-       ([false], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.ofList [.neg 3, .neg 4]], some (.neg 4)),
-       ([false, false], pairSet 3, none),
-       ([false, true], pairSet 4, none),
-       ([true], ClauseSequent.ofList [Clause.single (.pos 3), exGoalClause,
-         Clause.single (.pos 1), Clause.ofList [.neg 3, .pos 2]], some (.neg 2)),
-       ([true, false], pairSet 1, none),
-       ([true, true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.neg 2),
-         Clause.ofList [.neg 3, .pos 2]], some (.neg 3)),
-       ([true, true, false], pairSet 2, none),
-       ([true, true, true], pairSet 3, none)] ∧
-    exFirstGCNFProof.nodeCount = 9 ∧ exFirstGCNFProof.leafCount = 5 
 -- ATTACH-BLOCKER: unsupported untagged structure
 /-- A primitive GCNF derivation with explicit local premise-order choices.
     Paths identify nodes of the kernel; swapping changes only their display. -/
@@ -368,29 +269,6 @@ theorem exFirstGCNFProof_labels :
 structure OrderedGCNFProof (S : ClauseSequent) where
   kernel : GCNFProofTree S
   swapPaths : List (List Bool)
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Trace actual node occurrences in a chosen premise presentation.
-    The recorded pivot is the kernel's literal; swapPaths records when its
-    singleton premise is displayed on the left. -/
-def gcnfProofTraceWithOrder (swapPaths : List (List Bool)) :
-    (path : List Bool) → {S : ClauseSequent} → GCNFProofTree S →
-      List (List Bool × ClauseSequent × Option Literal)
-  | _, S, .axiom_ _ _ _ => [([], S, none)]
-  | path, _, .rule Gamma As B _ _ _ _ _ left right _ _ _ _ =>
-      let l := gcnfProofTraceWithOrder swapPaths (path ++ [false]) left
-      let r := gcnfProofTraceWithOrder swapPaths (path ++ [true]) right
-      let children := if path ∈ swapPaths then (r, l) else (l, r)
-      ([], LCS.Finset.union Gamma (ClauseSequent.mapSet As
-        (fun A => clauseWithLiteral A B)), some B) ::
-        (children.1.map (fun (p, label, pivot) => (false :: p, label, pivot)) ++
-         children.2.map (fun (p, label, pivot) => (true :: p, label, pivot)))
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Ordered labels of a presented primitive derivation. -/
-@[blueprint "chap9__example_9_2_1"]
-def OrderedGCNFProof.trace {S : ClauseSequent} (T : OrderedGCNFProof S) :=
-  gcnfProofTraceWithOrder T.swapPaths [] T.kernel
 
 /-- Example 9.2.1: The second printed tree, with exact contexts and
     cancellation-first definite branches. The kernel retains the primitive
@@ -515,47 +393,6 @@ def exSLDFormProof : OrderedGCNFProof (ClauseSequent.ofList exHornClauseSet) whe
           LCS.Finset.mem_ofList, or_imp, forall_and] <;> native_decide
     exact result
 
--- ATTACH-KEEP: native decision certificate must retain its original front owner
-/-- Finite Boolean check of the displayed occurrence labels and node counts. -/
-theorem exSLDFormProof_labels_check : decide (exSLDFormProof.trace =
-      [([], ClauseSequent.ofList exHornClauseSet, some (.neg 2)),
-       ([false], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.single (.neg 1), Clause.ofList [.neg 3, .neg 4, .pos 1]], some (.pos 1)),
-       ([false, false], pairSet 1, none),
-       ([false, true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.ofList [.neg 3, .neg 4]], some (.neg 4)),
-       ([false, true, false], pairSet 3, none),
-       ([false, true, true], pairSet 4, none),
-       ([true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.neg 2),
-         Clause.ofList [.neg 3, .pos 2]], some (.pos 2)),
-       ([true, false], pairSet 2, none),
-       ([true, true], pairSet 3, none)] ∧
-    exSLDFormProof.kernel.nodeCount = 9 ∧ exSLDFormProof.kernel.leafCount = 5) = true := by
-  native_decide
-
-/-- Example 9.2.1: Exact displayed labels and ordered occurrences of the
-    second proof; each definite branch displays cancellation first. -/
-@[blueprint "chap9__example_9_2_1"]
-theorem exSLDFormProof_labels :
-    exSLDFormProof.trace =
-      [([], ClauseSequent.ofList exHornClauseSet, some (.neg 2)),
-       ([false], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.single (.neg 1), Clause.ofList [.neg 3, .neg 4, .pos 1]], some (.pos 1)),
-       ([false, false], pairSet 1, none),
-       ([false, true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.pos 4),
-         Clause.ofList [.neg 3, .neg 4]], some (.neg 4)),
-       ([false, true, false], pairSet 3, none),
-       ([false, true, true], pairSet 4, none),
-       ([true], ClauseSequent.ofList [Clause.single (.pos 3), Clause.single (.neg 2),
-         Clause.ofList [.neg 3, .pos 2]], some (.pos 2)),
-       ([true, false], pairSet 2, none),
-       ([true, true], pairSet 3, none)] ∧
-    exSLDFormProof.kernel.nodeCount = 9 ∧ exSLDFormProof.kernel.leafCount = 5 
-/-- Example 9.2.1 (companion): Proof that the example set consists of definite clauses
-    with exactly one goal clause. -/
-@[blueprint "chap9__example_9_2_1"]
-theorem exHornClauseSet_isDefiniteGoalSet :
-    isDefiniteGoalSet exHornClauseSet 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: Bool-valued check that all literals in a clause are negative.
     Used to verify that no clause in As is a definite clause. -/

@@ -114,12 +114,6 @@ end LCS.Herbrand.SharpenedHauptsatz.Permutability
 
 namespace LCS.Herbrand.SharpenedHauptsatz.Permutability.AnyFOLKStep
 
-/-- Definition 7.3.2 (companion def): Returns True for rules with exactly one premise: all one-premise constructors. The wrapping of indexed rules via `AnyFOLKStep.one` makes this trivial. -/
-@[blueprint "chap7__definition_7_3_2"]
-def isOnePremise {L : Language} : AnyFOLKStep L → Prop
-  | .one _ => True
-  | .two _ => False
-
 /-- Definition 7.3.2 (companion def): Structural classification at the `AnyFOLKStep` level, delegating to the step-specific `isStructural` predicates. -/
 @[blueprint "chap7__definition_7_3_2"]
 def isStructural {L : Language} : AnyFOLKStep L → Prop
@@ -253,12 +247,6 @@ def AnyFOLKStep.schemaKind {L : Language} : AnyFOLKStep L → Nat
 def isDescendantOfPremise {L : Language} {s : Sequent L} {T : FOLKProofTree s}
     (R₁ R₂ : LKInferenceOccurrence T) : Prop :=
   premiseAddressDescendant R₁.address R₂.address
-
-/-- Definition 7.3.2 (companion): The selected upper occurrence is not in any premise subtree of the selected lower occurrence. A nonstructural intermediate does not erase ancestry. -/
-@[blueprint "chap7__definition_7_3_2"]
-def notDescendantOfPremise {L : Language} {s : Sequent L} {T : FOLKProofTree s}
-    (R₁ R₂ : LKInferenceOccurrence T) : Prop :=
-  ¬ isDescendantOfPremise R₁ R₂
 
 /-- Definition 7.3.2 (companion): The selected upper inference lies above the selected lower inference, with only structural rules strictly between their addresses. Off-path branches are unrestricted. -/
 @[blueprint "chap7__definition_7_3_2"]
@@ -447,12 +435,6 @@ def CanPermuteWith {L : Language} {s : Sequent L} {T : FOLKProofTree s}
 def isDescendantOfPremiseLKe {L : Language} {s : Sequent L} {T : LKeProofTree s}
     (R₁ R₂ : LKeInferenceOccurrence T) : Prop :=
   premiseAddressDescendant R₁.address R₂.address
-
-/-- Definition 7.3.2 (companion): The selected upper occurrence is not in any premise subtree of the selected lower occurrence. A nonstructural intermediate does not erase ancestry. -/
-@[blueprint "chap7__definition_7_3_2"]
-def notDescendantOfPremiseLKe {L : Language} {s : Sequent L} {T : LKeProofTree s}
-    (R₁ R₂ : LKeInferenceOccurrence T) : Prop :=
-  ¬ isDescendantOfPremiseLKe R₁ R₂
 
 /-- Definition 7.3.2 (companion): The selected upper inference lies above the selected lower inference, with only structural rules strictly between their addresses. Off-path branches are unrestricted. -/
 @[blueprint "chap7__definition_7_3_2"]
@@ -927,121 +909,6 @@ def LKeProofTree.hasOnlyAtomicCuts {L : Language} :
     LKeProofTree.hasOnlyAtomicCuts left ∧ LKeProofTree.hasOnlyAtomicCuts right
 
 -- ===================================================================
--- Lemma 7.3.3 (part i, logical): permutability_quantifier_with_logical
--- ===================================================================
-
-/-- Lemma 7.3.3(i): In a pure, cut-free LK proof over an equality-free language, a selected quantifier inference permutes with a selected logical inference under the syntactic principal/side-formula proviso. -/
-theorem permutability_quantifier_with_logical
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    (hcf : T.isCutFree)
-    (hq : R₁.rule.isQuantifier)
-    (hlog : R₂.rule.isLogical)
-    (hprov : principalNotSideOf R₁.rule R₂.rule) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
--- Lemma 7.3.3 (part i, structural): permutability_quantifier_with_structural
--- ===================================================================
-
-/-- Lemma 7.3.3(i): The structural-rule case for selected occurrences in a pure, cut-free equality-free LK proof. -/
-theorem permutability_quantifier_with_structural
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    (hcf : T.isCutFree)
-    (hq : R₁.rule.isQuantifier)
-    (hstr : R₂.rule.isStructural)
-    (hprov : principalNotSideOf R₁.rule R₂.rule) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
--- Lemma 7.3.3 (part i, cut): permutability_quantifier_with_cut
--- ===================================================================
-
-/-- Lemma 7.3.3(i), atomic-cut generalization: In a pure equality-free LK proof whose cuts are all atomic, a selected quantifier inference permutes with a selected cut under the principal/side-formula proviso. -/
-theorem permutability_quantifier_with_cut
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    /- STANDING ASSUMPTION #24 (§6.4.6): only atomic cuts are
-       inessential. In the pure-variable LKe setting of Lem 7.3.3,
-       T has no essential cuts, i.e., every cut formula is atomic. -/
-    (hatomic : FOLKProofTree.hasOnlyAtomicCuts T)
-    (hq : R₁.rule.isQuantifier)
-    (hcut : R₂.rule.isCut)
-    (hprov : principalNotSideOf R₁.rule R₂.rule) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
--- Lemma 7.3.3 (part ii, quantifier): permutability_quantifier_with_weakening
--- ===================================================================
-
-/-- Lemma 7.3.3(ii): A selected quantifier inference permutes with the weakening immediately below it in a pure, cut-free equality-free LK proof. Adjacency is equality of the selected node address with the weakening premise address. -/
-theorem permutability_quantifier_with_weakening
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    (hcf : T.isCutFree)
-    (hq : R₁.rule.isQuantifier)
-    (hwk : R₂.rule.isWeakening)
-    /- Part (ii) textbook positional constraint: R₂'s premise IS the
-       conclusion of R_1. -/
-    (hadj : R₁.immediatelyAbove R₂) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
--- Lemma 7.3.3 (part ii, contraction): permutability_contraction_with_weakening
--- ===================================================================
-
-/-- Lemma 7.3.3(ii): The contraction/weakening case uses literal node adjacency in a pure, cut-free equality-free LK proof. -/
-theorem permutability_contraction_with_weakening
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    (hcf : T.isCutFree)
-    (hcon : R₁.rule.isContraction)
-    (hwk : R₂.rule.isWeakening)
-    /- Part (ii) textbook positional constraint. -/
-    (hadj : R₁.immediatelyAbove R₂) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
--- Lemma 7.3.3 (part ii, exchange): permutability_exchange_with_weakening
--- ===================================================================
-
-/-- Lemma 7.3.3(ii): The exchange/weakening case uses literal node adjacency in a pure, cut-free equality-free LK proof. -/
-theorem permutability_exchange_with_weakening
-    {L : Language} (_hL : L.withoutEquality) {s : Sequent L} (T : FOLKProofTree s)
-    (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T)
-    (hcf : T.isCutFree)
-    (hexch : R₁.rule.isExchange)
-    (hwk : R₂.rule.isWeakening)
-    /- Part (ii) textbook positional constraint. -/
-    (hadj : R₁.immediatelyAbove R₂) :
-    CanPermuteWith R₁ R₂ := by
--- BEGIN PROOF
-  -- REPAIR(T7-40): proof pending
-  sorry
-
--- ===================================================================
 -- Lemma 7.3.3: permutability_quantifier_with_rule
 -- ===================================================================
 
@@ -1092,51 +959,5 @@ theorem permutability_quantifier_with_rule_LKe
 inductive QuantifierInferenceKind where
   | allRight | exLeft | allLeft | exRight
   deriving DecidableEq
-
-/-- Lemma 7.3.3 (companion): Identify the named quantifier schema of an indexed inference; nonquantifier inferences return none. -/
-@[blueprint "chap7__lemma_7_3_3"]
-def AnyFOLKStep.quantifierKind {L : Language} : AnyFOLKStep L → Option QuantifierInferenceKind
-  | .one rule => match rule with
-    | .allRight .. => some .allRight
-    | .exLeft .. => some .exLeft
-    | .allLeft .. => some .allLeft
-    | .exRight .. => some .exRight
-    | _ => none
-  | .two _ => none
-
-/-- Lemma 7.3.3 (companion): The eight ordered pairs in the source remark: the two eigenvariable rules exchange with each other; each goes over either instantiating rule; and the two instantiating rules exchange with each other. -/
-@[blueprint "chap7__lemma_7_3_3"]
-def quantifierPermutationDirection : QuantifierInferenceKind → QuantifierInferenceKind → Bool
-  | .allRight, .exLeft | .exLeft, .allRight => true
-  | .allRight, .allLeft | .allRight, .exRight => true
-  | .exLeft, .allLeft | .exLeft, .exRight => true
-  | .allLeft, .exRight | .exRight, .allLeft => true
-  | _, _ => false
-
-/-- Lemma 7.3.3 (companion): The source-directed quantifier pair condition on the actual selected inference schemas. -/
-@[blueprint "chap7__lemma_7_3_3"]
-def directedQuantifierPair {L : Language} (R₁ R₂ : AnyFOLKStep L) : Prop :=
-  match R₁.quantifierKind, R₂.quantifierKind with
-  | some k₁, some k₂ => quantifierPermutationDirection k₁ k₂ = true
-  | _, _ => False
-
-
-
-/-- Lemma 7.3.3 (companion): Directed quantifier-permutation remark in equality-free LK. It inherits purity, cut-freeness, the local structural-intermediate setup in CanPermuteWith, and the syntactic principal/side-formula proviso. -/
-@[blueprint "chap7__lemma_7_3_3"]
-theorem permutability_directed_quantifiers {L : Language} (hL : L.withoutEquality)
-    {s : Sequent L} (T : FOLKProofTree s) (R₁ R₂ : LKInferenceOccurrence T)
-    (hpure : IsPureVariableProofLK T) (hcf : T.isCutFree)
-    (hpair : directedQuantifierPair R₁.rule R₂.rule)
-    (hside : principalNotSideOf R₁.rule R₂.rule) : CanPermuteWith R₁ R₂ 
-
-/-- Lemma 7.3.3 (companion): Directed quantifier-permutation remark in LKₑ. It inherits purity, absence of essential cuts, the selected local-boundary setup, and the syntactic principal/side-formula proviso. -/
-@[blueprint "chap7__lemma_7_3_3"]
-theorem permutability_directed_quantifiers_LKe {L : Language} (hL : L.hasEquality = true)
-    {s : Sequent L} (T : LKeProofTree s) (R₁ R₂ : LKeInferenceOccurrence T)
-    (hpure : IsPureVariableProofLKe T) (hatomic : LKeProofTree.hasOnlyAtomicCuts T)
-    (hpair : directedQuantifierPair R₁.rule R₂.rule)
-    (hside : principalNotSideOf R₁.rule R₂.rule) : CanPermuteWithLKe R₁ R₂ 
-
 
 end LCS.Herbrand.SharpenedHauptsatz.Permutability

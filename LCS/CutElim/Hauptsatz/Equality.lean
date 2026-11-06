@@ -3,8 +3,8 @@ import LCS.Util
 import LCS.CutElim.Hauptsatz
 import LCS.CutElim.Hauptsatz.CutElimination
 import LCS.FirstOrder.Semantics
-import LCS.CutElim.Hauptsatz.Equality.Part1
-import LCS.CutElim.Hauptsatz.Equality.Part2
+import LCS.CutElim.Hauptsatz.Equality.SystemG1nnfEq
+import LCS.CutElim.Hauptsatz.Equality.CutElimination
 
 /-! # CutElim.Hauptsatz.Equality
     Formalization of Chapter 6, Sections 4.5-4.6.

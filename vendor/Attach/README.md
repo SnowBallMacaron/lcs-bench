@@ -205,13 +205,6 @@ This fixes the cross-file UTF-8 boundary panic in diagnostic suggestions.
 Sources above were copied from committed blobs, excluding later uncommitted
 prototype development.
 
-Topic fronts created by the module splitter may use
-`attach_helper_namespace Parent.Unit.Proofs` after imports. The namespace must
-be an ancestor unit's reserved `Proofs` namespace. This persistent mapping keeps
-helper declarations and scoped simp entries under their original names when a
-front/proof unit is divided into topic units; standalone checks recover it from
-the compiled owner module. Proof files retain the existing restricted grammar.
-
 The current automated smoke fixture is
 `tests/fixtures/attach_split/AttachSmoke.lean`. The writer integration test
 registers it through `attached_units.txt` and checks proof edits, selective

@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.ManySorted : UInt64 := 7997727374982375383
+def AttachStamp.LCS.FirstOrder.ManySorted : UInt64 := 8654201107746338670

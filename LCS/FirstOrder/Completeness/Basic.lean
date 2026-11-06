@@ -35,47 +35,9 @@ structure SearchState (L : Language) : Type 1 where
   /-- NUMACT: counter of activated new variables -/
   numact : Nat
 
-namespace SearchState
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- A sequent is an axiom, or every formula on either side is atomic or
-belongs to every formula record in the state. -/
-def isFinishedLeaf {L : Language} (st : SearchState L)
-    (seq : Sequent L) : Prop :=
-  isAxiom seq ∨
-  ((∀ A ∈ seq.antecedent,
-    A.isAtomic ∨
-    (∀ rec ∈ st.term0, A ∈ rec.2)) ∧
-   (∀ B ∈ seq.succedent,
-    B.isAtomic ∨
-    (∀ rec ∈ st.term0, B ∈ rec.2)))
-
-end SearchState
-
--- ===================================================================
--- Per-formula free/bound condition: noFreeOccursBound
--- ===================================================================
-
--- retained: used by LCS.FirstOrder.Completeness, LCS.FirstOrder.Equality.Completeness.Part1, LCS.FirstOrder.Equality.Completeness.Part2
-/-- Per-formula condition, used by chapter 6 statements pending E-CUTFB repair.
-Each formula separately has disjoint sets of free and bound variables. -/
-def noFreeOccursBound {L : Language} (seq : Sequent L) : Prop :=
-  ∀ A ∈ (seq.antecedent ++ seq.succedent),
-    ∀ x : Nat, ¬(x ∈ formulaFVN A ∧ x ∈ formulaBVN A)
-
 -- ===================================================================
 -- Theorem 5.5.1 (companion def): isFiniteSubsequent
 -- ===================================================================
-
-/-- Theorem 5.5.1 (companion): seq' is a finite subsequent of seq iff
-seq'.antecedent is a sublist of seq.antecedent and seq'.succedent is a
-sublist of seq.succedent. Used in the completeness theorem: a valid
-sequent yields a proof tree for a finite subsequent of the input. -/
-@[blueprint "chap5__theorem_5_5_1"]
-def isFiniteSubsequent {L : Language}
-    (seq' seq : Sequent L) : Prop :=
-  seq'.antecedent.Sublist seq.antecedent ∧
-  seq'.succedent.Sublist seq.succedent
 
 /-- Theorem 5.5.1 (finite subsequence): A finite list occurs in an ordered
 possibly infinite sequence at strictly increasing positions. -/
@@ -92,22 +54,6 @@ def IsFiniteSubsequentInf {L : Language} (s : Sequent L) (q : InfSequentN L) : P
   IsFiniteSubsequenceN s.antecedent q.antecedent ∧
     IsFiniteSubsequenceN s.succedent q.succedent
 
-/-- Theorem 5.5.1, using Definition 3.5.2: A possibly infinite sequent is
-provable when a finite subsequent has a G-proof under the §5.4.8 convention. -/
-@[blueprint "chap5__theorem_5_5_1"]
-def infSequentProvable {L : Language} (q : InfSequentN L) : Prop :=
-  ∃ s : Sequent L, IsFiniteSubsequentInf s q ∧ sequentProvableExt s
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- A finite sequent is a finite subsequent of its infinite-sequence embedding. -/
-theorem IsFiniteSubsequentInf.ofSequent {L : Language} (s : Sequent L) :
-    IsFiniteSubsequentInf s (InfSequentN.ofSequent s) := by
-  constructor
-  · exact ⟨fun i => i.val, fun _ _ h => h,
-      fun i => List.getElem?_eq_some_iff.mpr ⟨i.isLt, rfl⟩⟩
-  · exact ⟨fun i => i.val, fun _ _ h => h,
-      fun i => List.getElem?_eq_some_iff.mpr ⟨i.isLt, rfl⟩⟩
-
 -- retained: used by LCS.FirstOrder.Completeness.Search.Part2
 /-- Finite embedding preserves the sequent-wide free/bound convention. -/
 theorem crossNoFreeBoundInf_ofSequent_iff {L : Language} (s : Sequent L) :
@@ -115,20 +61,6 @@ theorem crossNoFreeBoundInf_ofSequent_iff {L : Language} (s : Sequent L) :
   simp only [crossNoFreeBoundInf, crossNoFreeBound,
     InfSequentN.memAntecedent_ofSequent, InfSequentN.memSuccedent_ofSequent,
     List.mem_append]
-
--- ===================================================================
--- searchHalts (infrastructure for future proving)
--- ===================================================================
-
--- retained: used by LCS.FirstOrder.Completeness
-/-- An existential condition on arbitrary bounded lists of sequents:
-each member is an axiom or satisfies the formula-record condition for some state. -/
-def searchHalts {L : Language} (_seq : Sequent L) : Prop :=
-  ∃ (n : Nat), ∀ (leaves : List (Sequent L)),
-    leaves.length ≤ n →
-    ∀ leaf ∈ leaves,
-      isAxiom leaf ∨
-      ∃ (st : SearchState L), SearchState.isFinishedLeaf st leaf
 
 -- ===================================================================
 -- Theorem 5.5.1 (companion def): searchHaltsConcrete
@@ -465,17 +397,6 @@ theorem exCounterInterpWith_falsifies
     (as : Assignment (exCounterInterpWith p q)) :
     ¬ formulaEvalN (exCounterInterpWith p q) exFormulaPQa as ∧
       sequentFalsifiableIn (exCounterInterpWith p q) (Sequent.mk [] [exFormulaPQa]) 
-
--- ===================================================================
--- Theorem 5.5.1 (companion): sequentQuantifierFree
--- ===================================================================
-
-/-- Theorem 5.5.1 (companion): A sequent is quantifier-free if all
-formulae in the antecedent and succedent are quantifier-free. -/
-@[blueprint "chap5__theorem_5_5_1"]
-def sequentQuantifierFree {L : Language} (seq : Sequent L) : Prop :=
-  (∀ A ∈ seq.antecedent, isQuantifierFree A) ∧
-  (∀ B ∈ seq.succedent, isQuantifierFree B)
 
 -- ===================================================================
 -- sequentFalsifiable: Falsifiability for Sequent

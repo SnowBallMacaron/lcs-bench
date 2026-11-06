@@ -1,12 +1,8 @@
-import LCS.Item
-import LCS.CutElim.Hauptsatz
-import LCS.Util
-import LCS.FirstOrder.Semantics.Subformulae
-import LCS.Herbrand.PrenexForm
-import LCS.Herbrand.SharpenedHauptsatz.Theorem
-import LCS.CutElim.Interpolation.Equality
-import LCS.Herbrand.HerbrandTheorem.Part1
-import LCS.Herbrand.HerbrandTheorem.Part2
+import LCS.Herbrand.HerbrandTheorem.Preliminaries
+import LCS.Herbrand.HerbrandTheorem.SkolemFunctions
+import LCS.Herbrand.HerbrandTheorem.SkolemExamples
+import LCS.Herbrand.HerbrandTheorem.Substitutions
+import LCS.Herbrand.HerbrandTheorem.SigmaMatrix
 
 /-! # Herbrand.HerbrandTheorem
     Formalization of Chapter 7, Sections 5.1-5.3: Preliminaries,
@@ -16,50 +12,16 @@ import LCS.Herbrand.HerbrandTheorem.Part2
     Definitions 7.5.1-7.5.4 (Skolem functions, functional form,
     substitutions, sigma-matrix), and Examples 7.5.1-7.5.2.
 
+    Content modules, in book order:
+    - `Preliminaries`: Section 7.5.1, Lemma 7.5.1 and the reduction to one sentence.
+    - `SkolemFunctions`: Section 7.5.2, Definitions 7.5.1-7.5.2.
+    - `SkolemExamples`: Section 7.5.2, Examples 7.5.1-7.5.2.
+    - `Substitutions`: Section 7.5.3, Definition 7.5.3.
+    - `SigmaMatrix`: Definition 7.5.4 (sigma-matrix of the functional form).
+
     Source: Logic for Computer Science, Gallier 2015
 -/
 
 namespace LCS.Herbrand.HerbrandTheorem
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.Herbrand.PrenexForm
-open LCS.Herbrand.SharpenedHauptsatz.Theorem
-open LCS.CutElim.LK
-open LCS.CutElim.LKe.Equivalence
-open LCS.FirstOrder.Gentzen
-open LCS.CutElim.Interpolation.Equality
-
-
-namespace LKAlteredDiagram
-
-
-end LKAlteredDiagram
-
-
--- ===================================================================
--- Definition 7.5.3 (companion def): Substitution.applyTerm
--- ===================================================================
-
-namespace Substitution
-
-
-end Substitution
-
-
-section ValidityDuality
-
-open LCS.FirstOrder.SemanticsN
-
-
-end ValidityDuality
-
--- ===================================================================
--- Theorem 7.5.1 (required helper): sigmaMatrix_eq_original
--- ===================================================================
-
 
 end LCS.Herbrand.HerbrandTheorem

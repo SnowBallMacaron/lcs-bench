@@ -142,7 +142,6 @@ sort-tagged quantifiers `MSFormula.all s i` / `MSFormula.ex s i`.
     sort `s` that is free for `x_i^s` in `B`, as in Definition 5.3.9.
     A sort-equality decision is used only to form the substitution
     instance; it is not a parameter of the subformula relation. -/
-@[blueprint "chap10__definition_10_3_5" (main := true)]
 inductive MSIsSubformula {L : MSLanguage} :
     MSFormula L → MSFormula L → Prop where
   /-- Reflexivity: every formula is a subformula of itself; covers the
@@ -290,16 +289,6 @@ def varMeaning {L : MSLanguage} (M : MSStructure L) (s : L.SortType)
     (i : Nat) : MSSemTerm M s :=
   fun v => v s i
 
-/-- Definition 10.3.4 (companion): The assignment homomorphism
-`φ : V → 𝓜` sending each variable `x_i^s` to its meaning `x_𝓜`. Named
-separately from `varMeaning` to make `φ` explicit; `φ-hat`
-(`msTermEval`/`msFormulaEval` below) is its unique extension to terms
-and formulae (free generation, Theorem 10.2.1). -/
-@[blueprint "chap10__definition_10_3_4"]
-def phiMap {L : MSLanguage} (M : MSStructure L) (s : L.SortType)
-    (i : Nat) : MSSemTerm M s :=
-  varMeaning M s i
-
 -- ===================================================================
 -- Definition 10.3.3: Quantifier semantic functions (A_i^s)_M, (E_i^s)_M
 -- ===================================================================
@@ -309,7 +298,7 @@ def phiMap {L : MSLanguage} (M : MSStructure L) (s : L.SortType)
 `f(v[x_i := a]) = T` for all `a ∈ M_s` (equivalently, `= F` iff
 `f(v[x_i := a]) = F` for some `a`). The `∀` over `M.carrier s` is a
 `Prop` decided classically, so this is `noncomputable`. -/
-@[blueprint "chap10__definition_10_3_3"]
+@[blueprint "chap10__definition_10_3_3" (main := true)]
 noncomputable def forallM {L : MSLanguage} (M : MSStructure L)
     {s : L.SortType} (i : Nat) (f : MSSemBool M) : MSSemBool M :=
   fun v =>
@@ -350,7 +339,7 @@ is literally the value of the unique homomorphism `φ-hat` (extending
 `φ = phiMap`) at the term — and `noncomputable` because `msFormulaEval`
 (below) uses it alongside the classically-decided quantifier/equality
 clauses. -/
-@[blueprint "chap10__definition_10_3_3"]
+@[blueprint "chap10__definition_10_3_5" (main := true)]
 noncomputable def msTermEval {L : MSLanguage} (M : MSStructure L)
     (v : MSAssignment M) : {s : L.SortType} → MSTerm L s → M.carrier s
   | _, .var s i   => varMeaning M s i v
@@ -380,7 +369,7 @@ Nonatomic clauses (lifted operations of `𝓜`):
 Both `msTermEval` and `msFormulaEval` are the unique homomorphism
 `φ-hat` (terms before formulae); `noncomputable` because of `forallM`/
 `existsM` and the equality test. -/
-@[blueprint "chap10__definition_10_3_3" (main := true)]
+@[blueprint "chap10__definition_10_3_6" (main := true)]
 noncomputable def msFormulaEval {L : MSLanguage} (M : MSStructure L) :
     MSFormula L → MSSemBool M
   | .falsum         => fun _ => BoolVal.F
@@ -403,7 +392,6 @@ noncomputable def msFormulaEval {L : MSLanguage} (M : MSStructure L) :
 -- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- A structural formula address: 0 selects a unary body or a binary
 left operand; 1 selects a binary right operand. The root address is `[]`. -/
-@[blueprint "chap10__definition_10_3_6"]
 abbrev MSFormulaPosition := List Nat
 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
@@ -423,7 +411,6 @@ def msSubformulaAt {L : MSLanguage} :
 /-- A variable occurrence is either a quantifier's binder position or a
 variable inside an atomic argument. Atomic and function arguments use
 zero-based indices; equality has arguments 0 and 1. -/
-@[blueprint "chap10__definition_10_3_6"]
 inductive MSVariableOccurrence where
   | atom (formulaPos : MSFormulaPosition) (argument : Nat) (termPos : List Nat)
   | binder (formulaPos : MSFormulaPosition)
@@ -468,69 +455,5 @@ def msVariableAt {L : MSLanguage} (A : MSFormula L)
           | 1 => msTermVariableAt u termPos
           | _ => none
       | _ => none
-
-/-- Definition 10.3.6 (companion): The quantifier at `qpos` binds an
-occurrence of its sort/index variable anywhere in the subformula it heads,
-including its own binder and matching occurrences under inner quantifiers.
-The occurrence's formula address must extend `qpos`. This is the headed-
-subformula reading of Definition 5.3.10: vacuous binders count, and an inner
-quantifier may bind the same occurrence as an outer quantifier. -/
-@[blueprint "chap10__definition_10_3_6"]
-def msQuantifierBinds {L : MSLanguage} (A : MSFormula L)
-    (qpos : MSFormulaPosition) (occ : MSVariableOccurrence) : Prop :=
-  match msSubformulaAt A qpos with
-  | some (.all s i _) | some (.ex s i _) =>
-      msVariableAt A occ = some (s, i) ∧
-      ∃ rest : MSFormulaPosition, occ.formulaPos = qpos ++ rest
-  | _ => False
-
-/-- Definition 10.3.6 (companion): Condition (i) of rectified — the free-
-and bound-variable sets `FV(A)` and `BV(A)` (the §10.2 functions
-`msFormulaFV`/`msFormulaBV`, returning sets of `(sort, index)` pairs) are
-disjoint. -/
-@[blueprint "chap10__definition_10_3_6"]
-def msBoundVarsFresh {L : MSLanguage} (A : MSFormula L) : Prop :=
-  ∀ x : MSVar L, ¬ (x ∈ msFormulaFV A ∧ x ∈ msFormulaBV A)
-
-/-- Definition 10.3.6 (companion): Condition (ii) of rectified — distinct
-quantifier occurrences in `A` bind distinct `(sort, index)` variables.
-Defined recursively: atomic formulae are vacuously fine; a binary
-connective requires both operands fine and `BV` of the two operands
-disjoint; a quantifier `∀_s x_i / ∃_s x_i` requires the body fine and
-the bound variable `(s, i)` not bound again inside the body
-(`(s, i) ∉ BV(A)`). -/
-@[blueprint "chap10__definition_10_3_6"]
-def msDistinctQuantifierBindings {L : MSLanguage} :
-    MSFormula L → Prop
-  | .falsum     => True
-  | .pred _ _   => True
-  | .eq_ _ _ _ _ => True
-  | .neg A      => msDistinctQuantifierBindings A
-  | .conj A B   =>
-    msDistinctQuantifierBindings A ∧ msDistinctQuantifierBindings B ∧
-    (∀ x : MSVar L, ¬ (x ∈ msFormulaBV A ∧ x ∈ msFormulaBV B))
-  | .disj A B   =>
-    msDistinctQuantifierBindings A ∧ msDistinctQuantifierBindings B ∧
-    (∀ x : MSVar L, ¬ (x ∈ msFormulaBV A ∧ x ∈ msFormulaBV B))
-  | .impl A B   =>
-    msDistinctQuantifierBindings A ∧ msDistinctQuantifierBindings B ∧
-    (∀ x : MSVar L, ¬ (x ∈ msFormulaBV A ∧ x ∈ msFormulaBV B))
-  | .equiv_ A B =>
-    msDistinctQuantifierBindings A ∧ msDistinctQuantifierBindings B ∧
-    (∀ x : MSVar L, ¬ (x ∈ msFormulaBV A ∧ x ∈ msFormulaBV B))
-  | .all s i A  =>
-    msDistinctQuantifierBindings A ∧ ¬ ((s, i) ∈ msFormulaBV A)
-  | .ex s i A   =>
-    msDistinctQuantifierBindings A ∧ ¬ ((s, i) ∈ msFormulaBV A)
-
-/-- Definition 10.3.6: A many-sorted formula `A` is rectified iff
-(i) `FV(A)` and `BV(A)` are disjoint (`msBoundVarsFresh`) and
-(ii) distinct quantifiers bind distinct variables
-(`msDistinctQuantifierBindings`). A predicate on the existing
-`MSFormula` type (Pattern 5), exactly as one-sorted `isRectified`
-(chap5 Def 5.3.10). -/
-@[blueprint "chap10__definition_10_3_6" (main := true)]
-def msIsRectified {L : MSLanguage} (A : MSFormula L) : Prop :=
-  msBoundVarsFresh A ∧ msDistinctQuantifierBindings A
 
 end LCS.FirstOrder.ManySorted.Semantics

@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Propositional.Syntax : UInt64 := 7501649945039434650
+def AttachStamp.LCS.Propositional.Syntax : UInt64 := 8667154170852979027

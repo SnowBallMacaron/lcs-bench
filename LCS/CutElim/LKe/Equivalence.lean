@@ -6,12 +6,23 @@ import LCS.FirstOrder.Equality.Completeness
 import LCS.FirstOrder.Semantics.Subformulae
 import LCS.CutElim.LKe.Equivalence.AtomicLeaves
 import LCS.CutElim.LKe.Equivalence.ContextPermutation
+import LCS.CutElim.LKe.Equivalence.RootRules
+import LCS.CutElim.LKe.Equivalence.ConjunctionPermutation.PropositionalCases
 import LCS.CutElim.LKe.Equivalence.ConjunctionPermutation
+import LCS.CutElim.LKe.Equivalence.ImplicationPermutation.PropositionalCases
 import LCS.CutElim.LKe.Equivalence.ImplicationPermutation
 import LCS.CutElim.LKe.Equivalence.Normalization
-import LCS.CutElim.LKe.Equivalence.AtomicTranslation
-import LCS.CutElim.LKe.Equivalence.EqualityTranslation
-import LCS.CutElim.LKe.Equivalence.Validity
+import LCS.CutElim.LKe.Equivalence.AtomicCuts
+import LCS.CutElim.LKe.Equivalence.StructuralMoves
+import LCS.CutElim.LKe.Equivalence.Inversions
+import LCS.CutElim.LKe.Equivalence.EqualityRules
+import LCS.CutElim.LKe.Equivalence.GeqToLKe
+import LCS.CutElim.LKe.Equivalence.Soundness
+import LCS.CutElim.LKe.Equivalence.SemanticBridge.TermEnumeration
+import LCS.CutElim.LKe.Equivalence.SemanticBridge.SupportLanguage
+import LCS.CutElim.LKe.Equivalence.SemanticBridge.Lifting
+import LCS.CutElim.LKe.Equivalence.SemanticBridge
+import LCS.CutElim.LKe.Equivalence.Theorem
 
 /-! # CutElim.LKe.Equivalence
     Formalization of Chapter 6, Sections 3.2-3.3.

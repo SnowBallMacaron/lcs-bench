@@ -207,47 +207,6 @@ inductive PathDir where
   | right : PathDir
   deriving DecidableEq, Repr
 
-/-- Lemma 3.5.2 (required): A path through a deduction tree is a list
-    of directional choices. -/
-@[blueprint "chap3__lemma_3_5_2"]
-abbrev Path := List PathDir
-
-/-- Lemma 3.5.2 (required): Collects all sequents along a path in a
-    deduction tree. Returns the list of sequent labels from root to
-    the node reached by following the path directions. -/
-@[blueprint "chap3__lemma_3_5_2"]
-def sequentsAlongPath : {s : Sequent} → DeductionTree s → Path → List Sequent
-  | _, .leaf s, _ => [s]
-  | s, .onePremise _ child, dirs => s :: sequentsAlongPath child dirs
-  | s, .twoPremise _ _ _, [] => [s]
-  | s, .twoPremise _ left _, .left :: rest =>
-    s :: sequentsAlongPath left rest
-  | s, .twoPremise _ _ right, .right :: rest =>
-    s :: sequentsAlongPath right rest
-
-/-- Lemma 3.5.2 (required): The union of all antecedent formulae occurring
-    in sequents along a given path in a deduction tree. -/
-@[blueprint "chap3__lemma_3_5_2"]
-def pathAntecedentUnion {s : Sequent} (dt : DeductionTree s) (p : Path) :
-    Set PropFormulaNormalized :=
-  fun A => ∃ s ∈ sequentsAlongPath dt p, A ∈ s.antecedent
-
-/-- Lemma 3.5.2 (required): The union of all succedent formulae occurring
-    in sequents along a given path in a deduction tree. -/
-@[blueprint "chap3__lemma_3_5_2"]
-def pathSuccedentUnion {s : Sequent} (dt : DeductionTree s) (p : Path) :
-    Set PropFormulaNormalized :=
-  fun B => ∃ s ∈ sequentsAlongPath dt p, B ∈ s.succedent
-
-/-- Lemma 3.5.2 (required): The signed set of formulae along a path in
-    a deduction tree: {T A | A in U} union {F B | B in V}. -/
-@[blueprint "chap3__lemma_3_5_2"]
-def pathSignedSet {s : Sequent} (dt : DeductionTree s) (p : Path) :
-    Set SignedFormula :=
-  fun sf => match sf with
-    | .trueF A => pathAntecedentUnion dt p A
-    | .falseF B => pathSuccedentUnion dt p B
-
 -- ========= Lemma 3.5.3 (required def): Canonical Valuation =========
 
 /-- Lemma 3.5.3 (required): The canonical valuation for a Hintikka set S. -/
@@ -256,12 +215,6 @@ noncomputable def hintikkaCanonicalValuation (S : Set SignedFormula) : Valuation
   fun n =>
     if SignedFormula.falseF (.var n) ∈ S then BoolVal.F
     else BoolVal.T
-
-/-- Lemma 3.5.2 (required helper): The sequence of sequents along any path
-    in a deduction tree is non-empty. -/
-@[blueprint "chap3__lemma_3_5_2"]
-theorem sequentsAlongPath_ne_nil {s : Sequent} (dt : DeductionTree s) (p : Path) :
-    sequentsAlongPath dt p ≠ [] 
 
 -- ========= Lemma 3.5.3: Hintikka Set Satisfiability =========
 
@@ -403,35 +356,11 @@ theorem step2_support_right {p q conc : Sequent} (r : GentzenStep2 p q conc)
   | trueF A => cases A <;> simp_all [occurs, expanded] <;> grind
   | falseF A => cases A <;> simp_all [occurs, expanded] <;> grind
 
-
-
-/-- The endpoint may be an internal binary node when the choices run out. -/
-@[blueprint "chap3__lemma_3_5_2"]
-abbrev leafSeq {s : Sequent} (dt : DeductionTree s) (p : Path) :=
-  (sequentsAlongPath dt p).getLast (sequentsAlongPath_ne_nil dt p)
-
-
-
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem support_lift {S T : Set SignedFormula} {s : Sequent}
     (hsub : ∀ sf, S sf → T sf) {sf : SignedFormula}
     (h : occurs s sf ∨ expanded S sf) : occurs s sf ∨ expanded T sf :=
   h.imp id (expanded_mono hsub sf)
-
-
-
-
-
-
-
-/-- Proof of Lemma 3.5.2, finite branch case: the signed union includes
-    every visited label and is Hintikka when its endpoint is open and atomic. -/
-@[blueprint "chap3__lemma_3_5_2"]
-theorem finite_hintikka_set_extraction {s : Sequent} (dt : DeductionTree s)
-    (hwf : WFTree dt) (p : Path) (hna : ¬isAxiom (leafSeq dt p))
-    (hAnt : ∀ A ∈ (leafSeq dt p).antecedent, isAtomicFormula A)
-    (hSuc : ∀ A ∈ (leafSeq dt p).succedent, isAtomicFormula A) :
-    IsHintikkaSet (pathSignedSet dt p) 
 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The formula actually selected by a one-premise rule. -/

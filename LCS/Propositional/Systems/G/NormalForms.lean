@@ -522,21 +522,4 @@ theorem exDNFSearchTree_atomic_leaves :
     ∀ s ∈ exDNFSearchTree.leaves, ∀ A ∈ s.antecedent ++ s.succedent,
       ∃ n, A = .var n 
 
-/-- Example 3.4.5: Conjoining the leaf clauses gives the displayed CNF;
-    clause order does not affect which valuations satisfy every leaf. -/
-@[blueprint "chap3__example_3_4_5"]
-theorem exCNFresult_leaf_characterization (v : Valuation) :
-    evalExtN v exCNFresult = BoolVal.T ↔
-      ∀ s ∈ exCNFSearchTree.leaves,
-        (∀ A ∈ s.antecedent, evalExtN v A = BoolVal.T) →
-        ∃ B ∈ s.succedent, evalExtN v B = BoolVal.T 
-
-/-- Example 3.4.6: Disjoining the leaf falsification terms gives the displayed DNF. -/
-@[blueprint "chap3__example_3_4_6"]
-theorem exDNFresult_leaf_characterization (v : Valuation) :
-    evalExtN v exDNFresult = BoolVal.T ↔
-      ∃ s ∈ exDNFSearchTree.leaves,
-        (∀ A ∈ s.antecedent, evalExtN v A = BoolVal.T) ∧
-        (∀ B ∈ s.succedent, evalExtN v B = BoolVal.F) 
-
 end LCS.Propositional.Systems.G.NormalForms

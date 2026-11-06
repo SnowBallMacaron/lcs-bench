@@ -54,12 +54,6 @@ def satisfiedByNoEq {L : Language} (hL : L.withoutEquality) (M : Structure L)
     (s : Assignment M) (A : SignedFormulaNoEq L hL) : Prop :=
   satisfiedBy M s A
 
-/-- Definition 5.4.7 (companion): The conjugate of a signed formula. -/
-@[blueprint "chap5__definition_5_4_7"]
-def conjugate {L : Language} : SignedFormula L → SignedFormula L
-  | .trueF A => .falseF A
-  | .falseF A => .trueF A
-
 end SignedFormula
 
 -- ===================================================================
@@ -263,30 +257,6 @@ structure IsTermAlgebra (L : Language) (H : Set (Term L)) : Prop where
   /-- Every constant symbol is in H -/
   closedConst : ∀ (c : L.constSymbols), Term.const c ∈ H
 
-/-- Definition 5.4.5 (remark, "term algebras are algebras"): A nonempty
-set H of terms is a term algebra exactly when the constant and function
-constructors restrict to operations on the subtype of terms in H. -/
-@[blueprint "chap5__definition_5_4_5"]
-theorem isTermAlgebra_iff_constructorOperations
-    {L : Language} (H : Set (Term L)) (hH : ∃ t, H t) :
-    IsTermAlgebra L H ↔
-      ∃ (constH : L.constSymbols → {t : Term L // H t})
-        (funcH : (f : L.funSymbols) →
-          (Fin (L.funArity f) → {t : Term L // H t}) →
-          {t : Term L // H t}),
-        (∀ c, (constH c).val = Term.const c) ∧
-        ∀ f ts,
-          (funcH f ts).val = Term.func f (fun i => (ts i).val) 
-
-/-- Definition 5.4.5 (remark): A nonempty term algebra closed under a
-positive-arity function symbol cannot be covered by a finite tuple of terms. -/
-@[blueprint "chap5__definition_5_4_5"]
-theorem termAlgebra_infinite {L : Language} {H : Set (Term L)}
-    (f : L.funSymbols) (hf : 0 < L.funArity f) (hH : IsTermAlgebra L H) :
-    ¬ ∃ (n : Nat) (e : Fin n → Term L), ∀ t ∈ H, ∃ i, e i = t 
-
-
-
 -- ATTACH-BLOCKER: unsupported untagged structure
 /-- Definition 5.4.5 (companion, generated): A generated term algebra is a term
 algebra H that is additionally closed under sub-terms. -/
@@ -429,20 +399,6 @@ def reductLanguage (L : Language) (S : Set (SignedFormula L)) : Language where
   predArity := fun P => L.predArity P.val
   hasEquality := L.hasEquality
 
-/-- Definition 5.4.6 (companion): The occurrence language L_S is a reduct
-of L via the subtype inclusions. -/
-@[blueprint "chap5__definition_5_4_6"]
-def reductLanguage_isReduct (L : Language) (S : Set (SignedFormula L)) :
-    IsLanguageReduct (reductLanguage L S) L where
-  constEmbed := Subtype.val
-  constInj := fun _ _ h => Subtype.ext h
-  funEmbed := Subtype.val
-  funInj := fun _ _ h => Subtype.ext h
-  funArityCompat := fun _ => rfl
-  predEmbed := Subtype.val
-  predInj := fun _ _ h => Subtype.ext h
-  predArityCompat := fun _ => rfl
-
 -- ===================================================================
 -- Definition 5.4.7: Term algebra over the occurrence language
 -- ===================================================================
@@ -464,32 +420,6 @@ structure IsTermAlgebraOver (L : Language) (S : Set (SignedFormula L))
       (∀ i, ts i ∈ H) → Term.func f ts ∈ H
   /-- Every constant occurring in S belongs to the algebra. -/
   closedConst : ∀ (c : L.constSymbols), c ∈ signedSetConstSyms S → Term.const c ∈ H
-
--- retained: used by LCS.FirstOrder.Completeness.InfiniteSearch
-/-- All terms using only the function and constant symbols of S form a
-term algebra over the occurrence language L_S. -/
-theorem occurrenceTerms_isTermAlgebraOver {L : Language} (S : Set (SignedFormula L)) :
-    IsTermAlgebraOver L S (fun t => termFunSyms t ⊆ signedSetFunSyms S ∧
-      termConstSyms t ⊆ signedSetConstSyms S) := by
-  refine { nonempty := ?_, symbols := fun _ h => h, closedFunc := ?_, closedConst := ?_ }
-  · exact ⟨Term.var 0, fun _ h => h.elim, fun _ h => by cases h⟩
-  · intro f hf ts hts
-    constructor
-    · intro g hg
-      rcases hg with rfl | ⟨i, hi⟩
-      · exact hf
-      · exact (hts i).1 g hi
-    · intro c hc
-      change Term.const c ∈ termConstsList (.func f ts) at hc
-      simp only [termConstsList, ← List.flatMap_eq_foldl, List.mem_flatMap, List.mem_ofFn] at hc
-      obtain ⟨_, ⟨i, rfl⟩, hi⟩ := hc
-      exact (hts i).2 c hi
-  · intro c hc
-    exact ⟨fun _ h => h.elim, fun d hd => by
-      have he : d = c := Term.const.inj (List.mem_singleton.mp hd)
-      exact he ▸ hc⟩
-
-
 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Constants in a function application occur in one of its arguments. -/
@@ -579,64 +509,9 @@ structure IsStructureReduct {L L' : Language} (hR : IsLanguageReduct L L')
       cast (by rw [sameDomain]) (args i))
 attribute [blueprint "chap5__definition_5_4_6"] _root_.LCS.FirstOrder.Gentzen.SignedFormulae.IsStructureReduct.sameDomain
 
-
-
-/-- Definition 5.4.6 (companion): Embed terms along a language reduct. -/
-@[blueprint "chap5__definition_5_4_6"]
-def Term.mapReduct {L L' : Language} (hR : IsLanguageReduct L L') : Term L → Term L'
-  | .var x => .var x
-  | .const c => .const (hR.constEmbed c)
-  | .func f ts => .func (hR.funEmbed f)
-      (fun i => Term.mapReduct hR (ts (Fin.cast (hR.funArityCompat f) i)))
-
-/-- Definition 5.4.6 (companion): Embed formulae along a language reduct
-whose target language admits equality whenever the source does. -/
-@[blueprint "chap5__definition_5_4_6"]
-def FormulaN.mapReduct {L L' : Language} (hR : IsLanguageReduct L L')
-    (hEq : L.hasEquality = true → L'.hasEquality = true) : FormulaN L → FormulaN L'
-  | .predN P ts => .predN (hR.predEmbed P)
-      (fun i => Term.mapReduct hR (ts (Fin.cast (hR.predArityCompat P) i)))
-  | .eq_ h t u => .eq_ (hEq h) (Term.mapReduct hR t) (Term.mapReduct hR u)
-  | .neg A => .neg (FormulaN.mapReduct hR hEq A)
-  | .conj A B => .conj (FormulaN.mapReduct hR hEq A) (FormulaN.mapReduct hR hEq B)
-  | .disj A B => .disj (FormulaN.mapReduct hR hEq A) (FormulaN.mapReduct hR hEq B)
-  | .impl A B => .impl (FormulaN.mapReduct hR hEq A) (FormulaN.mapReduct hR hEq B)
-  | .all x A => .all x (FormulaN.mapReduct hR hEq A)
-  | .ex x A => .ex x (FormulaN.mapReduct hR hEq A)
-
-/-- Proof of Definition 5.4.6 (Note): Every structure of a reduct language
-has an expansion on the same nonempty carrier. Symbols outside the embedding
-receive arbitrary interpretations. -/
-@[blueprint "chap5__definition_5_4_6"]
-theorem exists_structureExpansion {L L' : Language} (hR : IsLanguageReduct L L')
-    (M : Structure L) : ∃ M' : Structure L', IsStructureReduct hR M M' 
-
-/-- Proof of Definition 5.4.6 (Note, formulae): Satisfaction agrees between
-a structure and its expansion for transported formulae and assignments,
-provided equality in the source language is available in the target. -/
-@[blueprint "chap5__definition_5_4_6"]
-theorem formulaEvalN_mapReduct {L L' : Language} {hR : IsLanguageReduct L L'}
-    (hEq : L.hasEquality = true → L'.hasEquality = true)
-    {M : Structure L} {M' : Structure L'} (h : IsStructureReduct hR M M')
-    (A : FormulaN L) (s : Assignment M) :
-    formulaEvalN M' (FormulaN.mapReduct hR hEq A) (fun x => cast h.sameDomain (s x)) ↔
-      formulaEvalN M A s 
-
 -- ===================================================================
 -- Definition 5.4.4 (companion): Signed set satisfaction
 -- ===================================================================
-
-namespace SignedSet
-
-/-- Definition 5.6.1 (companion, set extension): A set of signed formulae,
-    for any equality flag, is satisfied by (M, s) iff every member is
-    satisfied by (M, s). Its formulae may contain equality atoms. -/
-@[blueprint "chap5__definition_5_6_1"]
-def satisfiedBy {L : Language} (M : Structure L)
-    (s : Assignment M) (S : Set (SignedFormula L)) : Prop :=
-  ∀ sf, sf ∈ S → SignedFormula.satisfiedBy M s sf
-
-end SignedSet
 
 -- ===================================================================
 -- Helper: Substitution-evaluation for ground (closed) terms

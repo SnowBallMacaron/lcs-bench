@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FOResolution.GroundResolution.PropositionalTranslation : UInt64 := 4202153893971049433
+def AttachStamp.LCS.FOResolution.GroundResolution.PropositionalTranslation : UInt64 := 10383912970648567198

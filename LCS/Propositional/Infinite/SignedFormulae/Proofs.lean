@@ -14,20 +14,6 @@ open LCS.Propositional.Infinite
 
 open Classical
 
-proof_of sequentsAlongPath_ne_nil := by
-  -- BEGIN PROOF
-    cases dt with
-    | leaf s => simp [sequentsAlongPath]
-    | onePremise _ child => simp [sequentsAlongPath]
-    | twoPremise _ left right =>
-      cases p with
-      | nil => simp [sequentsAlongPath]
-      | cons d rest =>
-        cases d with
-        | left => simp [sequentsAlongPath]
-        | right => simp [sequentsAlongPath]
-
-
 proof_of hintikka_set_satisfiable := by
   -- BEGIN PROOF
     refine ⟨hintikkaCanonicalValuation S, fun sf hsf => ?_⟩
@@ -35,105 +21,6 @@ proof_of hintikka_set_satisfiable := by
     cases sf with
     | trueF A => exact (hAux A).1 hsf
     | falseF A => exact (hAux A).2 hsf
-
-
-helper /-- Theorem 3.5.1 (infrastructure for future proving): If an infinite
-    sequent is falsifiable, then there exists a Hintikka set and
-    falsifying valuation. This is a semantic-only companion that
-    bypasses `infSearch`; the main textbook statement
-    `search_theorem_3_5_1` binds the falsifying valuation to an
-    `infSearchSteps`-produced tree. -/
-theorem infinite_sequent_falsifiable_case (seq : InfSequent)
-    (h : infSeqFalsifiable seq)
-    : ∃ (S : Set SignedFormula), IsHintikkaSet S ∧
-      (∃ v : Valuation, SignedSet.satisfiedBy S v ∧ infSeqFalsifies v seq) :=
--- BEGIN PROOF
-by
-  obtain ⟨v, hv⟩ := h
-  let S : Set SignedFormula := fun sf => match sf with
-    | .trueF A => evalExtN v A = BoolVal.T
-    | .falseF A => evalExtN v A = BoolVal.F
-  refine ⟨S, ?hintikka, v, ?sat, hv⟩
-  case hintikka =>
-    refine ⟨?_, ?_, ?_⟩
-    · intro n ⟨hT, hF⟩
-      change v n = BoolVal.T at hT
-      change v n = BoolVal.F at hF
-      rw [hT] at hF; exact absurd hF (by decide)
-    · intro a ha
-      cases a with
-      | tConj X Y =>
-        have hEval : evalExtN v (.conj X Y) = BoolVal.T := ha
-        simp only [evalExtN, hAnd] at hEval
-        constructor
-        · show evalExtN v X = BoolVal.T
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hAnd]
-        · show evalExtN v Y = BoolVal.T
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hAnd]
-      | fDisj X Y =>
-        have hEval : evalExtN v (.disj X Y) = BoolVal.F := ha
-        simp only [evalExtN, hOr] at hEval
-        constructor
-        · show evalExtN v X = BoolVal.F
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hOr]
-        · show evalExtN v Y = BoolVal.F
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hOr]
-      | fImpl X Y =>
-        have hEval : evalExtN v (.impl X Y) = BoolVal.F := ha
-        simp only [evalExtN, hImplies] at hEval
-        constructor
-        · show evalExtN v X = BoolVal.T
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hImplies]
-        · show evalExtN v Y = BoolVal.F
-          cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hImplies]
-      | tNeg X =>
-        have hEval : evalExtN v (.neg X) = BoolVal.T := ha
-        simp only [evalExtN, hNeg] at hEval
-        have hXF : evalExtN v X = BoolVal.F := by
-          cases hx : evalExtN v X <;> simp_all [hNeg]
-        exact ⟨hXF, hXF⟩
-      | fNeg X =>
-        have hEval : evalExtN v (.neg X) = BoolVal.F := ha
-        simp only [evalExtN, hNeg] at hEval
-        have hXT : evalExtN v X = BoolVal.T := by
-          cases hx : evalExtN v X <;> simp_all [hNeg]
-        exact ⟨hXT, hXT⟩
-    · intro b hb
-      cases b with
-      | fConj X Y =>
-        have hEval : evalExtN v (.conj X Y) = BoolVal.F := hb
-        simp only [evalExtN, hAnd] at hEval
-        show evalExtN v X = BoolVal.F ∨ evalExtN v Y = BoolVal.F
-        cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hAnd]
-      | tDisj X Y =>
-        have hEval : evalExtN v (.disj X Y) = BoolVal.T := hb
-        simp only [evalExtN, hOr] at hEval
-        show evalExtN v X = BoolVal.T ∨ evalExtN v Y = BoolVal.T
-        cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hOr]
-      | tImpl X Y =>
-        have hEval : evalExtN v (.impl X Y) = BoolVal.T := hb
-        simp only [evalExtN, hImplies] at hEval
-        show evalExtN v X = BoolVal.F ∨ evalExtN v Y = BoolVal.T
-        cases hx : evalExtN v X <;> cases hy : evalExtN v Y <;> simp_all [hImplies]
-  case sat =>
-    intro sf hsf
-    cases sf with
-    | trueF A => exact hsf
-    | falseF A => exact hsf
-
-helper /-- Theorem 3.5.1 (infrastructure for future proving): Finite sequent case
-    of the falsifiable branch. If a finite sequent is falsifiable, a Hintikka
-    set and falsifying valuation exist (reduces to the infinite case). Like
-    `infinite_sequent_falsifiable_case` above, this is a semantic-only
-    companion that bypasses `infSearch`. -/
-theorem finite_sequent_falsifiable_case (seq : InfSequent)
-    (hFinAnt : ∃ N, ∀ n, n ≥ N → seq.antecedent n = none)
-    (hFinSuc : ∃ M, ∀ n, n ≥ M → seq.succedent n = none)
-    (hFals : infSeqFalsifiable seq)
-    : ∃ (S : Set SignedFormula), IsHintikkaSet S ∧
-      (∃ v : Valuation, SignedSet.satisfiedBy S v ∧ infSeqFalsifies v seq) :=
--- BEGIN PROOF
-  infinite_sequent_falsifiable_case seq hFals
 
 helper /-- Theorem 3.5.1 (infrastructure for future proving): If an infinite
     sequent is not valid, a falsifying valuation exists via classical
@@ -154,135 +41,6 @@ by
   cases hb : evalExtN v B with
   | F => rfl
   | T => exact absurd ⟨n, B, hn, hb⟩ hSuc
-
-helper /-- Every finite traversal contains its actual root, including an empty choice list. -/
-theorem root_mem_sequentsAlongPath {s : Sequent} (dt : DeductionTree s) (p : Path) :
-    s ∈ sequentsAlongPath dt p := by
-  cases dt with
-  | leaf => simp [sequentsAlongPath]
-  | onePremise => exact List.Mem.head _
-  | twoPremise => cases p with
-    | nil => exact List.Mem.head _
-    | cons d p => cases d <;> exact List.Mem.head _
-
-helper theorem pathSignedSet_iff {s : Sequent} (dt : DeductionTree s) (p : Path)
-    (sf : SignedFormula) :
-    pathSignedSet dt p sf ↔ ∃ t ∈ sequentsAlongPath dt p, occurs t sf := by
-  cases sf <;> rfl
-
-helper /-- Following a finite branch either preserves a formula to its endpoint,
-    or witnesses its decomposition somewhere on that same branch. -/
-theorem path_support_from_root {s : Sequent} (dt : DeductionTree s) (p : Path)
-    (hwf : WFTree dt) (sf : SignedFormula) (h : occurs s sf) :
-    occurs (leafSeq dt p) sf ∨ expanded (pathSignedSet dt p) sf := by
-  induction hwf generalizing p with
-  | leaf s => exact Or.inl h
-  | @step1 prem conc child rule hchild ih =>
-    have hsub : ∀ sf, pathSignedSet child p sf →
-        pathSignedSet (.onePremise rule child) p sf := by
-      intro sf hsf
-      rw [pathSignedSet_iff] at hsf ⊢
-      obtain ⟨t, ht, hm⟩ := hsf
-      exact ⟨t, List.Mem.tail _ ht, hm⟩
-    have hend : leafSeq (.onePremise rule child) p = leafSeq child p := by
-      simp only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)]
-    rw [hend]
-    rcases step1_support rule sf h with hp | he
-    · exact support_lift hsub (ih p hp)
-    · exact Or.inr (expanded_mono (fun sf hm => hsub sf
-        ((pathSignedSet_iff child p sf).mpr
-          ⟨prem, root_mem_sequentsAlongPath child p, hm⟩)) sf he)
-  | @step2 p1 p2 conc c1 c2 rule hw1 hw2 ih1 ih2 =>
-    cases p with
-    | nil => exact Or.inl h
-    | cons dir rest =>
-      cases dir with
-      | left =>
-        have hsub : ∀ sf, pathSignedSet c1 rest sf →
-            pathSignedSet (.twoPremise rule c1 c2) (.left :: rest) sf := by
-          intro sf hsf
-          rw [pathSignedSet_iff] at hsf ⊢
-          obtain ⟨t, ht, hm⟩ := hsf
-          exact ⟨t, List.Mem.tail _ ht, hm⟩
-        have hend : leafSeq (.twoPremise rule c1 c2) (.left :: rest) =
-            leafSeq c1 rest := by
-          simp only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)]
-        rw [hend]
-        rcases step2_support_left rule sf h with hp | he
-        · exact support_lift hsub (ih1 rest hp)
-        · exact Or.inr (expanded_mono (fun sf hm => hsub sf
-            ((pathSignedSet_iff c1 rest sf).mpr
-              ⟨p1, root_mem_sequentsAlongPath c1 rest, hm⟩)) sf he)
-      | right =>
-        have hsub : ∀ sf, pathSignedSet c2 rest sf →
-            pathSignedSet (.twoPremise rule c1 c2) (.right :: rest) sf := by
-          intro sf hsf
-          rw [pathSignedSet_iff] at hsf ⊢
-          obtain ⟨t, ht, hm⟩ := hsf
-          exact ⟨t, List.Mem.tail _ ht, hm⟩
-        have hend : leafSeq (.twoPremise rule c1 c2) (.right :: rest) =
-            leafSeq c2 rest := by
-          simp only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)]
-        rw [hend]
-        rcases step2_support_right rule sf h with hp | he
-        · exact support_lift hsub (ih2 rest hp)
-        · exact Or.inr (expanded_mono (fun sf hm => hsub sf
-            ((pathSignedSet_iff c2 rest sf).mpr
-              ⟨p2, root_mem_sequentsAlongPath c2 rest, hm⟩)) sf he)
-
-helper theorem path_support {s : Sequent} (dt : DeductionTree s) (p : Path)
-    (hwf : WFTree dt) (sf : SignedFormula) (h : pathSignedSet dt p sf) :
-    occurs (leafSeq dt p) sf ∨ expanded (pathSignedSet dt p) sf := by
-  induction hwf generalizing p with
-  | leaf s =>
-    rw [pathSignedSet_iff] at h
-    exact Or.inl (by simpa [leafSeq, sequentsAlongPath] using h)
-  | @step1 prem conc child rule hchild ih =>
-    rw [pathSignedSet_iff] at h
-    obtain ⟨t, ht, hm⟩ := h
-    rcases List.mem_cons.mp ht with rfl | ht
-    · exact path_support_from_root _ p (.step1 rule hchild) sf hm
-    · have hsub : ∀ sf, pathSignedSet child p sf →
-          pathSignedSet (.onePremise rule child) p sf := by
-        intro sf hsf
-        rw [pathSignedSet_iff] at hsf ⊢
-        obtain ⟨t, ht, hm⟩ := hsf
-        exact ⟨t, List.Mem.tail _ ht, hm⟩
-      have hr := support_lift hsub (ih p ((pathSignedSet_iff child p sf).mpr ⟨t, ht, hm⟩))
-      simpa only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)] using hr
-  | @step2 p1 p2 conc c1 c2 rule hw1 hw2 ih1 ih2 =>
-    cases p with
-    | nil =>
-      rw [pathSignedSet_iff] at h
-      exact Or.inl (by simpa [leafSeq, sequentsAlongPath] using h)
-    | cons dir rest =>
-      cases dir with
-      | left =>
-        rw [pathSignedSet_iff] at h
-        obtain ⟨t, ht, hm⟩ := h
-        rcases List.mem_cons.mp ht with rfl | ht
-        · exact path_support_from_root _ _ (.step2 rule hw1 hw2) sf hm
-        · have hsub : ∀ sf, pathSignedSet c1 rest sf →
-              pathSignedSet (.twoPremise rule c1 c2) (.left :: rest) sf := by
-            intro sf hsf
-            rw [pathSignedSet_iff] at hsf ⊢
-            obtain ⟨t, ht, hm⟩ := hsf
-            exact ⟨t, List.Mem.tail _ ht, hm⟩
-          have hr := support_lift hsub (ih1 rest ((pathSignedSet_iff c1 rest sf).mpr ⟨t, ht, hm⟩))
-          simpa only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)] using hr
-      | right =>
-        rw [pathSignedSet_iff] at h
-        obtain ⟨t, ht, hm⟩ := h
-        rcases List.mem_cons.mp ht with rfl | ht
-        · exact path_support_from_root _ _ (.step2 rule hw1 hw2) sf hm
-        · have hsub : ∀ sf, pathSignedSet c2 rest sf →
-              pathSignedSet (.twoPremise rule c1 c2) (.right :: rest) sf := by
-            intro sf hsf
-            rw [pathSignedSet_iff] at hsf ⊢
-            obtain ⟨t, ht, hm⟩ := hsf
-            exact ⟨t, List.Mem.tail _ ht, hm⟩
-          have hr := support_lift hsub (ih2 rest ((pathSignedSet_iff c2 rest sf).mpr ⟨t, ht, hm⟩))
-          simpa only [leafSeq, sequentsAlongPath, List.getLast_cons (sequentsAlongPath_ne_nil _ _)] using hr
 
 helper theorem hintikka_of_support (S : Set SignedFormula) (terminal : Sequent)
     (hsupport : ∀ sf, S sf → occurs terminal sf ∨ expanded S sf)
@@ -305,9 +63,6 @@ helper theorem hintikka_of_support (S : Set SignedFormula) (terminal : Sequent)
     have h := hsupport b.toSigned hb
     cases b <;> simp_all [TypeB.toSigned, TypeB.comp1, TypeB.comp2, expanded, occurs,
       isAtomicFormula] <;> grind
-
-proof_of finite_hintikka_set_extraction := hintikka_of_support _ _ (path_support dt p hwf) hna hAnt hSuc
-
 
 helper theorem branchPrincipal_expanded {s t : Sequent} (step : InfBranchStep s t)
     (sf : SignedFormula) (h : branchPrincipal step = some sf) :
@@ -485,9 +240,9 @@ theorem infinite_limit_path_labels (seq : InfSequent) (address : Nat → List Na
   refine ⟨label, hlabel, ?_⟩
   intro n
   rcases (hpath.2 n).1 with h | h
-  · exact LCS.Propositional.Infinite.Proofs.infSearchLimit_branchStep seq (address n) 0 (hlabel n)
+  · exact LCS.Propositional.Infinite.Search.Proofs.infSearchLimit_branchStep seq (address n) 0 (hlabel n)
       (by simpa only [h] using hlabel (n + 1))
-  · exact LCS.Propositional.Infinite.Proofs.infSearchLimit_branchStep seq (address n) 1 (hlabel n)
+  · exact LCS.Propositional.Infinite.Search.Proofs.infSearchLimit_branchStep seq (address n) 1 (hlabel n)
       (by simpa only [h] using hlabel (n + 1))
 
 helper /-- Every finite prefix of a limit path is the path node at its own length. -/
@@ -497,10 +252,10 @@ theorem search_path_prefix_eq (seq : InfSequent) (address : Nat → List Nat)
   obtain ⟨suffix, heq⟩ := hq
   have hlen : q.length ≤ n := by
     have h := congrArg List.length heq
-    rw [List.length_append, LCS.Propositional.Infinite.Proofs.infSearchPath_length seq address hp n] at h
+    rw [List.length_append, LCS.Propositional.Infinite.Search.Proofs.infSearchPath_length seq address hp n] at h
     omega
   have h := congrArg (List.take q.length) heq
-  simpa [LCS.Propositional.Infinite.Proofs.infSearchPath_take seq address hp q.length n hlen] using h
+  simpa [LCS.Propositional.Infinite.Search.Proofs.infSearchPath_take seq address hp q.length n hlen] using h
 
 helper /-- A selected rule at an actual limit-tree edge lying between two nodes of
     the chosen path supplies the corresponding temporal fairness event. -/
@@ -524,19 +279,19 @@ theorem limit_principal_event_on_path (seq : InfSequent) (address : Nat → List
   have hlen : i ≤ q.length := by
     obtain ⟨suffix, hs⟩ := hstart
     have h := congrArg List.length hs
-    rw [List.length_append, LCS.Propositional.Infinite.Proofs.infSearchPath_length seq address hp i] at h
+    rw [List.length_append, LCS.Propositional.Infinite.Search.Proofs.infSearchPath_length seq address hp i] at h
     omega
   have hparent' : infSearchLimit seq (address q.length) parent := by
     rw [← hq]
     exact hparent
   have hparent_eq : parent = label q.length :=
-    LCS.Propositional.Infinite.Proofs.infSearchLimit_unique seq (address q.length) parent (label q.length) hparent' (hl q.length)
+    LCS.Propositional.Infinite.Search.Proofs.infSearchLimit_unique seq (address q.length) parent (label q.length) hparent' (hl q.length)
   have hqd' : q ++ [dir] = address (q.length + 1) := by simpa using hqd
   have hchild' : infSearchLimit seq (address (q.length + 1)) child := by
     rw [← hqd']
     exact hchild
   have hchild_eq : child = label (q.length + 1) :=
-    LCS.Propositional.Infinite.Proofs.infSearchLimit_unique seq (address (q.length + 1)) child (label (q.length + 1))
+    LCS.Propositional.Infinite.Search.Proofs.infSearchLimit_unique seq (address (q.length + 1)) child (label (q.length + 1))
       hchild' (hl (q.length + 1))
   subst parent
   subst child
@@ -566,15 +321,15 @@ theorem next_stage_expansion_path (seq : InfSequent) (address : Nat → List Nat
     if isAxiomBool s then .leaf s
     else .extend (InfSeq.head st.L) (InfSeq.head st.R)
       (.leaf (extendSeq s (InfSeq.head st.L) (InfSeq.head st.R)))
-  obtain ⟨m, hm⟩ := LCS.Propositional.Infinite.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl (k + 1)
+  obtain ⟨m, hm⟩ := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl (k + 1)
   have hnnode : (infSearchSteps seq (k + 1)).tree.labelAt (address n) = some (label n) :=
-    LCS.Propositional.Infinite.Proofs.infExpand_labelAt_preserves st _ _ (InfDeductionTree.labelAt_of_leafAt _ _ hleaf)
-  have hnm := LCS.Propositional.Infinite.Proofs.infSearchPath_node_before_leaf seq address hp (k + 1) n m _ _ hnnode hm
+    LCS.Propositional.Infinite.Search.Proofs.infExpand_labelAt_preserves st _ _ (InfDeductionTree.labelAt_of_leafAt _ _ hleaf)
+  have hnm := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_node_before_leaf seq address hp (k + 1) n m _ _ hnnode hm
   let suffix := (address m).drop n
   have hsplit : address m = address n ++ suffix := by
     calc
       address m = (address m).take n ++ (address m).drop n := (List.take_append_drop _ _).symm
-      _ = address n ++ suffix := by rw [LCS.Propositional.Infinite.Proofs.infSearchPath_take seq address hp n m hnm]
+      _ = address n ++ suffix := by rw [LCS.Propositional.Infinite.Search.Proofs.infSearchPath_take seq address hp n m hnm]
   have hlocal : (replace (label n)).leafAt suffix = some (label m) := by
     rw [← InfDeductionTree.leafAt_bindLeaves_below_leaf replace st.tree (address n) suffix hleaf]
     change (infSearchSteps seq (k + 1)).tree.leafAt (address n ++ suffix) = some (label m)
@@ -588,17 +343,17 @@ theorem next_stage_expansion_path (seq : InfSequent) (address : Nat → List Nat
     InfDeductionTree.leafAt_bindLeaves_decompose addHeads _ suffix hlocal'
   have hopen : ¬isAxiom terminal := by
     intro ha
-    have hb : isAxiomBool terminal = true := (LCS.Propositional.Infinite.Proofs.isAxiomBool_iff terminal).mpr ha
+    have hb : isAxiomBool terminal = true := (LCS.Propositional.Infinite.Search.Proofs.isAxiomBool_iff terminal).mpr ha
     simp only [addHeads, hb, ↓reduceIte] at hafter
     cases tail with
     | nil =>
       have heq : terminal = label m := Option.some.inj hafter
-      exact LCS.Propositional.Infinite.Proofs.infSearchPath_nonaxiom seq address label hp hl m (heq ▸ ha)
+      exact LCS.Propositional.Infinite.Search.Proofs.infSearchPath_nonaxiom seq address label hp hl m (heq ▸ ha)
     | cons => simp [InfDeductionTree.leafAt] at hafter
   have hb : isAxiomBool terminal = false := by
     cases h : isAxiomBool terminal with
     | false => rfl
-    | true => exact False.elim (hopen ((LCS.Propositional.Infinite.Proofs.isAxiomBool_iff terminal).mp h))
+    | true => exact False.elim (hopen ((LCS.Propositional.Infinite.Search.Proofs.isAxiomBool_iff terminal).mp h))
   have htail : tail = [0] ∧ label m = extendSeq terminal (InfSeq.head st.L) (InfSeq.head st.R) := by
     simp only [addHeads, hb, Bool.false_eq_true, ↓reduceIte] at hafter
     cases tail with
@@ -627,7 +382,7 @@ helper theorem unfinished_of_compound (st : InfSearchState) (s : Sequent)
   cases h : infIsFinishedLeafBool st s with
   | false => rfl
   | true =>
-    rcases (LCS.Propositional.Infinite.Proofs.infIsFinishedLeafBool_iff st s).mp h with hax | ⟨_, _, hatomic⟩
+    rcases (LCS.Propositional.Infinite.Search.Proofs.infIsFinishedLeafBool_iff st s).mp h with hax | ⟨_, _, hatomic⟩
     · exact False.elim (ho hax)
     · cases sf with
       | trueF A =>
@@ -647,7 +402,7 @@ theorem stage_leaf_principal_event (seq : InfSequent) (address : Nat → List Na
     ∃ m, n ≤ m ∧ ∃ selected : InfBranchStep (label m) (label (m + 1)),
       branchPrincipal selected = some sf := by
   have huf := unfinished_of_compound (infSearchSteps seq k) (label n)
-    (LCS.Propositional.Infinite.Proofs.infSearchPath_nonaxiom seq address label hp hl n) sf hm hc
+    (LCS.Propositional.Infinite.Search.Proofs.infSearchPath_nonaxiom seq address label hp hl n) sf hm hc
   obtain ⟨endpoint, q, terminal, ps, _, hend, hfinite, hopen, _, hlift⟩ :=
     next_stage_expansion_path seq address label hp hl k n hleaf huf
   have hevent : ∃ r dir parent child,
@@ -689,8 +444,8 @@ theorem infinite_limit_path_fair (seq : InfSequent) (address : Nat → List Nat)
         branchPrincipal selected = some sf := by
   intro i sf hm hc
   obtain ⟨k, hnode⟩ := hl i
-  obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
-  have hin := LCS.Propositional.Infinite.Proofs.infSearchPath_node_before_leaf seq address hp k i n _ _ hnode hleaf
+  obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
+  have hin := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_node_before_leaf seq address hp k i n _ _ hnode hleaf
   rcases branch_occurrence_until label steps i n hin sf hm with hn | ⟨m, him, _, he⟩
   · obtain ⟨m, hnm, selected, he⟩ := stage_leaf_principal_event seq address label hp hl k n hleaf sf hn hc
     exact ⟨m, Nat.le_trans hin hnm, selected, he⟩
@@ -703,7 +458,7 @@ helper theorem unfinished_of_head (st : InfSearchState) (s : Sequent)
   cases h : infIsFinishedLeafBool st s with
   | false => rfl
   | true =>
-    rcases (LCS.Propositional.Infinite.Proofs.infIsFinishedLeafBool_iff st s).mp h with hax | ⟨hL, hR, _⟩
+    rcases (LCS.Propositional.Infinite.Search.Proofs.infIsFinishedLeafBool_iff st s).mp h with hax | ⟨hL, hR, _⟩
     · exact False.elim (ho hax)
     · rcases hhead with hhead | hhead
       · exact False.elim (hhead (hL 0))
@@ -716,7 +471,7 @@ theorem infinite_limit_path_covers_input (seq : InfSequent) (address : Nat → L
     (hl : ∀ n, infSearchLimit seq (address n) (label n)) :
     ∀ sf, signedSetOfSequent seq sf → ∃ n, occurs (label n) sf := by
   have hroot : label 0 = (infSearchInit seq).rootSeq := by
-    apply LCS.Propositional.Infinite.Proofs.infSearchLimit_unique seq (address 0) _ _ (hl 0)
+    apply LCS.Propositional.Infinite.Search.Proofs.infSearchLimit_unique seq (address 0) _ _ (hl 0)
     rw [hp.1]
     exact ⟨0, rfl⟩
   intro sf hs
@@ -729,13 +484,13 @@ theorem infinite_limit_path_covers_input (seq : InfSequent) (address : Nat → L
       rw [hroot]
       simp [occurs, infSearchInit, InfSeq.head, hindex]
     | succ k =>
-      obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
+      obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
       have hhead : InfSeq.head (infSearchSteps seq k).L = some A := by
         change (infSearchSteps seq k).L 0 = some A
-        rw [(LCS.Propositional.Infinite.Proofs.infSearchSteps_remaining seq k 0).1]
+        rw [(LCS.Propositional.Infinite.Search.Proofs.infSearchSteps_remaining seq k 0).1]
         simpa using hindex
       have huf := unfinished_of_head (infSearchSteps seq k) (label n)
-        (LCS.Propositional.Infinite.Proofs.infSearchPath_nonaxiom seq address label hp hl n)
+        (LCS.Propositional.Infinite.Search.Proofs.infSearchPath_nonaxiom seq address label hp hl n)
         (Or.inl (by rw [hhead]; simp))
       obtain ⟨m, _, _, _, _, _, _, _, heq, _⟩ :=
         next_stage_expansion_path seq address label hp hl k n hleaf huf
@@ -750,13 +505,13 @@ theorem infinite_limit_path_covers_input (seq : InfSequent) (address : Nat → L
       rw [hroot]
       simp [occurs, infSearchInit, InfSeq.head, hindex]
     | succ k =>
-      obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
+      obtain ⟨n, hleaf⟩ := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_crosses_stage_leaf seq address label hp hl k
       have hhead : InfSeq.head (infSearchSteps seq k).R = some A := by
         change (infSearchSteps seq k).R 0 = some A
-        rw [(LCS.Propositional.Infinite.Proofs.infSearchSteps_remaining seq k 0).2]
+        rw [(LCS.Propositional.Infinite.Search.Proofs.infSearchSteps_remaining seq k 0).2]
         simpa using hindex
       have huf := unfinished_of_head (infSearchSteps seq k) (label n)
-        (LCS.Propositional.Infinite.Proofs.infSearchPath_nonaxiom seq address label hp hl n)
+        (LCS.Propositional.Infinite.Search.Proofs.infSearchPath_nonaxiom seq address label hp hl n)
         (Or.inr (by rw [hhead]; simp))
       obtain ⟨m, _, _, _, _, _, _, _, heq, _⟩ :=
         next_stage_expansion_path seq address label hp hl k n hleaf huf
@@ -820,12 +575,6 @@ theorem fair_branch_satisfiable (b : FairOpenBranch) :
   | trueF A => exact (h A).1 hsf
   | falseF A => exact (h A).2 hsf
 
-helper /-- All formulas of the starting sequent occur in the corrected path union. -/
-theorem root_signedSet_sub_pathSignedSet {s : Sequent} (dt : DeductionTree s)
-    (p : Path) (sf : SignedFormula) (h : occurs s sf) :
-    pathSignedSet dt p sf :=
-  (pathSignedSet_iff dt p sf).mpr ⟨s, root_mem_sequentsAlongPath dt p, h⟩
-
 helper /-- Once every enumerated input formula has entered the branch, its canonical
     valuation falsifies the entire possibly infinite input sequent. -/
 theorem fair_branch_falsifies_input (seq : InfSequent) (b : FairOpenBranch)
@@ -843,7 +592,7 @@ proof_of infinite_search_path_canonical_countermodel := by
   let branch : FairOpenBranch :=
     { label := label
       step := steps
-      isOpen := LCS.Propositional.Infinite.Proofs.infSearchPath_nonaxiom seq address label hp hl
+      isOpen := LCS.Propositional.Infinite.Search.Proofs.infSearchPath_nonaxiom seq address label hp hl
       fair := infinite_limit_path_fair seq address label hp hl steps }
   exact ⟨label, hl, fair_branch_hintikka_set_extraction branch,
     fair_branch_falsifies_input seq branch (infinite_limit_path_covers_input seq address label hp hl)⟩

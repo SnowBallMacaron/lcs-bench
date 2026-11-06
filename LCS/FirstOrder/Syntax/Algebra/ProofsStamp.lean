@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.Syntax.Algebra : UInt64 := 1051421982932835173
+def AttachStamp.LCS.FirstOrder.Syntax.Algebra : UInt64 := 446039984701800467

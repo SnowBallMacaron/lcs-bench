@@ -70,58 +70,17 @@ proof_of GCNFProofTree.ordinary := @fun
     obtain ⟨A, _, rfl⟩ := LCS.Finset.mem_image.mp hC
     exact Clause.ordinary_of_mem (LCS.Finset.mem_insert.mpr (Or.inl rfl))
 
-
 namespace GCNFProofTree
-
-helper theorem GCNFProofTree.axiomsMinimal_implies_axiomsAllSingleLiteral :
-    {S : ClauseSequent} → (T : GCNFProofTree S) →
-    T.axiomsMinimal → T.axiomsAllSingleLiteral
-  | _, .axiom_ S _ _, h => by
-    obtain ⟨P, hP⟩ := h
-    intro C hC
-    subst hP
-    rw [LCS.Finset.mem_ofList] at hC
-    have : C = Clause.single (Literal.pos P) ∨ C = Clause.single (Literal.neg P) := by
--- BEGIN PROOF
-      rcases List.mem_cons.mp hC with rfl | h
-      · exact Or.inl rfl
-      · exact Or.inr (List.mem_singleton.mp h)
-    rcases this with rfl | rfl
-    · exact ⟨Literal.pos P, rfl⟩
-    · exact ⟨Literal.neg P, rfl⟩
-  | _, .rule _ _ _ _ _ _ _ _ left right _ _ _ _, h =>
-    ⟨axiomsMinimal_implies_axiomsAllSingleLiteral left h.1,
-     axiomsMinimal_implies_axiomsAllSingleLiteral right h.2⟩
-
-end GCNFProofTree
-
-namespace GCNFProofTree
-
-helper @[simp] theorem GCNFProofTree.leafCount_cast_reverse {S T : ClauseSequent} (h : S = T)
-    (t : GCNFProofTree T) : (leafCount (h ▸ t : GCNFProofTree S)) = t.leafCount := by
-  cases h
-  rfl
 
 proof_of leafCount_cast := open LCS.Resolution.GCNF.Proofs.GCNFProofTree in
   by
     cases h
     rfl
 
-
-helper @[simp] theorem GCNFProofTree.nodeCount_cast_reverse {S T : ClauseSequent} (h : S = T)
-    (t : GCNFProofTree T) : (nodeCount (h ▸ t : GCNFProofTree S)) = t.nodeCount := by
-  cases h
-  rfl
-
 helper @[simp] theorem GCNFProofTree.weaken_leafCount {S : ClauseSequent} (t : GCNFProofTree S)
     (Extra : ClauseSequent) (hExtra : Extra.isOrdinary) :
     (t.weaken Extra hExtra).leafCount = t.leafCount := by
   cases t <;> simp [weaken, leafCount, cast_eq]
-
-helper @[simp] theorem GCNFProofTree.weaken_nodeCount {S : ClauseSequent} (t : GCNFProofTree S)
-    (Extra : ClauseSequent) (hExtra : Extra.isOrdinary) :
-    (t.weaken Extra hExtra).nodeCount = t.nodeCount := by
-  cases t <;> simp [weaken, nodeCount, cast_eq]
 
 helper theorem GCNFProofTree.nodeCount_eq_two_leafCount_sub_one {S : ClauseSequent} (t : GCNFProofTree S) :
     t.nodeCount + 1 = 2 * t.leafCount := by
@@ -132,32 +91,6 @@ helper theorem GCNFProofTree.nodeCount_eq_two_leafCount_sub_one {S : ClauseSeque
     omega
 
 end GCNFProofTree
-
-namespace GCNFDeductionTree
-
-helper def GCNFDeductionTree.toProof : {S : ClauseSequent} → (t : GCNFDeductionTree S) →
-    t.allLeavesAxioms → GCNFProofTree S
-  | _, .leaf S hOrd, hAx => .axiom_ S hOrd hAx
-  | _, .rule Gamma As B Cs Gamma1 Gamma2 hGamma hAs left right hNe hCs hG1 hG2, h =>
-    .rule Gamma As B Cs Gamma1 Gamma2 hGamma hAs (toProof left h.1) (toProof right h.2)
-      hNe hCs hG1 hG2
-
-end GCNFDeductionTree
-
-namespace GCNFProofTree
-
-helper theorem GCNFProofTree.toDeduction_allLeavesAxioms {S : ClauseSequent} (t : GCNFProofTree S) :
-    t.toDeduction.allLeavesAxioms := by
-  induction t with
-  | axiom_ _ _ hAx => exact hAx
-  | rule _ _ _ _ _ _ _ _ _ _ _ _ _ _ ihL ihR => exact ⟨ihL, ihR⟩
-
-end GCNFProofTree
-
-proof_of exGCNFProofTree_conclusion_eq := by
-  -- BEGIN PROOF
-    rfl
-
 
 proof_of gcnf_axiom_valid := by
   -- BEGIN PROOF
@@ -577,15 +510,6 @@ helper theorem commute_to_normal_form
 
 proof_of gPrime_proof_normal_form := commute_to_normal_form S pt hClause
   -- BEGIN PROOF
-
-
-helper /-- Permutation invariance for GCNFProvable. With the SortedFinset-based representation
-    of ClauseSequent, extensional equality gives transport of provability. -/
-theorem gcnf_provable_perm (S S' : ClauseSequent)
-    (h : GCNFProvable S) (hp : ∀ C, C ∈ S ↔ C ∈ S') : GCNFProvable S' := by
--- BEGIN PROOF
-  have heq : S = S' := LCS.Finset.ext hp
-  subst heq; exact h
 
 open Classical
 
@@ -1216,63 +1140,6 @@ proof_of gcnf_completeness := by
       intro _
       exact gcnf_minimal_from_normal_form S hValid hNe
 
-
-helper /-- The context-restricted variant is complete on ordinary clause sequents. -/
-theorem gcnf_restricted_completeness (S : ClauseSequent)
-    (hOrdinary : S.isOrdinary) (hValid : S.isValid) : GCNFRestrictedProvable S := by
-  have hSeq : S = LCS.Finset.ofList S.toList := by
-    apply LCS.Finset.ext; intro C
-    rw [LCS.Finset.mem_ofList, LCS.Finset.mem_toList]
-  rw [hSeq]
-  exact gcnf_provable_of_list S.toList
-    (fun C hC => hOrdinary C ((LCS.Finset.mem_toList S C).mp hC)) (hSeq ▸ hValid)
-
-helper /-- Validity checking reduces to the empty-succedent sequent of a CNF
-    equivalent to the negation of the input proposition. -/
-theorem validity_via_negated_cnf (A B : PropFormulaNormalized)
-    (_hCNF : PropFormulaNormalized.isCNF B) (hEquiv : logEquivN B (.neg A)) :
-    ((∀ v, evalExtN v A = BoolVal.T) ↔ ¬ ∃ v, evalExtN v B = BoolVal.T) ∧
-    ((¬ ∃ v, evalExtN v B = BoolVal.T) ↔ sequentValid ⟨[B], []⟩) := by
-  have hEq := (tautological_equiv_iff_equal_evalN B (.neg A)).mp hEquiv
-  constructor
-  · constructor
-    · rintro hA ⟨v, hB⟩
-      rw [hEq v] at hB
-      simp [evalExtN, hA v, hNeg] at hB
-    · intro hB v
-      cases hA : evalExtN v A with
-      | T => rfl
-      | F =>
-        apply False.elim
-        apply hB
-        refine ⟨v, ?_⟩
-        rw [hEq v]
-        simp [evalExtN, hA, hNeg]
-  · constructor
-    · intro hB v hAntecedent
-      exact False.elim (hB ⟨v, hAntecedent B (by simp)⟩)
-    · rintro hS ⟨v, hB⟩
-      obtain ⟨C, hC, _⟩ := hS v (by
-        intro C hC
-        have h : C = B := by simpa using hC
-        rw [h]
-        exact hB)
-      simp at hC
-
-namespace OrdinaryClauseProof
-
-helper @[simp] theorem OrdinaryClauseProof.leafCount_cast_reverse {S T : ClauseSequent} (h : S = T)
-    (t : OrdinaryClauseProof T) : (leafCount (h ▸ t : OrdinaryClauseProof S)) = t.leafCount := by
-  cases h
-  rfl
-
-helper @[simp] theorem OrdinaryClauseProof.nodeCount_cast_reverse {S T : ClauseSequent} (h : S = T)
-    (t : OrdinaryClauseProof T) : (nodeCount (h ▸ t : OrdinaryClauseProof S)) = t.nodeCount := by
-  cases h
-  rfl
-
-end OrdinaryClauseProof
-
 proof_of Clause.union_ordinary_left := by
   intro h
   apply hA
@@ -1300,103 +1167,5 @@ proof_of exProof_node_comparison := by
     · simp [exGCNFProofTree, GCNFProofTree.nodeCount, cast_eq]
     · simp only [exOrdinaryProofTree, OrdinaryClauseProof.orLeftOfList,
         OrdinaryClauseProof.nodeCount_cast, OrdinaryClauseProof.nodeCount]
-
-
-helper /-- The restriction to clause antecedents and atomic succedents is inherited
-    by every premise; inspection of all eight G′ rules leaves exactly two. -/
-theorem clauseCompatible_proof_fragment {s : Sequent} (t : ProofTree s)
-    (h : isClauseCompatible s) : ProofTree.clauseFragment t := by
-  induction t with
-  | axiom_ => exact h
-  | onePremise rule t ih =>
-    refine ⟨h, ?_⟩
-    cases rule with
-    | andLeft Γ Δ Λ A B =>
-      have ha := h.1 (.conj A B) (by simp)
-      simp [isClauseN] at ha
-    | orRight Γ Δ Λ A B =>
-      obtain ⟨n, hn⟩ := h.2 (.disj A B) (by simp)
-      cases hn
-    | implRight Γ Δ Λ A B =>
-      obtain ⟨n, hn⟩ := h.2 (.impl A B) (by simp)
-      cases hn
-    | negRight Γ Δ Λ A =>
-      obtain ⟨n, hn⟩ := h.2 (.neg A) (by simp)
-      cases hn
-    | negLeft Γ Δ Λ A =>
-      have ha := h.1 (.neg A) (by simp)
-      have hn : ∃ n, A = .var n := by
-        cases A <;> simp_all [isClauseN]
-      obtain ⟨n, rfl⟩ := hn
-      exact ⟨ih (negLeft_preserves_compat Γ Δ Λ n h), trivial⟩
-  | twoPremise rule left right ihL ihR =>
-    refine ⟨h, ?_⟩
-    cases rule with
-    | andRight Γ Δ Λ A B =>
-      obtain ⟨n, hn⟩ := h.2 (.conj A B) (by simp)
-      cases hn
-    | implLeft Γ Δ Λ A B =>
-      have ha := h.1 (.impl A B) (by simp)
-      simp [isClauseN] at ha
-    | orLeft Γ Δ Λ A B =>
-      have ha := h.1 (.disj A B) (by simp)
-      have hp : isClauseN A ∧ isClauseN B := by simpa [isClauseN] using ha
-      exact ⟨ihL (orLeft_preserves_compat_left Γ Δ Λ A B h (Or.inl hp.1)),
-        ihR (orLeft_preserves_compat_right Γ Δ Λ A B h (Or.inl hp.2)), trivial⟩
-
-helper /-- Only the two stated left rules occur anywhere in a G′ clause proof. -/
-theorem clause_sequent_applicable_rules {s : Sequent} (t : ProofTree s)
-    (h : ProofTree.isClauseSequent s) : ProofTree.clauseFragment t :=
-  clauseCompatible_proof_fragment t (clauseSeq_compatible s h)
-
-namespace OrdinaryClauseProof
-
-helper @[simp] theorem OrdinaryClauseProof.weaken_leafCount {S : ClauseSequent} (t : OrdinaryClauseProof S)
-    (Extra : ClauseSequent) (hExtra : Extra.isOrdinary) :
-    (t.weaken Extra hExtra).leafCount = t.leafCount := by
-  induction t with
-  | axiom_ => rfl
-  | orLeft Gamma A B left right ihL ihR =>
-    simp [weaken, leafCount, ihL, ihR]
-
-helper @[simp] theorem OrdinaryClauseProof.weakenOfList_leafCount {cs : List Clause}
-    (t : OrdinaryClauseProof (LCS.Finset.ofList cs)) (extra : List Clause)
-    (hExtra : ∀ C ∈ extra, C.isOrdinary) :
-    (t.weakenOfList extra hExtra).leafCount = t.leafCount := by
-  simp [weakenOfList]
-
-helper /-- The actual expanded tree contains the leaves of the left proof and those
-    of 2^m−1 copies of the right proof. This describes possible duplication;
-    early axiom closure may instead give smaller ordinary proof trees. -/
-theorem OrdinaryClauseProof.expandBatch_leafCount (Gamma : List Clause) (B : Clause) (hB : B.isOrdinary)
-    (As : List Clause) (hAs : ∀ A ∈ As, A.isOrdinary)
-    (left : OrdinaryClauseProof (LCS.Finset.ofList (Gamma ++ As)))
-    (right : OrdinaryClauseProof (LCS.Finset.ofList (Gamma ++ [B]))) :
-    (expandBatch Gamma B hB As hAs left right).leafCount =
-      left.leafCount + (2 ^ As.length - 1) * right.leafCount := by
-  induction As generalizing Gamma with
-  | nil => simp [expandBatch]
-  | cons A As ih =>
-    have hp : 0 < 2 ^ As.length := Nat.two_pow_pos _
-    simp [expandBatch, orLeftOfList, leafCount, leafCount_cast, leafCount_cast_reverse,
-      ih, Nat.pow_succ, cast_eq]
-    have hpow : 2 ^ As.length * 2 - 1 =
-        (2 ^ As.length - 1) + (2 ^ As.length - 1) + 1 := by omega
-    rw [hpow, Nat.add_mul, Nat.add_mul, Nat.one_mul]
-    omega
-
-end OrdinaryClauseProof
-
-namespace BatchedClauseProof
-
-helper /-- The displayed simultaneous rule has one copy of each premise tree. -/
-theorem BatchedClauseProof.rule_leafCount (Gamma As : List Clause) (B : Clause)
-    (hAsNonempty : As ≠ []) (hAs : ∀ A ∈ As, A.isOrdinary) (hB : B.isOrdinary)
-    (left : BatchedClauseProof (LCS.Finset.ofList (Gamma ++ As)))
-    (right : BatchedClauseProof (LCS.Finset.ofList (Gamma ++ [B]))) :
-    (rule Gamma As B hAsNonempty hAs hB left right).leafCount =
-      left.leafCount + right.leafCount := rfl
-
-end BatchedClauseProof
 
 end LCS.Resolution.GCNF

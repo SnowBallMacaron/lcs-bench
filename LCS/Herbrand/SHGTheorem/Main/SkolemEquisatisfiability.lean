@@ -2,7 +2,7 @@ import LCS.Item
 import LCS.Util
 import LCS.Herbrand.SHGTheorem
 import LCS.Herbrand.SHGTheorem.Herbrand
-import LCS.Herbrand.SHGTheorem.Main.SkolemSemanticsBase
+import LCS.Herbrand.SHGTheorem.Main.SkolemFormForward
 import Attach
 import LCS.Herbrand.SHGTheorem.Main.SkolemEquisatisfiability.ProofsStamp
 
@@ -20,6 +20,415 @@ open LCS.Herbrand.PrenexForm
 open LCS.Herbrand.NNFHauptsatz.Theorem
 open LCS.CutElim.Hauptsatz
 open LCS.FirstOrder.SemanticsN.Substitution
+
+-- ===================================================================
+-- Lemma 7.6.3 (contextual witness-selection infrastructure)
+-- ===================================================================
+
+/-- Interpretations of the exact finite family of Skolem symbols over
+the carrier of a fixed base structure. -/
+abbrev SkolemInterpretation {L : Language}
+    (S : SkolemSpec L) (M : Structure L) :=
+  (i : Fin S.n) →
+    (Fin (S.skolemRank i) → M.carrier) → M.carrier
+
+/-- Expansion determined by a complete interpretation of the exact
+Skolem-symbol family. -/
+noncomputable def interpretationExpansion {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (K : SkolemInterpretation S M) : Structure S.language :=
+  { carrier := M.carrier
+    carrierNonempty := M.carrierNonempty
+    interpFunc := fun f args =>
+      match f with
+      | Sum.inl g => M.interpFunc g args
+      | Sum.inr i => K i.val args
+    interpConst := fun
+      | Sum.inl c => M.interpConst c
+      | Sum.inr i => K i.val (fun j => Fin.elim0 (Fin.cast i.property j))
+    interpPred := M.interpPred }
+
+theorem interpretationExpansion_isExpansion {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (K : SkolemInterpretation S M) :
+    isExpansion L S.n S.skolemRank M
+      (interpretationExpansion S M K) :=
+  ⟨rfl, fun _ _ => rfl, fun _ => rfl, fun _ _ => Iff.rfl⟩
+
+/-- Every Skolem constant or function head in a term belongs to `available`. -/
+def skolemTermSupported {L : Language} (S : SkolemSpec L)
+    (available : List (Fin S.n)) : Term S.language → Prop
+  | .var _ => True
+  | .const (Sum.inl _) => True
+  | .const (Sum.inr i) => i.val ∈ available
+  | .func (Sum.inl _) ts =>
+      ∀ j, skolemTermSupported S available (ts j)
+  | .func (Sum.inr i) ts =>
+      i.val ∈ available ∧
+      ∀ j, skolemTermSupported S available (ts j)
+
+/-- Every Skolem head occurring in a formula belongs to `available`. -/
+def skolemFormulaSupported {L : Language} (S : SkolemSpec L)
+    (available : List (Fin S.n)) : FormulaN S.language → Prop
+  | .predN _ ts =>
+      ∀ j, skolemTermSupported S available (ts j)
+  | .eq_ _ t₁ t₂ =>
+      skolemTermSupported S available t₁ ∧
+      skolemTermSupported S available t₂
+  | .neg A => skolemFormulaSupported S available A
+  | .conj A B =>
+      skolemFormulaSupported S available A ∧
+      skolemFormulaSupported S available B
+  | .disj A B =>
+      skolemFormulaSupported S available A ∧
+      skolemFormulaSupported S available B
+  | .impl A B =>
+      skolemFormulaSupported S available A ∧
+      skolemFormulaSupported S available B
+  | .all _ A => skolemFormulaSupported S available A
+  | .ex _ A => skolemFormulaSupported S available A
+
+private theorem skolemTermSupported_mono {L : Language}
+    (S : SkolemSpec L) {xs ys : List (Fin S.n)}
+    (hSub : ∀ i, i ∈ xs → i ∈ ys) :
+    ∀ t, skolemTermSupported S xs t →
+      skolemTermSupported S ys t := by
+  intro t
+  induction t with
+  | var _ => exact fun _ => trivial
+  | const c =>
+    cases c with
+    | inl _ => exact fun _ => trivial
+    | inr i => exact hSub i.val
+  | func f ts ih =>
+    cases f with
+    | inl f =>
+      intro h j
+      exact ih j (h j)
+    | inr i =>
+      intro h
+      exact ⟨hSub i.val h.1, fun j => ih j (h.2 j)⟩
+
+theorem skolemFormulaSupported_mono {L : Language}
+    (S : SkolemSpec L) {xs ys : List (Fin S.n)}
+    (hSub : ∀ i, i ∈ xs → i ∈ ys) :
+    ∀ A, skolemFormulaSupported S xs A →
+      skolemFormulaSupported S ys A := by
+  intro A
+  induction A with
+  | predN _ ts =>
+    intro h j
+    exact skolemTermSupported_mono S hSub (ts j) (h j)
+  | eq_ _ t₁ t₂ =>
+    intro h
+    exact
+      ⟨skolemTermSupported_mono S hSub t₁ h.1,
+       skolemTermSupported_mono S hSub t₂ h.2⟩
+  | neg A ih => exact ih
+  | conj A B ihA ihB =>
+    intro h
+    exact ⟨ihA h.1, ihB h.2⟩
+  | disj A B ihA ihB =>
+    intro h
+    exact ⟨ihA h.1, ihB h.2⟩
+  | impl A B ihA ihB =>
+    intro h
+    exact ⟨ihA h.1, ihB h.2⟩
+  | all _ A ih => exact ih
+  | ex _ A ih => exact ih
+
+private theorem liftTermSkolem_supported_nil {L : Language}
+    (S : SkolemSpec L) :
+    ∀ t : Term L,
+      skolemTermSupported S [] (liftTermSkolem t) := by
+  intro t
+  induction t with
+  | var _ => trivial
+  | const _ => trivial
+  | func _ ts ih =>
+    exact fun j => ih j
+
+theorem liftFormulaSkolem_supported_nil {L : Language}
+    (S : SkolemSpec L) :
+    ∀ A : FormulaN L,
+      skolemFormulaSupported S [] (liftFormulaSkolem A) := by
+  intro A
+  induction A with
+  | predN _ ts =>
+    exact fun j => liftTermSkolem_supported_nil S (ts j)
+  | eq_ _ t₁ t₂ =>
+    exact
+      ⟨liftTermSkolem_supported_nil S t₁,
+       liftTermSkolem_supported_nil S t₂⟩
+  | neg _ ih => exact ih
+  | conj _ _ ihA ihB => exact ⟨ihA, ihB⟩
+  | disj _ _ ihA ihB => exact ⟨ihA, ihB⟩
+  | impl _ _ ihA ihB => exact ⟨ihA, ihB⟩
+  | all _ _ ih => exact ih
+  | ex _ _ ih => exact ih
+
+theorem exactSkolemTerm_supported {L : Language}
+    (S : SkolemSpec L) (i : Fin S.n)
+    (available : List (Fin S.n)) (hi : i ∈ available) :
+    skolemTermSupported S available (exactSkolemTerm S i) := by
+  unfold exactSkolemTerm
+  split
+  · exact hi
+  · exact ⟨hi, fun _ => trivial⟩
+
+private theorem termSubst_supported {L : Language}
+    (S : SkolemSpec L) (available : List (Fin S.n)) :
+    ∀ r t : Term S.language, skolemTermSupported S available r →
+      skolemTermSupported S available t →
+      ∀ x, skolemTermSupported S available (termSubst r t x) := by
+  intro r
+  induction r with
+  | var y =>
+    intro t _ ht x
+    simp only [termSubst]
+    split
+    · exact ht
+    · trivial
+  | const c =>
+    intro t hr _ x
+    exact hr
+  | func f ts ih =>
+    intro t hr ht x
+    cases f with
+    | inl f =>
+      intro j
+      exact ih j t (hr j) ht x
+    | inr i =>
+      exact ⟨hr.1, fun j => ih j t (hr.2 j) ht x⟩
+
+theorem formulaSubstN_supported {L : Language}
+    (S : SkolemSpec L) (available : List (Fin S.n)) :
+    ∀ A t x,
+      skolemFormulaSupported S available A →
+      skolemTermSupported S available t →
+      skolemFormulaSupported S available (formulaSubstN A t x) := by
+  intro A
+  induction A with
+  | predN P ts =>
+    intro t x hA ht j
+    exact termSubst_supported S available (ts j) t (hA j) ht x
+  | eq_ h t₁ t₂ =>
+    intro t x hA ht
+    exact
+      ⟨termSubst_supported S available t₁ t hA.1 ht x,
+       termSubst_supported S available t₂ t hA.2 ht x⟩
+  | neg A ih =>
+    intro t x hA ht
+    exact ih t x hA ht
+  | conj A B ihA ihB =>
+    intro t x hA ht
+    exact ⟨ihA t x hA.1 ht, ihB t x hA.2 ht⟩
+  | disj A B ihA ihB =>
+    intro t x hA ht
+    exact ⟨ihA t x hA.1 ht, ihB t x hA.2 ht⟩
+  | impl A B ihA ihB =>
+    intro t x hA ht
+    exact ⟨ihA t x hA.1 ht, ihB t x hA.2 ht⟩
+  | all y A ih =>
+    intro t x hA ht
+    simp only [formulaSubstN]
+    split
+    · exact ih t x hA ht
+    · exact hA
+  | ex y A ih =>
+    intro t x hA ht
+    simp only [formulaSubstN]
+    split
+    · exact ih t x hA ht
+    · exact hA
+
+/-- Pointwise agreement of two Skolem interpretations on a list of
+allocated symbols. -/
+def skolemInterpretationsAgreeOn {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (available : List (Fin S.n))
+    (K K' : SkolemInterpretation S M) : Prop :=
+  ∀ i, i ∈ available → ∀ args, K i args = K' i args
+
+private theorem termEval_interpretationExpansion_eq {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (available : List (Fin S.n))
+    (K K' : SkolemInterpretation S M)
+    (hAgree : skolemInterpretationsAgreeOn S M available K K')
+    (s : Nat → M.carrier) :
+    ∀ t, skolemTermSupported S available t →
+      termEval (interpretationExpansion S M K) s t =
+        termEval (interpretationExpansion S M K') s t := by
+  intro t
+  induction t with
+  | var _ => exact fun _ => rfl
+  | const c =>
+    cases c with
+    | inl _ => exact fun _ => rfl
+    | inr i => exact fun h => hAgree i.val h _
+  | func f ts ih =>
+    cases f with
+    | inl f =>
+      intro h
+      simp only [termEval, interpretationExpansion]
+      congr 1
+      funext j
+      exact ih j (h j)
+    | inr i =>
+      intro h
+      simp only [termEval, interpretationExpansion]
+      calc
+        K i.val (fun j => termEval (interpretationExpansion S M K) s (ts j)) =
+            K i.val (fun j => termEval (interpretationExpansion S M K') s (ts j)) := by
+              congr 1
+              funext j
+              exact ih j (h.2 j)
+        _ = K' i.val
+            (fun j => termEval (interpretationExpansion S M K') s (ts j)) :=
+              hAgree i.val h.1 _
+
+theorem formulaEvalN_interpretationExpansion_iff {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (available : List (Fin S.n))
+    (K K' : SkolemInterpretation S M)
+    (hAgree : skolemInterpretationsAgreeOn S M available K K') :
+    ∀ (A : FormulaN S.language),
+      skolemFormulaSupported S available A →
+      ∀ s : Nat → M.carrier,
+        formulaEvalN (interpretationExpansion S M K) A s ↔
+          formulaEvalN (interpretationExpansion S M K') A s := by
+  intro A
+  induction A with
+  | predN P ts =>
+    intro h s
+    simp only [formulaEvalN]
+    have hArgs :
+        (fun j => termEval (interpretationExpansion S M K) s (ts j)) =
+          (fun j => termEval (interpretationExpansion S M K') s (ts j)) := by
+      funext j
+      exact termEval_interpretationExpansion_eq
+        S M available K K' hAgree s (ts j) (h j)
+    rw [hArgs]
+    rfl
+  | eq_ h t₁ t₂ =>
+    intro hSupport s
+    simp only [formulaEvalN]
+    rw [termEval_interpretationExpansion_eq
+          S M available K K' hAgree s t₁ hSupport.1,
+        termEval_interpretationExpansion_eq
+          S M available K K' hAgree s t₂ hSupport.2]
+    exact Iff.rfl
+  | neg A ih =>
+    intro h s
+    exact not_congr (ih h s)
+  | conj A B ihA ihB =>
+    intro h s
+    exact and_congr (ihA h.1 s) (ihB h.2 s)
+  | disj A B ihA ihB =>
+    intro h s
+    exact or_congr (ihA h.1 s) (ihB h.2 s)
+  | impl A B ihA ihB =>
+    intro h s
+    exact imp_congr (ihA h.1 s) (ihB h.2 s)
+  | all x A ih =>
+    intro h s
+    exact forall_congr' fun a => ih h (assignUpdate s x a)
+  | ex x A ih =>
+    intro h s
+    exact exists_congr fun a => ih h (assignUpdate s x a)
+
+theorem not_mem_right_of_nodup_append {α : Type}
+    {xs ys : List α} (h : (xs ++ ys).Nodup)
+    {a : α} (ha : a ∈ xs) : a ∉ ys := by
+  intro ha'
+  exact (List.nodup_append.mp h).2.2 a ha a ha' rfl
+
+theorem not_mem_left_of_nodup_append {α : Type}
+    {xs ys : List α} (h : (xs ++ ys).Nodup)
+    {a : α} (ha : a ∈ ys) : a ∉ xs := by
+  intro ha'
+  exact (List.nodup_append.mp h).2.2 a ha' a ha rfl
+
+theorem skolemInterpretationsAgreeOn_of_frame {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    {available changed : List (Fin S.n)}
+    {K K' : SkolemInterpretation S M}
+    (hFrame : ∀ i, i ∉ changed → ∀ args, K' i args = K i args)
+    (hDisjoint : ∀ i, i ∈ available → i ∉ changed) :
+    skolemInterpretationsAgreeOn S M available K K' := by
+  intro i hi args
+  exact (hFrame i (hDisjoint i hi) args).symm
+
+/-- Values of the exact ordered universal scope under an assignment. -/
+def exactScopeValues {L : Language}
+    (S : SkolemSpec L) (M : Structure L) (i : Fin S.n)
+    (s : Nat → M.carrier) :
+    Fin (S.skolemRank i) → M.carrier :=
+  fun k =>
+    s ((S.skolemScope i).get
+      ⟨k.val, by
+        simpa [SkolemSpec.skolemRank] using k.isLt⟩)
+
+theorem termEval_exactSkolemTerm {L : Language}
+    (S : SkolemSpec L) (M : Structure L)
+    (K : SkolemInterpretation S M) (i : Fin S.n)
+    (s : Nat → M.carrier) :
+    termEval (interpretationExpansion S M K) s
+        (exactSkolemTerm S i) =
+      K i (exactScopeValues S M i s) := by
+  unfold exactSkolemTerm
+  split
+  · rename_i hRank
+    simp only [termEval, interpretationExpansion]
+    apply congrArg (K i)
+    funext j
+    exact Fin.elim0 (Fin.cast hRank j)
+  · rfl
+
+theorem skolemSpec_indices_nodup {L : Language}
+    (S : SkolemSpec L) : S.indices.Nodup := by
+  unfold SkolemSpec.indices
+  change List.Pairwise (fun x₁ x₂ : Fin S.n => x₁ ≠ x₂)
+    (List.ofFn fun i : Fin S.n => i)
+  rw [List.pairwise_iff_getElem]
+  intro i j hi hj hij
+  rw [List.getElem_ofFn, List.getElem_ofFn]
+  intro hEq
+  have hVal := congrArg Fin.val hEq
+  simp at hVal
+  omega
+
+/-- Every computed allocation is backed by an existential descriptor;
+the filter-map representation cannot allocate any other constructor. -/
+private theorem skolemAllocation_isExistential {L : Language}
+    (S : SkolemSpec L) (i : Fin S.n) :
+    ∃ x D, (S.allocation i).1 = FormulaN.ex x D := by
+  have hMem : S.allocation i ∈ S.allocations :=
+    List.get_mem S.allocations i
+  unfold SkolemSpec.allocations existentialDescriptors
+    existentialDescriptorsAux at hMem
+  obtain ⟨pair, _hPairMem, hPair⟩ := List.mem_filterMap.mp hMem
+  rcases pair with ⟨F, scope⟩
+  cases F with
+  | predN _ _ => simp at hPair
+  | eq_ _ _ _ => simp at hPair
+  | neg _ => simp at hPair
+  | conj _ _ => simp at hPair
+  | disj _ _ => simp at hPair
+  | impl _ _ => simp at hPair
+  | all _ _ => simp at hPair
+  | ex x D =>
+    have hEq :
+        (FormulaN.ex x D, scope) = S.allocation i :=
+      Option.some.inj hPair
+    exact ⟨x, D, by rw [← hEq]⟩
+
+/-- Proof-backed binder/body map used to seed the public
+`witnessSelectingExpansion`. -/
+noncomputable def skolemAllocationBinderBody {L : Language}
+    (S : SkolemSpec L) (i : Fin S.n) : Nat × FormulaN L :=
+  let h := skolemAllocation_isExistential S i
+  (Classical.choose h, Classical.choose (Classical.choose_spec h))
 
 -- ATTACH-BLOCKER: private declaration
 /-- Context-strengthened semantic invariant for the backward direction.
@@ -750,8 +1159,6 @@ theorem skolemForm_backward_genN {L : Language}
 -- Lemma 7.6.3 (companion theorem): skolem_form_backward
 -- ===================================================================
 
-
-
 -- ===================================================================
 -- Lemma 7.6.3: skolem_form_sat_iff
 -- ===================================================================
@@ -776,289 +1183,5 @@ theorem skolem_form_sat_iff {L : Language}
     (_hSkolem : SK spec = B) :
     satisfiableN A ↔ satisfiableN B 
 
--- ===================================================================
--- Theorem 7.6.1 (part a, helper): g1nnf_provable_of_unsat
--- ===================================================================
-
-/-- Completeness bridge for an unsatisfiable formula in a language without
- equality: the singleton antecedent sequent is G1nnf-provable. -/
-theorem g1nnf_provable_of_unsat {L : Language}
-    (hL : L.withoutEquality)
-    (A : FormulaN L)
-    (_hUnsat : ¬ satisfiableN A) :
-    LCS.Herbrand.NNFHauptsatz.Theorem.G1nnfProvableSet hL
-      (({A} : LCS.Finset (FormulaN L)),
-       (∅ : LCS.Finset (FormulaN L))) := by
-  -- DEBT(completeness bridge: an unsatisfiable sentence of an equality-free language has a G1nnf proof of A →; pre-existing placeholder, chapter 7 proof-closing pass)
-  sorry
-
-/-- Completeness bridge for an unsatisfiable formula in a language with
- equality: the singleton antecedent sequent is G1nnf=-provable. -/
-theorem g1nnfEq_provable_of_unsat {L : Language}
-    (hL : L.hasEquality = true)
-    (A : FormulaN L)
-    (_hUnsat : ¬ satisfiableN A) :
-    LCS.Herbrand.NNFHauptsatz.Equality.G1nnfEqProvable_Set hL
-      (({A} : LCS.Finset (FormulaN L)),
-       (∅ : LCS.Finset (FormulaN L))) := by
-  -- REPAIR(T6-21d): proof pending (G1nnf= completeness for the SHG with-equality case)
-  sorry
-
--- retained: used by LCS.FOResolution.Method.Completeness.Completeness
-/-- No-equality, closed-NNF completeness bridge for a singleton
-antecedent.  The closedness hypothesis discharges the cross-formula
-free/bound-variable condition of `g1nnf_completeness`; the resulting
-set-level derivation is converted to the indexed proof-tree presentation
-consumed by the Chapter 7/8 Herbrand infrastructure. -/
-theorem g1nnf_provable_of_unsat_closed_nnf_noeq {L : Language}
-    [DecidableEq (FormulaN L)]
-    (hNoEq : L.withoutEquality)
-    (A : FormulaN L)
-    (hNNF : FormulaN.isNNF A)
-    (hClosed : FormulaN.isClosed A)
-    (hUnsat : ¬ satisfiableN A) :
-    LCS.Herbrand.NNFHauptsatz.Theorem.G1nnfProvableSet hNoEq
-      (({A} : LCS.Finset (FormulaN L)),
-       (∅ : LCS.Finset (FormulaN L))) := by
-  let s : G1nnfSequent L hNoEq :=
-    { ante := fun F => F = A
-      succ := Set.empty
-      ante_nnf := by
-        intro F hF
-        exact hF ▸ hNNF
-      succ_nnf := by
-        intro F hF
-        exact hF.elim
-      ante_finite := ⟨[A], fun F => by simp⟩
-      succ_finite := Set.Finite.empty }
-  have hsValid : s.isValid := by
-    intro M σ hAnte
-    exact (hUnsat ⟨M, σ, hAnte A rfl⟩).elim
-  have hsNoFreeBound :
-      ∀ x : Nat,
-        (∃ F, (F ∈ s.ante ∨ F ∈ s.succ) ∧
-          x ∈ formulaFVN F) →
-        (∀ B, (B ∈ s.ante ∨ B ∈ s.succ) →
-          x ∉ formulaBVN B) := by
-    intro x hx
-    have hxFalse : False := by
-      change
-        (∃ F : FormulaN L,
-          (F = A ∨ False) ∧ x ∈ formulaFVN F) at hx
-      obtain ⟨F, hF, hxF⟩ := hx
-      rcases hF with hFA | hF
-      · subst F
-        rw [hClosed] at hxF
-        exact hxF
-      · exact hF
-    exact hxFalse.elim
-  have hSetDerivable :
-      LCS.CutElim.Hauptsatz.Completeness.G1nnfSetDerivable
-        s.ante s.succ :=
-    LCS.CutElim.Hauptsatz.Completeness.g1nnf_completeness
-      hNoEq s hsValid hsNoFreeBound
-  have hAnte :
-      ∀ F, F ∈ ({A} : LCS.Finset (FormulaN L)) ↔ s.ante F := by
-    intro F
-    exact LCS.Finset.mem_singleton F A
-  have hSucc :
-      ∀ F, F ∈ (∅ : LCS.Finset (FormulaN L)) ↔ s.succ F := by
-    intro F
-    exact LCS.Finset.mem_empty F
-  have hFinsetNNF :
-      G1nnfFinsetSequent.IsNNF
-        (({A} : LCS.Finset (FormulaN L)),
-         (∅ : LCS.Finset (FormulaN L))) := by
-    constructor
-    · intro F hF
-      exact (LCS.Finset.mem_singleton F A).1 hF ▸ hNNF
-    · intro F hF
-      exact (LCS.Finset.not_mem_empty hF).elim
-  exact
-    LCS.CutElim.Hauptsatz.g1nnfProofTree_of_setDerivable
-      hSetDerivable hAnte hSucc hFinsetNNF
-
--- ===================================================================
--- Theorem 7.6.1 (part a, required companion): shg_unsat_cinstance
--- ===================================================================
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Internal closed-seed core of the forward direction of Theorem 7.6.1.
-    Chapter 7 obtains this seed from its standing base-language constant
-    assumption; later callers may instead supply a closed term already
-    living in the selected Skolem language. The language equality flag selects
-    G1nnf completeness and the G1nnf half lemma, or their equality-system
-    counterparts. -/
-noncomputable def shg_unsat_cinstance_seed {L : Language}
-    (spec : SkolemSpec L)
-    (A : FormulaN L)
-    (hSource : A = spec.source)
-    (seed : {t : Term spec.language // Term.isClosed t})
-    (hUnsat : ¬ satisfiableN A) :
-    CInstance spec.language :=
-  if hL : L.hasEquality = true then
-    let hProv := g1nnfEq_provable_of_unsat hL A hUnsat
-    let hEx :=
-      Herbrand.herbrand_half_lemma_G1nnfEq_seed hL spec A hSource seed hProv
-    Classical.choose (Classical.choose_spec hEx).1
-  else
-    have hNoEq : L.withoutEquality := by
-      cases h : L.hasEquality <;> simp_all [Language.withoutEquality]
-    let hProv := g1nnf_provable_of_unsat hNoEq A hUnsat
-    let hEx :=
-      Herbrand.herbrand_half_lemma_G1nnf_seed hNoEq spec A hSource seed hProv
-    Classical.choose (Classical.choose_spec hEx).1
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Specification of the internal closed-seed c-instance constructor. -/
-theorem shg_unsat_cinstance_seed_spec {L : Language}
-    (spec : SkolemSpec L)
-    (A : FormulaN L)
-    (hSource : A = spec.source)
-    (seed : {t : Term spec.language // Term.isClosed t})
-    (hUnsat : ¬ satisfiableN A) :
-    (shg_unsat_cinstance_seed spec A hSource seed hUnsat).source = SK spec ∧
-    CInstance.WellFormed
-      (shg_unsat_cinstance_seed spec A hSource seed hUnsat) ∧
-    ¬ satisfiableN
-      (shg_unsat_cinstance_seed spec A hSource seed hUnsat).toFormula := by
-  unfold shg_unsat_cinstance_seed
-  split
-  · rename_i hL
-    have hEx :=
-      Herbrand.herbrand_half_lemma_G1nnfEq_seed hL spec A hSource seed
-        (g1nnfEq_provable_of_unsat hL A hUnsat)
-    obtain ⟨hCinstOf, _hQF, hG2⟩ := Classical.choose_spec hEx
-    obtain ⟨hSrc, hToF, hWF⟩ := Classical.choose_spec hCinstOf
-    refine ⟨hSrc, hWF, ?_⟩
-    rw [hToF]
-    intro hSat
-    obtain ⟨M, s, hEval⟩ := hSat
-    have hValid :=
-      LCS.Herbrand.NNFHauptsatz.Equality.g2nnfEq_provable_implies_valid
-        (L := spec.language) hL _ _ hG2
-    obtain ⟨B, hB, _⟩ := hValid M s (by
-      intro A' hA'
-      have hEq := (LCS.Finset.mem_singleton A' (Classical.choose hEx)).mp hA'
-      exact hEq ▸ hEval)
-    exact LCS.Finset.not_mem_empty hB
-  · rename_i hL
-    have hNoEq : L.withoutEquality := by
-      cases h : L.hasEquality <;> simp_all [Language.withoutEquality]
-    have hEx :=
-      LCS.Herbrand.SHGTheorem.Herbrand.herbrand_half_lemma_G1nnf_seed
-        hNoEq spec A hSource seed (g1nnf_provable_of_unsat hNoEq A hUnsat)
-    have hCprop := Classical.choose_spec hEx
-    obtain ⟨hCinstOf, _hQF, hG2⟩ := hCprop
-    have hCiProp := Classical.choose_spec hCinstOf
-    obtain ⟨hSrc, hToF, hWF⟩ := hCiProp
-    refine ⟨hSrc, hWF, ?_⟩
-    rw [hToF]
-    intro hSat
-    obtain ⟨M, s, hEval⟩ := hSat
-    have hValid :
-        LCS.Herbrand.NNFHauptsatz.Soundness.setSequentValid
-          ({Classical.choose hEx} : LCS.Finset (FormulaN spec.language))
-          (∅ : LCS.Finset (FormulaN spec.language)) :=
-      LCS.Herbrand.NNFHauptsatz.Soundness.g2nnf_provable_implies_valid
-        (show spec.language.withoutEquality from hNoEq) _ _ hG2
-    have hImpossible :
-        ∃ B, Membership.mem
-            (∅ : LCS.Finset (FormulaN spec.language)) B ∧
-          formulaEvalN M B s := by
-      apply hValid M s
-      intro A' hA'
-      have hAeq : A' = Classical.choose hEx :=
-        (LCS.Finset.mem_singleton (α := FormulaN spec.language)
-          A' (Classical.choose hEx)).mp hA'
-      rw [hAeq]
-      exact hEval
-    obtain ⟨B, hB, _hEvalB⟩ := hImpossible
-    exact absurd hB LCS.Finset.not_mem_empty
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Theorem 7.6.1 (part a, required companion): Given an unsatisfiable rectified L-sentence A in NNF with Skolem spec `spec` (so `A = spec.source`), constructs a compound instance of `SK spec` that is unsatisfiable. The closed-seed construction selects G1nnf or G1nnf= completeness and the corresponding Herbrand half lemma according to the language equality flag. -/
-noncomputable def shg_unsat_cinstance {L : Language}
-    (spec : SkolemSpec L)
-    (A : FormulaN L)
-    (hSource : A = spec.source)
-    (hConst : Nonempty L.constSymbols)
-    (hUnsat : ¬ satisfiableN A) :
-    CInstance spec.language :=
-  let seed : {t : Term spec.language // Term.isClosed t} :=
-    ⟨.const (.inl (Classical.choice hConst)), by
-      simp [Term.isClosed, termFV]⟩
-  shg_unsat_cinstance_seed spec A hSource seed hUnsat
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Spec lemma for `shg_unsat_cinstance`: the produced c-instance has
-source `SK spec`, is WellFormed, and its extracted quantifier-free
-formula is unsatisfiable. -/
-theorem shg_unsat_cinstance_spec {L : Language}
-    (spec : SkolemSpec L)
-    (A : FormulaN L)
-    (hSource : A = spec.source)
-    (hConst : Nonempty L.constSymbols)
-    (hUnsat : ¬ satisfiableN A) :
-    (shg_unsat_cinstance spec A hSource hConst hUnsat).source = SK spec ∧
-    CInstance.WellFormed
-      (shg_unsat_cinstance spec A hSource hConst hUnsat) ∧
-    ¬ satisfiableN
-      (shg_unsat_cinstance spec A hSource hConst hUnsat).toFormula := by
-  unfold shg_unsat_cinstance
-  exact shg_unsat_cinstance_seed_spec spec A hSource _ hUnsat
-
--- ===================================================================
--- Theorem 7.6.1 (helper): closed terms evaluate assignment-independently
--- ===================================================================
-
-
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.GroundMatrix, LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Helper: a closed term is free for any variable in any formula. -/
-theorem isFreeForN_of_closed {L : Language}
-    (t : Term L) (hClosed : LCS.FirstOrder.Basic.Term.isClosed t)
-    (x : Nat) (A : FormulaN L) :
-    isFreeForN t x A := by
--- BEGIN PROOF
-  induction A with
-  | predN _ _ => simp [isFreeForN]
-  | eq_ _ _ _ => simp [isFreeForN]
-  | neg _ ih => simp [isFreeForN]; exact ih
-  | conj _ _ ihA ihB => simp [isFreeForN]; exact ⟨ihA, ihB⟩
-  | disj _ _ ihA ihB => simp [isFreeForN]; exact ⟨ihA, ihB⟩
-  | impl _ _ ihA ihB => simp [isFreeForN]; exact ⟨ihA, ihB⟩
-  | all y _ ih =>
-    simp [isFreeForN]
-    by_cases hxy : x = y
-    · left; exact hxy
-    · right
-      refine ⟨?_, ih⟩
-      intro hy
-      rw [hClosed] at hy
-      exact hy
-  | ex y _ ih =>
-    simp [isFreeForN]
-    by_cases hxy : x = y
-    · left; exact hxy
-    · right
-      refine ⟨?_, ih⟩
-      intro hy
-      rw [hClosed] at hy
-      exact hy
-
--- retained: used by LCS.Herbrand.SHGTheorem.Main.GroundMatrix, LCS.Herbrand.SHGTheorem.Main.SHG
-/-- Helper: for a closed term `t`, the evaluation of `A[t/x]` at
-`s` equals the evaluation of `A` at `s[x := termEval M s t]`. -/
-theorem formulaSubstEval_closed {L : Language} {M : Structure L}
-    (A : FormulaN L) (t : Term L) (x : Nat)
-    (hClosed : LCS.FirstOrder.Basic.Term.isClosed t)
-    (s : Assignment M) :
-    formulaEvalN M (formulaSubstN A t x) s ↔
-    formulaEvalN M A (assignUpdate s x (termEval M s t)) :=
--- BEGIN PROOF
-  formulaSubstEvalDirectN s A t x (isFreeForN_of_closed t hClosed x A)
-
 end LCS.Herbrand.SHGTheorem.Main
 end
-

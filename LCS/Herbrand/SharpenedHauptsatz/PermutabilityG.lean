@@ -119,12 +119,6 @@ def isDescendantOfPremiseG {L : Language} {s : Sequent L} {T : GProofTreeExt s}
     (R₁ R₂ : GInferenceOccurrence T) : Prop :=
   premiseAddressDescendant R₁.address R₂.address
 
-/-- Definition 7.3.2 (companion): The selected upper occurrence is not in any premise subtree of the selected lower occurrence. A nonstructural intermediate does not erase ancestry. -/
-@[blueprint "chap7__definition_7_3_2"]
-def notDescendantOfPremiseG {L : Language} {s : Sequent L} {T : GProofTreeExt s}
-    (R₁ R₂ : GInferenceOccurrence T) : Prop :=
-  ¬ isDescendantOfPremiseG R₁ R₂
-
 /-- Definition 7.3.2 (companion): The selected upper inference lies above the selected lower inference, with only structural rules strictly between their addresses. Off-path branches are unrestricted. -/
 @[blueprint "chap7__definition_7_3_2"]
 def descendsWithStructuralIntermediatesG {L : Language} {s : Sequent L} {T : GProofTreeExt s}
@@ -234,14 +228,6 @@ structure GLocalReplacement {L : Language} {s c : Sequent L}
   reversed : ¬ premiseAddressDescendant firstAddress secondAddress
   otherStructural : ∀ p rule, replacement.inferenceAt p = some rule →
     p ≠ firstAddress → p ≠ secondAddress → rule.isStructural
-
-/-- Definition 7.3.2 (companion): The resulting proof is computed by plugging Q through exactly the recorded outside continuation. -/
-@[blueprint "chap7__definition_7_3_2"]
-def GLocalReplacement.result {L : Language} {s c : Sequent L}
-    {T : GProofTreeExt s} {rootAddress : List Nat} {source : GProofTreeExt c}
-    {inputs : List (Σ p : Sequent L, GProofTreeExt p)} {R₁ R₂ : AnyGStep L}
-    (h : GLocalReplacement T rootAddress source inputs R₁ R₂) : GProofTreeExt s :=
-  h.continuation.plug h.replacement.plug
 
 /-- Definition 7.3.2 (companion): The one-premise case fixes T₁, S₀ and the selected lower inference before specifying Q and the unchanged outside continuation. -/
 @[blueprint "chap7__definition_7_3_2"]
@@ -447,12 +433,6 @@ def isDescendantOfPremiseGEq {L : Language} {hL : L.hasEquality = true} {s : Seq
     (R₁ R₂ : GEqInferenceOccurrence T) : Prop :=
   premiseAddressDescendant R₁.address R₂.address
 
-/-- Definition 7.3.2 (companion): The selected upper occurrence is not in any premise subtree of the selected lower occurrence. A nonstructural intermediate does not erase ancestry. -/
-@[blueprint "chap7__definition_7_3_2"]
-def notDescendantOfPremiseGEq {L : Language} {hL : L.hasEquality = true} {s : Sequent L} {T : GEqProofTree hL s}
-    (R₁ R₂ : GEqInferenceOccurrence T) : Prop :=
-  ¬ isDescendantOfPremiseGEq R₁ R₂
-
 /-- Definition 7.3.2 (companion): The selected upper inference lies above the selected lower inference, with only structural rules strictly between their addresses. Off-path branches are unrestricted. -/
 @[blueprint "chap7__definition_7_3_2"]
 def descendsWithStructuralIntermediatesGEq {L : Language} {hL : L.hasEquality = true} {s : Sequent L} {T : GEqProofTree hL s}
@@ -566,14 +546,6 @@ structure GEqLocalReplacement {L : Language} {hL : L.hasEquality = true} {s c : 
   reversed : ¬ premiseAddressDescendant firstAddress secondAddress
   otherStructural : ∀ p rule, replacement.inferenceAt p = some rule →
     p ≠ firstAddress → p ≠ secondAddress → rule.isStructural
-
-/-- Definition 7.3.2 (companion): The resulting proof is computed by plugging Q through exactly the recorded outside continuation. -/
-@[blueprint "chap7__definition_7_3_2"]
-def GEqLocalReplacement.result {L : Language} {hL : L.hasEquality = true} {s c : Sequent L}
-    {T : GEqProofTree hL s} {rootAddress : List Nat} {source : GEqProofTree hL c}
-    {inputs : List (Σ p : Sequent L, GEqProofTree hL p)} {R₁ R₂ : AnyGEqStep hL}
-    (h : GEqLocalReplacement T rootAddress source inputs R₁ R₂) : GEqProofTree hL s :=
-  h.continuation.plug h.replacement.plug
 
 /-- Definition 7.3.2 (companion): The one-premise case fixes T₁, S₀ and the selected lower inference before specifying Q and the unchanged outside continuation. -/
 @[blueprint "chap7__definition_7_3_2"]

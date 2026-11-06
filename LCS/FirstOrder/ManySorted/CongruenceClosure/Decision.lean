@@ -4,9 +4,13 @@ import LCS.FirstOrder.ManySorted
 import LCS.FirstOrder.ManySorted.Semantics
 import LCS.FirstOrder.ManySorted.Equality
 import LCS.FirstOrder.ManySorted.CongruenceClosure
-import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.HerbrandSatisfaction
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.Satisfiability
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.DisjunctiveNormalForm
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.ValidityReduction
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.GraphOfConjunction
 import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.SemanticEquality
 import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.QuotientModel
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.Examples
 
 /-! # FirstOrder.ManySorted.CongruenceClosure.Decision
     Formalization of Chapter 10, Subsections 10.6.1 and 10.6.3
@@ -28,39 +32,17 @@ import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.QuotientModel
     (LCS.FirstOrder.ManySorted.CongruenceClosure).
 
     Source: Logic for Computer Science, Gallier 2015.
+
+    Content modules, in book order:
+    - `Decision.Satisfiability` — the semantic notions used in Section 10.6: satisfiable, valid, unsatisfiable, entailment and models (Definition 10.3.6)
+    - `Decision.DisjunctiveNormalForm` — Section 10.6.1, Lemma 10.6.1 (literals, conjunctions of literals, disjunctive normal form and its correctness)
+    - `Decision.ValidityReduction` — Section 10.6.1, validity reduces to unsatisfiability of conjunctions of literals; the case without equality
+    - `Decision.GraphOfConjunction` — Section 10.6.3, Definition 10.6.3 (TERM(C), the ranked alphabet and the graph G(C) of a conjunction)
+    - `Decision.SemanticEquality` — Section 10.6.3, proof of Lemma 10.6.2: a model's semantic equality is a congruence containing E (collision implies unsatisfiable)
+    - `Decision.QuotientModel` — Section 10.6.3, proof of Lemma 10.6.2: the quotient model of TERM(C) (no collision implies satisfiable) and Lemma 10.6.2
+    - `Decision.Examples` — Examples 10.6.1-10.6.2 (the graph of a conjunction and its congruence closure)
 -/
 
 namespace LCS.FirstOrder.ManySorted.CongruenceClosure.Decision
-
-open LCS.FirstOrder.ManySorted
-open LCS.FirstOrder.ManySorted.Semantics
-open LCS.FirstOrder.ManySorted.Equality
-open LCS.FirstOrder.ManySorted.CongruenceClosure
-open LCS.Propositional.Semantics
-
--- ===================================================================
--- §10.3-grounded semantic predicates (introduced here, used by 10.6.1/2)
--- ===================================================================
-
-
--- ===================================================================
--- Lemma 10.6.1 (companion defs): literal / DNF / conjunction syntax
--- ===================================================================
-
-namespace MSFormula
-
-
-end MSFormula
-
-
--- ===================================================================
--- Lemma 10.6.1: msValid_reduces_to_conjunction_unsat
--- ===================================================================
-
-
--- ===================================================================
--- Lemma 10.6.2: the term algebra C and its three-case operation f_C
--- ===================================================================
-
 
 end LCS.FirstOrder.ManySorted.CongruenceClosure.Decision

@@ -117,19 +117,6 @@ def msEncodeAtom (L : MSLanguage) (P : L.predSymbols)
   MSFormula.eq_ (L := boolExtendedLanguage L) rfl (MSBoolSort L)
     (msPredAsFuncTerm L P args) (msTopConst L)
 
-/-- Lemma 10.6.4 (companion): the dedicated name for the positive-atom
-replacement rule — a positive atomic predicate formula `P t₁…t_k`
-occurring in `C` is replaced by the equation `(P t₁…t_k ≐_bool ⊤)` in
-`C'`. Same body as `msEncodeAtom`, named to make the positive replacement
-rule its own declaration. Realizes "positive atom replacement `P = ⊤`". -/
-@[blueprint "chap10__lemma_10_6_4"]
-def msEncodePositiveAtom (L : MSLanguage) (P : L.predSymbols)
-    (args : (i : Fin ((L.predArity P).map some).length) →
-      MSTerm (boolExtendedLanguage L)
-        (((L.predArity P).map some).get i)) :
-    MSFormula (boolExtendedLanguage L) :=
-  msEncodeAtom L P args
-
 /-- Lemma 10.6.4 (required): the encoding `¬(P t₁…t_k ≐_bool ⊤)` of a
 negated atomic predicate formula `¬P t₁…t_k`. This is the "negative atom
 replacement `¬(P = ⊤)`". -/
@@ -248,92 +235,9 @@ def msEncodeConjunction (L : MSLanguage) :
   | MSFormula.ex s i A => MSFormula.ex (some s) i (msEncodeConjunction L A)
 
 -- ===================================================================
--- Lemma 10.6.4 (companion defs): the equation set, semantic relation R,
--- and the "identity on BOOL" naming
--- ===================================================================
-
-/-- Lemma 10.6.4 (companion): `E_set = {t₁ ≐_{s₁} u₁, …}` — the set of
-POSITIVE equations of the ENCODED conjunction `C'` (reusing the
-Decision-module companion `Decision.msIsPositiveEquation` /
-`Decision.msConjunctContains` on the bool-extended language). E-script is
-the entailment basis defining the semantic-equality relation `R` for the
-with-predicate case. -/
-@[blueprint "chap10__lemma_10_6_4"]
-def equationSetOfConjunction (L : MSLanguage)
-    (C' : MSFormula (boolExtendedLanguage L)) :
-    Set (MSFormula (boolExtendedLanguage L)) :=
-  fun A => Decision.msIsPositiveEquation A ∧ Decision.msConjunctContains C' A
-
-/-- Lemma 10.6.4 (companion): the `S(C)`-indexed family `R` for the
-with-predicate case, now INCLUDING the bool sort `s = none`:
-`t R_s u ↔ E_set ⊨ t ≐_s u`. The textbook's semantic-equality relation
-`R`, shown to be a `G(C')`-congruence containing `E`. Reuses Decision's
-`msEntails` on the bool-extended language. -/
-@[blueprint "chap10__lemma_10_6_4"]
-noncomputable def semanticEqualityRelationPred (L : MSLanguage)
-    (C' : MSFormula (boolExtendedLanguage L))
-    (s : (boolExtendedLanguage L).SortType)
-    (t u : MSTerm (boolExtendedLanguage L) s) : Prop :=
-  Decision.msEntails (equationSetOfConjunction L C')
-    (MSFormula.eq_ (L := boolExtendedLanguage L) rfl s t u)
-
-/-- Lemma 10.6.4 (companion): the named declaration recording "the
-identity relation on BOOL". The substantive content — that the bool
-carrier is interpreted as BOOL and `≐_bool` is the identity on it — is
-the `requires` theorem `msEqBoolAsIdentity`; this predicate points to
-that fact for every structure `M` over `L'`. Realizes "identity relation
-on BOOL". -/
-@[blueprint "chap10__lemma_10_6_4"]
-def msEqBoolIsIdentity (L : MSLanguage)
-    (M : MSStructure (boolExtendedLanguage L)) : Prop :=
-  ∀ (v : MSAssignment M) (a b : MSTerm (boolExtendedLanguage L) (MSBoolSort L)),
-    msFormulaEval M (MSFormula.eq_ (L := boolExtendedLanguage L) rfl
-      (MSBoolSort L) a b) v = BoolVal.T ↔
-      msTermEval M v a = msTermEval M v b
-
--- ===================================================================
--- Lemma 10.6.4 (required theorems): semantics of ≐_bool and the
--- encoding-validity equivalence
--- ===================================================================
-
-/-- Lemma 10.6.4 (required): `≐_bool` behaves semantically EXACTLY as the
-identity relation on BOOL. The bool-sorted equality formula `(a ≐_bool b)`
-is true under `(M, v)` iff the two bool-carrier values `a_M[v]`, `b_M[v]`
-are identical. Because the carrier of `L'` at the bool sort `none` is
-interpreted as BOOL = {T, F}, `≐_bool` is interpreted as the identity on
-BOOL — this is what lets `≡` be treated as `=_bool`. Holds by the
-`MSFormula.eq_` clause of `msFormulaEval` (the classically-decided
-carrier-equality test). Realizes "equivalence connective as bool-equality
-`=_bool`" and "identity relation on BOOL". -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem msEqBoolAsIdentity (L : MSLanguage)
-    (M : MSStructure (boolExtendedLanguage L)) (v : MSAssignment M)
-    (a b : MSTerm (boolExtendedLanguage L) (MSBoolSort L)) :
-    msFormulaEval M (MSFormula.eq_ (L := boolExtendedLanguage L) rfl
-      (MSBoolSort L) a b) v = BoolVal.T ↔
-      msTermEval M v a = msTermEval M v b 
-
--- ===================================================================
 -- Lemma 10.6.4 (required theorems): R is a G(C')-congruence; the two
 -- collision cases (non-bool sort, atom = ⊤)
 -- ===================================================================
-
-/-- Lemma 10.6.4 (required): the semantic-equality family `R`
-(`semanticEqualityRelationPred`) is a `G(C')`-congruence containing `E`.
-The NEW case beyond Lemma 10.6.2 is the predicate-as-function congruence
-step: for subterms `P y₁…y_k` and `P z₁…z_k` with `P` now a bool-output
-function symbol of rank `(w₁…w_k, bool)`, if `E ⊨ y_i ≐_{w_i} z_i` for all
-`i` then `E ⊨ (P y₁…y_k ≐_bool P z₁…z_k)`, by the equality semantics of
-function application at the bool sort. This is the "predicate congruence
-step". Stated as `MSGCongruence` of the node-lift of `R` on `G(C')`. Proof
-body `sorry`. -/
-@[attach_debt, blueprint "chap10__lemma_10_6_4"]
-theorem semanticEqualityRelationPred_isCongruence (L : MSLanguage)
-    (C' : MSFormula (boolExtendedLanguage L)) :
-    MSGCongruence (graphOfConjunction (L := boolExtendedLanguage L) C')
-      (fun p q =>
-        ∃ (s : (boolExtendedLanguage L).SortType) (h1 : p.1.1 = s) (h2 : q.1.1 = s),
-          semanticEqualityRelationPred L C' s (h1 ▸ p.1.2) (h2 ▸ q.1.2)) 
 
 /-- Lemma 10.6.4 (helper): the carrier family of the encoded `L'`-structure
 built from a model `M` of `L`: a non-bool sort `some s` keeps `M`'s carrier
@@ -459,14 +363,6 @@ theorem inlArgRecast_heq (L : MSLanguage) (M : MSStructure L)
     (hi : j.val < (((boolExtendedLanguage L).funRank (Sum.inl f)).1).length) :
     inlArgRecast L M f args j ≍ args ⟨j.val, hi⟩ 
 
-/-- Lemma 10.6.4 (helper): `msTermEval` commutes with a sort-cast on a term —
-for `h : s = s'` and `t : MSTerm L s`, evaluating `h ▸ t` equals casting the
-meaning of `t`. By `cases h`. -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem msTermEval_term_cast {L : MSLanguage} (M : MSStructure L)
-    (v : MSAssignment M) {s s' : L.SortType} (h : s = s') (t : MSTerm L s) :
-    msTermEval M v (h ▸ t) = h ▸ msTermEval M v t 
-
 /-- Lemma 10.6.4 (helper): the bool-extended meaning of a sort-cast lift
 `h ▸ msLiftTerm L t` (for `h : b = some s2`) is heterogeneously equal to the
 `M`-meaning of `t`, given the term-transfer fact `ht` for `t`. The sort-cast
@@ -519,77 +415,6 @@ theorem liftTerm_eq_iff (L : MSLanguage) (M : MSStructure L)
     (msTermEval (encodeModel L M) (encodeAssignment L v) (msLiftTerm L t) =
       msTermEval (encodeModel L M) (encodeAssignment L v) (msLiftTerm L u))
       ↔ (msTermEval M v t = msTermEval M v u) 
-
-/-- Lemma 10.6.4 (helper): `⊤` is interpreted as `T` in the encoded model — its
-meaning is `interpConst none () = T` by `encodeModel`. -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem msTopConst_eval (L : MSLanguage) (M : MSStructure L)
-    (w : MSAssignment (encodeModel L M)) :
-    msTermEval (encodeModel L M) w (msTopConst L)
-      = (BoolVal.T : encodeCarrier L M none) 
-
-/-- Lemma 10.6.4 (helper): recast a single bool-extended argument of a
-predicate-as-function symbol `Sum.inr P` back to an `M`-argument (the predicate
-analogue of `inlArgRecast`). -/
-@[blueprint "chap10__lemma_10_6_4"]
-noncomputable def inrArgRecast (L : MSLanguage)
-    (M : MSStructure L) (P : L.predSymbols)
-    (args : (i : Fin (((L.predArity P).map some)).length) →
-      encodeCarrier L M (((L.predArity P).map some).get i))
-    (j : Fin (L.predArity P).length) : M.carrier ((L.predArity P).get j) :=
-  have hi : j.val < (((L.predArity P).map some)).length := by
-    have := j.isLt
-    simpa [boolExtendedLanguage, boolExtendedFunRank, List.length_map] using this
-  have hsort :
-      (((L.predArity P).map some).get ⟨j.val, hi⟩) =
-        some ((L.predArity P).get j) := by
-    simp [boolExtendedLanguage, boolExtendedFunRank, List.get_eq_getElem, List.getElem_map]
-  (show encodeCarrier L M (some ((L.predArity P).get j))
-    = M.carrier ((L.predArity P).get j) from rfl) ▸ (hsort ▸ args ⟨j.val, hi⟩)
-
-/-- Lemma 10.6.4 (helper, computation): `encodeModel`'s interpretation of the
-predicate-as-function symbol `Sum.inr P` is `M.interpPred P` on the recast
-argument family. Holds by `rfl`. -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem encodeModel_interpFunc_inr_eq (L : MSLanguage)
-    (M : MSStructure L) (P : MSPositivePredicates L)
-    (args : (i : Fin (((L.predArity P.val).map some)).length) →
-      (encodeModel L M).carrier (((L.predArity P.val).map some).get i)) :
-    (encodeModel L M).interpFunc (Sum.inr P) args =
-      (show BoolVal from M.interpPred P.val (inrArgRecast L M P.val args))
-
-/-- Lemma 10.6.4 (helper): `inrArgRecast` is HEq to the underlying bool-extended
-argument (the predicate analogue of `inlArgRecast_heq`). -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem inrArgRecast_heq (L : MSLanguage) (M : MSStructure L)
-    (P : L.predSymbols)
-    (args : (i : Fin (((L.predArity P).map some)).length) →
-      encodeCarrier L M (((L.predArity P).map some).get i))
-    (j : Fin (L.predArity P).length)
-    (hi : j.val < (((L.predArity P).map some)).length) :
-    inrArgRecast L M P args j ≍ args ⟨j.val, hi⟩ 
-
-/-- Lemma 10.6.4 (helper): the recast meaning of the `j`-th lifted
-predicate-argument equals the `M`-meaning of `ts j` (same shape as the func
-case of `msTermEval_encodeModel_liftTerm`, via the term-transfer lemma). -/
-@[blueprint "chap10__lemma_10_6_4"]
-theorem inrArgRecast_eval (L : MSLanguage) (M : MSStructure L)
-    (v : MSAssignment M) (P : L.predSymbols)
-    (ts : (i : Fin (L.predArity P).length) → MSTerm L ((L.predArity P).get i))
-    (args : (i : Fin (((L.predArity P).map some)).length) →
-      (encodeModel L M).carrier (((L.predArity P).map some).get i))
-    (hargs : ∀ i, args i = msTermEval (encodeModel L M) (encodeAssignment L v)
-      (by
-        have hi : i.val < (L.predArity P).length := by
-          have := i.isLt
-          simpa [boolExtendedLanguage, boolExtendedFunRank, List.length_map] using this
-        have hsort :
-            (((L.predArity P).map some).get i) =
-              some ((L.predArity P).get ⟨i.val, hi⟩) := by
-          simp only [boolExtendedLanguage, boolExtendedFunRank, List.get_eq_getElem]
-          all_goals exact List.getElem_map some
-        exact hsort ▸ msLiftTerm L (ts ⟨i.val, hi⟩))) (j : Fin (L.predArity P).length) :
-    inrArgRecast L M P args j = msTermEval M v (ts j) 
 
 /-- Lemma 10.6.4 (helper): a positive predicate atom `pred P ts` of `C` and its
 bool-equation encoding `msEncodeAtom L P (lifted ts)` evaluate to the SAME

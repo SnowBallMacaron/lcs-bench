@@ -25,8 +25,6 @@ open LCS.FirstOrder.SemanticsN (formulaEvalN formulaNoEq
 open LCS.FirstOrder.Gentzen
 open LCS.FirstOrder.Gentzen.Hintikka
 open LCS.FirstOrder.Completeness
-open LCS.FirstOrder.Completeness.InfiniteSearch (
-  signedLimitSet limitSet_isHintikka gamma_in_limitSet)
 open LCS.FirstOrder.Gentzen.SignedFormulae
   (SignedFormula)
 open LCS.FirstOrder.Gentzen.Hintikka
@@ -34,21 +32,6 @@ open LCS.FirstOrder.Gentzen.Hintikka
    hintikka_set_satisfiable hintikka_set_satisfiable_concrete)
 open LCS.FirstOrder.SyntaxN.Substitution (isFreeForN)
 open Classical
-
--- retained: used by LCS.FirstOrder.Equality.MetaTheorems
-/-- The globally-rectified condition for FormulaN. Captures Gallier's
-standing convention that all substitutions in the signed limit set
-are free-for (bound variables chosen fresh enough that variable
-capture never occurs). This is the isFreeFor condition required
-by limitSet_isHintikka. -/
-def globallyRectifiedN {L : Language} [Countable (FormulaN L)] [Countable (Term L)]
-    (Gamma : Set (FormulaN L)) : Prop :=
-  ∀ (x : Nat) (A : FormulaN L) (t : Term L),
-    (SignedFormula.trueF (FormulaN.all x A) ∈ signedLimitSet Gamma ∨
-     SignedFormula.falseF (FormulaN.all x A) ∈ signedLimitSet Gamma ∨
-     SignedFormula.trueF (FormulaN.ex x A) ∈ signedLimitSet Gamma ∨
-     SignedFormula.falseF (FormulaN.ex x A) ∈ signedLimitSet Gamma) →
-    isFreeForN t x A
 
 -- ===================================================================
 -- Lemma 5.5.1 (normalized): satisfiable_implies_consistentN
@@ -201,16 +184,6 @@ def isMaximalConsistentSetNoEq {L : Language} (hL : L.withoutEquality)
     (Delta : Set (FormulaN L)) : Prop :=
   isMaximalConsistentSet Delta
 
-/-- Lemma 5.5.2 (companion): In a language without equality, a consistent
-set is maximally consistent exactly when every proper superset is inconsistent. -/
-@[blueprint "chap5__lemma_5_5_2"]
-theorem isMaximalConsistentSet_iff_proper_supersetNoEq {L : Language}
-    (hL : L.withoutEquality) (Gamma : Set (FormulaN L))
-    (hCon : InfiniteSearch.isConsistentSetNoEq hL Gamma) :
-    isMaximalConsistentSetNoEq hL Gamma ↔
-      ∀ Delta, Set.subset Gamma Delta → Gamma ≠ Delta →
-        ¬ InfiniteSearch.isConsistentSetNoEq hL Delta 
-
 /-- Lemma 5.5.1: A satisfiable set in a language without equality is
 consistent. Nonempty formula syntax excludes the language with no predicate symbols. -/
 @[blueprint "chap5__lemma_5_5_1" (main := true)]
@@ -252,87 +225,5 @@ theorem maximal_consistent_extensionNoEq {L : Language}
     (Gamma : Set (FormulaN L)) (hCon : InfiniteSearch.isConsistentSetNoEq hL Gamma) :
     ∃ (Delta : Set (FormulaN L)),
       isMaximalConsistentSetNoEq hL Delta ∧ Set.subset Gamma Delta 
-
-
-
-
-
-/-- Theorem 5.5.4 (search-model remark): A nonclosed maximal path is
-either a path to a nonaxiom leaf of a finished round, or an infinite
-path whose every label in the limit tree is nonaxiomatic. -/
-@[blueprint "chap5__theorem_5_5_1"]
-inductive SearchNonclosedPath {L : Language} (hL : L.withoutEquality)
-    (q : InfSequentN L) (hq : q.builtFromX) (hFB : crossNoFreeBoundInf q)
-    (enum : Search.SearchEnumeration q) : Type where
-  | finite (k : Nat) (address : List Nat) (leaf : Sequent L)
-      (finished : Search.allFinished hL (Search.search51 hL q hq hFB enum k))
-      (atLeaf : address ∈ (Search.search51 hL q hq hFB enum k).tree.leafAddresses)
-      (label : (Search.search51 hL q hq hFB enum k).tree.forget.labelAt address = some leaf)
-      (nonaxiom : ¬ isAxiom leaf)
-  | infinite (path : Nat → Nat)
-      (inTree : Search.InfinitePath51 hL q hq hFB enum path)
-      (nonaxiom : ∀ n label,
-        Search.searchLimit51 hL q hq hFB enum ((List.range n).map path) label →
-          ¬ isAxiom label)
-
-/-- Theorem 5.5.4 (search-model remark): The signed set of a nonclosed
-path consists exactly of the signed formulae in its actual tree labels. -/
-@[blueprint "chap5__theorem_5_5_1"]
-def SearchNonclosedPath.signedSet {L : Language} {hL : L.withoutEquality}
-    {q : InfSequentN L} {hq : q.builtFromX} {hFB : crossNoFreeBoundInf q}
-    {enum : Search.SearchEnumeration q} :
-    SearchNonclosedPath hL q hq hFB enum → Set (SignedFormula L)
-  | .finite k address _ _ _ _ _ =>
-      finiteSearchPathSet (Search.search51 hL q hq hFB enum k).tree.forget address
-  | .infinite path _ _ => infiniteSearchPathSet hL q hq hFB enum path
-
-/-- Theorem 5.5.4 (search-model remark): H_S is the stopping round's
-TERM₀ plus remaining active AVAIL entries for a finite path, and the
-union of the run's TERM₀ entries for an infinite path. -/
-@[blueprint "chap5__theorem_5_5_1"]
-def SearchNonclosedPath.termDomain {L : Language} {hL : L.withoutEquality}
-    {q : InfSequentN L} {hq : q.builtFromX} {hFB : crossNoFreeBoundInf q}
-    {enum : Search.SearchEnumeration q} :
-    SearchNonclosedPath hL q hq hFB enum → Set (Term L)
-  | .finite k _ _ _ _ _ _ =>
-      finiteSearchTermDomain (Search.search51 hL q hq hFB enum k)
-  | .infinite _ _ _ => Search.eventuallyActivated51 hL q hq hFB enum
-
-/-- Theorem 5.5.4 (search-model remark): In a countable first-order
-language without equality, searching Γ → for a consistent Γ has a
-nonclosed maximal path for every admissible enumeration. The antecedent
-enumerates exactly Γ and the succedent is empty. -/
-theorem consistent_search_has_nonclosed_path (L : FirstOrderLanguage)
-    (hL : L.toLanguage.withoutEquality)
-    (Gamma : Set (FormulaN L.toLanguage))
-    (hCon : InfiniteSearch.isConsistentSetNoEq hL Gamma)
-    (q : InfSequentN L.toLanguage)
-    (hGamma : ∀ A, q.memAntecedent A ↔ A ∈ Gamma)
-    (hEmpty : ∀ n, q.succedent n = none)
-    (hq : q.builtFromX) (hFB : crossNoFreeBoundInf q)
-    (enum : Search.SearchEnumeration q) :
-    Nonempty (SearchNonclosedPath hL q hq hFB enum) := by
-  -- REPAIR(T110): proof pending
-  sorry
-
-/-- Theorem 5.5.4 (search-model remark): For every nonclosed maximal
-path of the search on Γ →, if its signed set S is Hintikka over its
-run-defined H_S, the Lemma 5.4.5 structure on H_S and its identity
-assignment satisfy every member of S and every formula of Γ. -/
-@[attach_debt, blueprint "chap5__theorem_5_5_4"]
-theorem nonclosed_search_path_hintikka_model {L : Language}
-    (hL : L.withoutEquality) (Gamma : Set (FormulaN L))
-    (q : InfSequentN L) (hGamma : ∀ A, q.memAntecedent A ↔ A ∈ Gamma)
-    (hEmpty : ∀ n, q.succedent n = none)
-    (hq : q.builtFromX) (hFB : crossNoFreeBoundInf q)
-    (enum : Search.SearchEnumeration q)
-    (path : SearchNonclosedPath hL q hq hFB enum)
-    (S : Set (SignedFormula L)) (hS : S = path.signedSet)
-    (hHS : IsHintikkaSet L hL path.termDomain S) :
-    (∀ sf ∈ S, SignedFormula.satisfiedBy
-      (hintikkaStructure path.termDomain S hHS)
-      (identityAssignment path.termDomain S hHS) sf) ∧
-    (∀ A ∈ Gamma, formulaEvalN (hintikkaStructure path.termDomain S hHS) A
-      (identityAssignment path.termDomain S hHS)) 
 
 end LCS.FirstOrder.Completeness.MetaTheorems

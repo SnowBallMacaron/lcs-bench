@@ -1,6 +1,6 @@
 import LCS.Item
 import LCS.Util
-import LCS.FOResolution.Method.ResolutionTrees
+import LCS.FOResolution.Method.SeparatingPairs
 import Attach
 import LCS.SLD.FirstOrder.SLDDerivations.ProofsStamp
 
@@ -35,24 +35,6 @@ inductive FOHornClauseCore (L : Language) : Type where
   | rule : FOAtomCore L → LCS.Finset (FOAtomCore L) → FOHornClauseCore L
   | fact : FOAtomCore L → FOHornClauseCore L
   | goal : LCS.Finset (FOAtomCore L) → FOHornClauseCore L
-
-/-- An injective atom map reflects equality of finite sets. -/
-theorem finset_image_injective {α β : Type} [DecidableEq β]
-    (f : α → β) (hf : Function.Injective f) :
-    Function.Injective (LCS.Finset.image f) := by
-  classical
-  intro s t h
-  apply LCS.Finset.ext
-  intro x
-  constructor
-  · intro hx
-    have hm : f x ∈ t.image f := h ▸ (LCS.Finset.mem_image.mpr ⟨x, hx, rfl⟩)
-    obtain ⟨y, hy, heq⟩ := LCS.Finset.mem_image.mp hm
-    exact hf heq ▸ hy
-  · intro hx
-    have hm : f x ∈ s.image f := h.symm ▸ (LCS.Finset.mem_image.mpr ⟨x, hx, rfl⟩)
-    obtain ⟨y, hy, heq⟩ := LCS.Finset.mem_image.mp hm
-    exact hf heq ▸ hy
 
 namespace FOHornClauseCore
 

@@ -75,14 +75,6 @@ structure MSLabeledGraph : Type 1 where
 
 namespace MSLabeledGraph
 
-/-- Definition 10.6.1 (companion): The `i`-th successor `v[i] = δ(v, i)`
-of a node `v`, defined exactly on edges `(v, i)` with
-`1 ≤ i ≤ n` where `r(Λ(v)) = (u_1…u_n, s)`. -/
-@[blueprint "chap10__definition_10_6_1"]
-def successor (G : MSLabeledGraph) (v : G.Node)
-    (i : Fin (G.Sigma.rank (G.Lambda v)).1.length) : G.Node :=
-  G.delta v i
-
 /-- Definition 10.6.1 (companion): An edge `(v, i)` in the domain of `δ`:
 a node together with a successor index in range for its label's arity. -/
 @[blueprint "chap10__definition_10_6_1"]
@@ -265,12 +257,6 @@ inductive ExampleSort : Type where
   | i : ExampleSort
   | s : ExampleSort
 
-/-- Example 10.6.1 (companion): Decidable equality of the example sorts,
-needed to type concrete terms and the conjunction. -/
-@[blueprint "chap10__example_10_6_1"]
-instance : DecidableEq ExampleSort := fun a b => by
-  cases a <;> cases b <;> first | exact isTrue rfl | exact isFalse (by intro h; cases h)
-
 /-- Example 10.6.1 (companion): The symbols `Σ = {f, g, a, b, c}` of the
 example ranked alphabet (all five symbols as one carrier). -/
 @[blueprint "chap10__example_10_6_1"]
@@ -413,14 +399,6 @@ def exampleConjunction : MSFormula exampleLanguage :=
 -- Lemma 10.6.3: Existence of the congruence closure — theorems
 -- ===================================================================
 
-/-- Lemma 10.6.3 (companion): The closure is the union of the iterates,
-`(R*)_s = ⋃_i R^i_s`: `R* u v ↔ ∃ i, R^i u v`. Holds by definition of
-`msCongruenceClosure`. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceClosure_eq_iUnion (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) (u v : G.Node) :
-    msCongruenceClosure G R hR u v ↔ ∃ i, msCongruenceIterate G R hR i u v
-
 /-- Lemma 10.6.3 (companion): The closure `R*` contains `R`: every pair
 related by `R` is already related at stage 0. -/
 @[blueprint "chap10__lemma_10_6_3"]
@@ -487,80 +465,6 @@ theorem msCongruenceClosure_smallest (G : MSLabeledGraph)
     (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) :
     ∀ R', MSGCongruence G R' → (∀ u v, R u v → R' u v) →
       ∀ u v, msCongruenceClosure G R hR u v → R' u v
-
-/-- Lemma 10.6.3 (companion): The bare existence statement — for any
-finite graph `G` and sort-supported relation `R` on `V`, a smallest G-congruence
-containing `R` exists (witnessed by `msCongruenceClosure G R hR`). -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceClosure_exists_least (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) :
-    ∃ Rstar, MSGCongruence G Rstar ∧ (∀ u v, R u v → Rstar u v) ∧
-      (∀ R', MSGCongruence G R' → (∀ u v, R u v → R' u v) →
-        ∀ u v, Rstar u v → R' u v)
-
-/-- Lemma 10.6.3 (companion): The one-step operator is a congruence for
-pointwise equivalence — if `R^i` and `R'` relate the same pairs, so do
-their one-step completions. Used to propagate a one-step fixpoint
-forward. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceIterateStep_congr (G : MSLabeledGraph)
-    (Ri Ri' : G.Node → G.Node → Prop) (h : ∀ a b, Ri a b ↔ Ri' a b)
-    (u v : G.Node) :
-    msCongruenceIterateStep G Ri u v ↔ msCongruenceIterateStep G Ri' u v
-
-/-- Lemma 10.6.3 (companion): A one-step fixpoint at stage `i` makes every
-later one-step a fixpoint too: `R^{i+k} = R^{i+k+1}` for all `k`. Proved
-by induction on `k`, propagating the fixpoint through the (pointwise)
-one-step congruence. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceIterate_fixpoint_step (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) (i : Nat)
-    (hfix : ∀ u v, msCongruenceIterate G R hR i u v ↔
-      msCongruenceIterate G R hR (i + 1) u v) :
-    ∀ k u v, msCongruenceIterate G R hR (i + k) u v ↔
-      msCongruenceIterate G R hR (i + k + 1) u v
-
-/-- Lemma 10.6.3 (companion): A one-step fixpoint at stage `i` is a
-fixpoint forever — every later iterate `R^{i+k}` equals `R^i`. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceIterate_fixpoint_add (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) (i : Nat)
-    (hfix : ∀ u v, msCongruenceIterate G R hR i u v ↔
-      msCongruenceIterate G R hR (i + 1) u v) :
-    ∀ k u v, msCongruenceIterate G R hR i u v ↔ msCongruenceIterate G R hR (i + k) u v
-
-/-- Lemma 10.6.3 (companion): A non-decreasing `ℕ`-sequence bounded above
-must repeat a value at two consecutive stages. The combinatorial core of
-finite stabilization. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem nat_seq_stabilizes (f : Nat → Nat) (N : Nat)
-    (hmono : ∀ i, f i ≤ f (i + 1)) (hbound : ∀ i, f i ≤ N) :
-    ∃ j, f j = f (j + 1)
-
-/-- Lemma 10.6.3 (companion): If a predicate `p` implies `q` everywhere on
-a list and they have equal count there, then `q` implies `p` on the list
-too — equal counts force the implication to be an equivalence. -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem countP_eq_imp_rev {α : Type u} (p q : α → Bool) (l : List α)
-    (himp : ∀ x ∈ l, p x → q x) (heq : l.countP p = l.countP q) :
-    ∀ x ∈ l, q x → p x
-
-/-- Lemma 10.6.3 (companion): Because `G` is finite, the iteration
-stabilizes — there is some `i` with `R^i = R^{i+1}` (a fixpoint). -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceIterate_stabilizes (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) :
-    ∃ i, ∀ u v, msCongruenceIterate G R hR i u v ↔
-      msCongruenceIterate G R hR (i + 1) u v
-
-/-- Lemma 10.6.3 (companion): There exists a stage at which the supported
-congruence closure equals the iterate, `R* = R^i`. This is an existence
-statement about finite stabilization. Effective saturation has
-no computable realization: deferred (OD-A17). -/
-@[blueprint "chap10__lemma_10_6_3"]
-theorem msCongruenceClosure_computable (G : MSLabeledGraph)
-    (R : G.Node → G.Node → Prop) (hR : MSSortSupported G R) :
-    ∃ i, ∀ u v, msCongruenceClosure G R hR u v ↔ msCongruenceIterate G R hR i u v
 
 /-- Lemma 10.6.3 (Existence of the congruence closure): For a finite
 graph `G` and a sort-supported relation `R` on its nodes, the iterated closure

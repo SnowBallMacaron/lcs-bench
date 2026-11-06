@@ -1,7 +1,9 @@
 import LCS.Herbrand.NNFHauptsatz
 import LCS.Herbrand.SharpenedHauptsatz
-import LCS.Herbrand.NNFHauptsatz.Renaming.Part1
-import LCS.Herbrand.NNFHauptsatz.Renaming.Part2
+import LCS.Herbrand.NNFHauptsatz.Renaming.Formulae
+import LCS.Herbrand.NNFHauptsatz.Renaming.Sequents
+import LCS.Herbrand.NNFHauptsatz.Renaming.Occurrences
+import LCS.Herbrand.NNFHauptsatz.Renaming.ProofTrees
 
 /-! # Herbrand.NNFHauptsatz Variable Renaming
 
@@ -11,30 +13,5 @@ map `ρ : Nat → Nat`; laws that reflect equality, substitution guards, or
 free-variable subtraction explicitly require `Function.Injective ρ`.
 -/
 
-namespace LCS.Herbrand.NNFHauptsatz
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.Herbrand.SharpenedHauptsatz
-
-
-namespace MaxQuantifierOccurrence
-
-
-end MaxQuantifierOccurrence
-
-
-namespace G2nnfRuleCore
-
-
-end G2nnfRuleCore
-
-namespace G2nnfProofTree
-
-
-end G2nnfProofTree
-
-end LCS.Herbrand.NNFHauptsatz
+namespace LCS.Herbrand.NNFHauptsatz.Renaming
+end LCS.Herbrand.NNFHauptsatz.Renaming

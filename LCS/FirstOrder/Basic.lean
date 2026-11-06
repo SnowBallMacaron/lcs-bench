@@ -189,22 +189,6 @@ def existsM {L : Language} (M : Structure L) (i : Nat)
     (f : Assignment M → Prop) : Assignment M → Prop :=
   fun s => ∃ a : M.carrier, f (assignUpdate s i a)
 
-/-- Definition 5.3.3 (Note): Universal quantification is true exactly when
-the function a ↦ f(s[x_i := a]) is constantly True. -/
-@[blueprint "chap5__definition_5_3_3"]
-theorem forallM_iff_constTrue {L : Language} (M : Structure L) (i : Nat)
-    (f : Assignment M → Prop) (s : Assignment M) :
-    forallM M i f s ↔
-      (fun a : M.carrier => f (assignUpdate s i a)) = (fun _ => True) 
-
-/-- Definition 5.3.3 (Note): Existential quantification is false exactly when
-the function a ↦ f(s[x_i := a]) is constantly False. -/
-@[blueprint "chap5__definition_5_3_3"]
-theorem not_existsM_iff_constFalse {L : Language} (M : Structure L) (i : Nat)
-    (f : Assignment M → Prop) (s : Assignment M) :
-    (¬ existsM M i f s) ↔
-      (fun a : M.carrier => f (assignUpdate s i a)) = (fun _ => False) 
-
 /-- Definition 5.3.4: The lifted Boolean connective ∧_M on truth-value
 functions `[V → M] → Prop`. For `f, g : Assignment M → Prop`, the pointwise
 conjunction `andM f g s` holds iff both `f s` and `g s` hold. -/

@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.Semantics.Substitution : UInt64 := 5735532256623301319
+def AttachStamp.LCS.FirstOrder.Semantics.Substitution : UInt64 := 16499157016954300034

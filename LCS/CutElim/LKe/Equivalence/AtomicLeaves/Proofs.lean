@@ -1,42 +1,21 @@
 import LCS.CutElim.LKe.Equivalence.AtomicLeaves
 
 section
-
 namespace LCS.CutElim.LKe.Equivalence
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.Semantics.Subformulae
-
 open LCS.FirstOrder.Gentzen
-
 open LCS.FirstOrder.Gentzen.Hintikka
-
 open LCS.FirstOrder.Equality
-
 open LCS.FirstOrder.Completeness
-
 open LCS.FirstOrder.Equality.Completeness
-
 open LCS.CutElim.LK
-
 open LCS.CutElim.LKe
-
 open LCS.CutElim.CompletenessBridge
-
-helper /-- Lemma 6.3.1 (required def): The maximum of sequentWeight over
-all leaf sequents of the proof tree. Returns 0 for empty leaf list. -/
-def geqTreeWeight {L : Language} {hL : L.hasEquality = true} {s : Sequent L}
-    (T : GEqProofTree hL s) : Nat :=
-  (geqLeafSequents T |>.map sequentWeight).foldl max 0
 
 helper theorem formulaWeight_zero_implies {L : Language} (A : FormulaN L)
     (h : formulaWeight A = 0) : isAtomicOrQuantified A := by
@@ -62,60 +41,6 @@ helper theorem perm_sequentWeight_zero {L : Language} (s : Sequent L)
     exact formulaWeight_zero_implies A
       (perm_foldl_add_zero_all_zero (by omega)
         _ (List.mem_map.mpr ⟨A, hA, rfl⟩))
-
-helper theorem perm_neg_both_leaf_ax {L : Language}
-    (A : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
-    isAxiom (Sequent.mk ([A] ++ Γ₁ ++ Γ₂) (Δ₁ ++ Δ₂ ++ [A])) :=
--- BEGIN PROOF
-  ⟨A, by simp [List.mem_append], by simp [List.mem_append]⟩
-
-helper theorem perm_impl_both_leaf1_ax {L : Language}
-    (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
-    isAxiom (Sequent.mk ([A] ++ Γ₁ ++ Γ₂) (Δ₁ ++ [B] ++ Δ₂ ++ [A])) :=
--- BEGIN PROOF
-  ⟨A, by simp [List.mem_append], by simp [List.mem_append]⟩
-
-helper theorem perm_impl_both_leaf2_ax {L : Language}
-    (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
-    isAxiom (Sequent.mk ([A, B] ++ Γ₁ ++ Γ₂) (Δ₁ ++ [B] ++ Δ₂)) :=
--- BEGIN PROOF
-  ⟨B, by simp [List.mem_append], by simp [List.mem_append]⟩
-
-end LCS.CutElim.LKe.Equivalence
-
-end
-
-section
-
-namespace LCS.CutElim.LKe.Equivalence
-
-open LCS.FirstOrder.Basic
-
-open LCS.FirstOrder.SyntaxN
-
-open LCS.FirstOrder.SyntaxN.Variables
-
-open LCS.FirstOrder.SyntaxN.Substitution
-
-open LCS.FirstOrder.SemanticsN
-
-open LCS.FirstOrder.Semantics.Subformulae
-
-open LCS.FirstOrder.Gentzen
-
-open LCS.FirstOrder.Gentzen.Hintikka
-
-open LCS.FirstOrder.Equality
-
-open LCS.FirstOrder.Completeness
-
-open LCS.FirstOrder.Equality.Completeness
-
-open LCS.CutElim.LK
-
-open LCS.CutElim.LKe
-
-open LCS.CutElim.CompletenessBridge
 
 helper /-- For an axiom sequent, build a GProofTreeExt with conclusion s and
 all leaf sequents atomic/quantified.
@@ -316,11 +241,5 @@ proof_of permutation_lemma_geq := by
       exact ⟨.eqGeneral axioms hne haxioms Γ Δ T',
         by simp [geqLeafSequents]; exact hT'leaf⟩
 
-
-
-
-
-
 end LCS.CutElim.LKe.Equivalence
-
 end

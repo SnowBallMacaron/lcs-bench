@@ -2,8 +2,11 @@ import LCS.Item
 import LCS.Util
 import LCS.CutElim.CompletenessBridge
 import LCS.CutElim.DecEqOfSymbols
-import LCS.CutElim.LK.Part1
-import LCS.CutElim.LK.Part2
+import LCS.CutElim.LK.Syntax
+import LCS.CutElim.LK.Occurrences
+import LCS.CutElim.LK.Soundness
+import LCS.CutElim.LK.CutFreeRules
+import LCS.CutElim.LK.GEquivalence
 
 /-! # CutElim.LK
     Formalization of Chapter 6, Section 2.
@@ -66,14 +69,5 @@ end FOLKDeductionTree
 
 
 -- Float an element from inside a left list to the front
-
-section
-
-local notation "CutFreeTree" => (fun s => {t : FOLKProofTree s // FOLKProofTree.isCutFree t})
-
-
-end
-
-
 
 end LCS.CutElim.LK

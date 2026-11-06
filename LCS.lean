@@ -18,11 +18,9 @@ import LCS.Resolution.Method
 import LCS.Resolution.Method.Completeness
 import LCS.Resolution.Method.Reverse
 import LCS.Resolution.Method.ReverseExamples
-import LCS.Resolution.Method.ReverseGrowth
 import LCS.FirstOrder.Syntax
 import LCS.FirstOrder.Syntax.Algebra
 import LCS.FirstOrder.Syntax.FreeGeneration
-import LCS.FirstOrder.Syntax.Parenthesized
 import LCS.FirstOrder.Syntax.RankedAlphabet
 import LCS.FirstOrder.Syntax.Variables
 import LCS.FirstOrder.Syntax.Substitution
@@ -30,6 +28,7 @@ import LCS.FirstOrder.Semantics
 import LCS.FirstOrder.Semantics.Substitution
 import LCS.FirstOrder.Semantics.Subformulae
 import LCS.FirstOrder.Semantics.Equivalence
+import LCS.FirstOrder.Semantics.ArithmeticStructures
 import LCS.FirstOrder.Gentzen
 import LCS.FirstOrder.Gentzen.SignedFormulae
 import LCS.FirstOrder.Gentzen.Hintikka
@@ -64,6 +63,7 @@ import LCS.Herbrand.NNFHauptsatz.Theorem
 import LCS.Herbrand.NNFHauptsatz.Equality
 import LCS.Herbrand.SharpenedHauptsatz
 import LCS.Herbrand.SharpenedHauptsatz.Permutability
+import LCS.Herbrand.SharpenedHauptsatz.PermutabilityG
 import LCS.Herbrand.SharpenedHauptsatz.Theorem
 import LCS.Herbrand.HerbrandTheorem
 import LCS.Herbrand.HerbrandTheorem.Main
@@ -83,15 +83,11 @@ import LCS.SLD.SLDForm
 import LCS.SLD.SLDForm.Completeness
 import LCS.SLD.Propositional
 import LCS.SLD.FirstOrder
-import LCS.SLD.SearchSpace
-import LCS.SLD.PrologSyntax
 import LCS.SLD.LogicProgramming
 import LCS.SLD.LogicProgramming.Queries
 import LCS.SLD.LogicProgramming.Correctness
 import LCS.SLD.LogicProgramming.Completeness
 import LCS.FirstOrder.ManySorted.SyntaxAlgebra
-import LCS.FirstOrder.ManySorted.SyntaxAlgebra.Parenthesized
-import LCS.FirstOrder.ManySorted.SyntaxAlgebra.TreeIsomorphism
 import LCS.FirstOrder.ManySorted
 import LCS.FirstOrder.ManySorted.Semantics
 import LCS.FirstOrder.ManySorted.Semantics.Substitution
@@ -105,8 +101,3 @@ import LCS.FirstOrder.ManySorted.ClosureApplications
 import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision
 import LCS.FirstOrder.ManySorted.CongruenceClosure.Predicates
 import LCS.FirstOrder.ManySorted.CongruenceClosure.Algorithm
-import LCS.Examples.PrologAppend
-import LCS.Examples.PrologArithmetic
-import LCS.Examples.PrologMember
-import LCS.Examples.PrologReverse
-import LCS.Examples.PrologPath

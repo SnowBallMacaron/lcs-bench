@@ -15,9 +15,6 @@ open LCS.FirstOrder.Gentzen.Hintikka
 
 open LCS.FirstOrder.Completeness
 
-open LCS.FirstOrder.Completeness.InfiniteSearch (
-  signedLimitSet limitSet_isHintikka gamma_in_limitSet)
-
 open LCS.FirstOrder.Gentzen.SignedFormulae
   (SignedFormula)
 
@@ -147,20 +144,6 @@ helper theorem limit_maximal {L : Language}
       rw [dif_pos hConExt]; right; rfl
     exact ⟨n + 1, hStep⟩
 
-helper /-- A consistent set is maximally consistent exactly when every proper
-superset is inconsistent. -/
-theorem isMaximalConsistentSet_iff_proper_superset {L : Language}
-    (Gamma : Set (FormulaN L)) (hCon : InfiniteSearch.isConsistentSet Gamma) :
-    isMaximalConsistentSet Gamma ↔
-      ∀ Delta, Set.subset Gamma Delta → Gamma ≠ Delta →
-        ¬ InfiniteSearch.isConsistentSet Delta := by
-  constructor
-  · intro hMax Delta hSub hNe hDeltaCon
-    exact hNe (hMax.2 Delta hDeltaCon hSub)
-  · intro hProper
-    refine ⟨hCon, fun Delta hDeltaCon hSub => ?_⟩
-    exact Classical.byContradiction fun hNe => hProper Delta hSub hNe hDeltaCon
-
 helper /-- Every consistent set Gamma of an enumerated formula language is a
 subset of a maximal consistent set Delta. -/
 theorem maximal_consistent_extension {L : Language}
@@ -187,9 +170,6 @@ theorem formulaNoEq_of_withoutEquality {L : Language} (hL : L.withoutEquality)
   | impl _ _ ihA ihB => exact ⟨ihA, ihB⟩
   | all _ _ ih => exact ih
   | ex _ _ ih => exact ih
-
-proof_of isMaximalConsistentSet_iff_proper_supersetNoEq := isMaximalConsistentSet_iff_proper_superset Gamma hCon
-
 
 proof_of satisfiable_implies_consistentNNoEq := satisfiable_implies_consistentN Gamma hSat
 
@@ -240,48 +220,5 @@ proof_of maximal_consistent_extensionNoEq := by
     exact maximal_consistent_extension Gamma hCon
   · obtain ⟨A, _⟩ := hCon
     exact False.elim (hEmpty ⟨A⟩)
-
-
-helper /-- Without equality or predicate symbols there are no normalized formulae. -/
-theorem formulaN_not_nonemptyNoEq {L : Language} (hL : L.withoutEquality)
-    (hPred : L.predSymbols → False) : ¬ Nonempty (FormulaN L) := by
-  rintro ⟨A⟩
-  induction A with
-  | predN P _ => exact hPred P
-  | eq_ h _ _ => simp [Language.withoutEquality] at hL; simp [hL] at h
-  | neg _ ih => exact ih
-  | conj _ _ ih _ => exact ih
-  | disj _ _ ih _ => exact ih
-  | impl _ _ ih _ => exact ih
-  | all _ _ ih => exact ih
-  | ex _ _ ih => exact ih
-
-helper /-- In the empty-formula language the empty set is satisfiable but fails
-existential consistency. -/
-theorem emptySet_satisfiable_not_consistentNoEq {L : Language}
-    (hL : L.withoutEquality) (hPred : L.predSymbols → False) :
-    satisfiableSetN (∅ : Set (FormulaN L)) ∧
-      ¬ InfiniteSearch.isConsistentSetNoEq hL (∅ : Set (FormulaN L)) := by
-  constructor
-  · let M : Structure L := {
-      carrier := Unit
-      carrierNonempty := ⟨()⟩
-      interpFunc := fun _ _ => ()
-      interpConst := fun _ => ()
-      interpPred := fun _ _ => True }
-    exact ⟨M, fun _ => (), fun _ h => False.elim h⟩
-  · rintro ⟨A, _⟩
-    exact formulaN_not_nonemptyNoEq hL hPred ⟨A⟩
-
-proof_of nonclosed_search_path_hintikka_model := by
-  have hSat := hintikka_set_satisfiable_concrete hL path.termDomain S hHS
-  refine ⟨hSat, ?_⟩
-  intro A hA
-  have hInput := (hGamma A).mpr hA
-  have hIn : SignedFormula.trueF A ∈ S := by
-    -- REPAIR(T110): proof pending
-    sorry
-  exact hSat (SignedFormula.trueF A) hIn
-
 
 end LCS.FirstOrder.Completeness.MetaTheorems

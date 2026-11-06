@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.Basic : UInt64 := 6146632711200185293
+def AttachStamp.LCS.FirstOrder.Basic : UInt64 := 422256052407444614

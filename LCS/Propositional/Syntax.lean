@@ -204,11 +204,6 @@ def exModusTollens : PropFormula :=
 def exExcludedMiddle : PropFormula :=
   PropFormula.disj (PropFormula.var 1) (PropFormula.neg (PropFormula.var 1))
 
-/-- Example 3.2.1 (companion): List of all example propositions from the textbook. -/
-@[blueprint "chap3__example_3_2_1"]
-def examplePropositions : List PropFormula :=
-  [exP1, exP2, exP1orP2, exImplEquiv, exNegEquivImplFls, exModusTollens, exExcludedMiddle]
-
 -- ========= Example 3.2.2: The symbols function =========
 
 namespace PropFormula

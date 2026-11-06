@@ -118,43 +118,6 @@ theorem msNamingConstEval {L : MSLanguage} (M : MSStructure L)
     msTermEval (msExtendedInterp M) v (msNamingConst m) = m 
 
 -- ===================================================================
--- Lifting terms/formulae from L to the extended language L(M)
--- ===================================================================
-
-/-- Lemma 10.3.1 (required helper, many-sorted analogue of one-sorted
-`liftTerm`): lift a term from `L` to the extended language `L(M)`, mapping
-each original constant `c` to `Sum.inl c` and leaving variables and
-function applications structurally unchanged (lifting arguments
-recursively). The sort is preserved. -/
-@[blueprint "chap10__lemma_10_3_1"]
-def msLiftTermExt {L : MSLanguage} (M : L.SortType → Type) :
-    {s : L.SortType} → MSTerm L s → MSTerm (msExtendedLanguage L M) s
-  | _, .var s i   => MSTerm.var (L := msExtendedLanguage L M) s i
-  | _, .const s c =>
-      MSTerm.const (L := msExtendedLanguage L M) s (Sum.inl c)
-  | _, .func f ts =>
-      MSTerm.func (L := msExtendedLanguage L M) f (fun i => msLiftTermExt M (ts i))
-
-/-- Lemma 10.3.1 (required helper, many-sorted analogue of one-sorted
-`liftFormula`): lift a formula from `L` to the extended language `L(M)` by
-lifting all embedded terms (via `msLiftTermExt`) and recursing through the
-connectives and quantifiers. The equality flag is shared between `L` and
-`L(M)`, so the `eq_` proof argument transfers unchanged. -/
-@[blueprint "chap10__lemma_10_3_1"]
-def msLiftFormulaExt {L : MSLanguage} (M : L.SortType → Type) :
-    MSFormula L → MSFormula (msExtendedLanguage L M)
-  | .falsum         => .falsum
-  | .pred P ts      => .pred P (fun i => msLiftTermExt M (ts i))
-  | .eq_ hL s t1 t2 => .eq_ hL s (msLiftTermExt M t1) (msLiftTermExt M t2)
-  | .conj A B       => .conj (msLiftFormulaExt M A) (msLiftFormulaExt M B)
-  | .disj A B       => .disj (msLiftFormulaExt M A) (msLiftFormulaExt M B)
-  | .impl A B       => .impl (msLiftFormulaExt M A) (msLiftFormulaExt M B)
-  | .equiv_ A B     => .equiv_ (msLiftFormulaExt M A) (msLiftFormulaExt M B)
-  | .neg A          => .neg (msLiftFormulaExt M A)
-  | .all s i A      => .all s i (msLiftFormulaExt M A)
-  | .ex s i A       => .ex s i (msLiftFormulaExt M A)
-
--- ===================================================================
 -- Lemma 10.3.1: Substitution-based semantics for sorted quantifiers
 -- ===================================================================
 
@@ -278,7 +241,6 @@ free variable of the term `t` (each variable applied at its own sort
 Proved by induction on `t` (var: directly from the agreement
 hypothesis; const: `rfl`; func: congruence + IH on each argument). Used
 in the atomic (`pred`, `eq_`) cases of the formula induction. -/
-@[blueprint "chap10__lemma_10_3_2"]
 theorem msTermCoincidence {L : MSLanguage} (M : MSStructure L)
     {s : L.SortType} (t : MSTerm L s) (v1 v2 : MSAssignment M)
     (hAgree : ∀ y : MSVar L, y ∈ msTermFV t → v1 y.1 y.2 = v2 y.1 y.2) :
@@ -311,23 +273,11 @@ theorem msCoincidenceLemma {L : MSLanguage} (M : MSStructure L)
     (hAgree : ∀ y : MSVar L, y ∈ msFormulaFV A → v1 y.1 y.2 = v2 y.1 y.2) :
     msFormulaEval M A v1 = msFormulaEval M A v2 
 
-/-- Lemma 10.3.2 (consequence, many-sorted analogue of one-sorted
-`sentenceTruthIndep`): a SENTENCE (closed formula, `FV(A) = ∅` via
-`MSFormula.isSentence`) has assignment-independent meaning, since the
-agreement hypothesis of `msCoincidenceLemma` is vacuously satisfied (no
-free variables). Strengthens "equal meaning under agreeing assignments"
-to unconditional equality for closed `A`. -/
-@[blueprint "chap10__lemma_10_3_2"]
-theorem msSentenceTruthIndep {L : MSLanguage} (M : MSStructure L)
-    (A : MSFormula L) (hSent : MSFormula.isSentence A)
-    (v1 v2 : MSAssignment M) :
-    msFormulaEval M A v1 = msFormulaEval M A v2 
-
 /-- §10.3.5, generalizing Lemma 5.3.4(i): universal bound-variable
 renaming preserves meaning in every structure and assignment. The replacement
 variable has the same sort, is free for the original variable in the arbitrary
 formula `A`, and is absent from `FV(A) \ {x}`. This permits `y = x`. -/
-@[attach_debt, blueprint "chap10__lemma_10_3_2"]
+@[attach_debt]
 theorem msAlphaEquivUniv {L : MSLanguage} [DecidableEq L.SortType]
     (A : MSFormula L) (s : L.SortType) (x y : Nat)
     (hFree : msIsFreeFor A s x (MSTerm.var s y))
@@ -340,7 +290,7 @@ theorem msAlphaEquivUniv {L : MSLanguage} [DecidableEq L.SortType]
 renaming preserves meaning in every structure and assignment. The replacement
 variable has the same sort, is free for the original variable in the arbitrary
 formula `A`, and is absent from `FV(A) \ {x}`. This permits `y = x`. -/
-@[attach_debt, blueprint "chap10__lemma_10_3_2"]
+@[attach_debt]
 theorem msAlphaEquivEx {L : MSLanguage} [DecidableEq L.SortType]
     (A : MSFormula L) (s : L.SortType) (x y : Nat)
     (hFree : msIsFreeFor A s x (MSTerm.var s y))

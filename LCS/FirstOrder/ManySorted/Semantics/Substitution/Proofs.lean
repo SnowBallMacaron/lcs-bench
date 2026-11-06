@@ -324,15 +324,6 @@ proof_of msCoincidenceLemma := by
       · rename_i hc1
         rw [if_neg (hcond ▸ hc1)]
 
-
-proof_of msSentenceTruthIndep := by
-  -- BEGIN PROOF
-    refine msCoincidenceLemma M A v1 v2 (fun y hy => ?_)
-    have hfv : msFormulaFV A = ∅ := hSent
-    rw [hfv] at hy
-    exact absurd hy id
-
-
 proof_of msAlphaEquivUniv := by
   -- REPAIR(T10-54): proof pending — universal same-sort renaming under free-for and freshness
   sorry

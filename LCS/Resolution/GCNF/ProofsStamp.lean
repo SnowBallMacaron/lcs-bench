@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Resolution.GCNF : UInt64 := 839369118193738435
+def AttachStamp.LCS.Resolution.GCNF : UInt64 := 4520074767810533527

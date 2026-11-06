@@ -4,67 +4,22 @@ import LCS.FirstOrder.Gentzen
 import LCS.FirstOrder.Gentzen.SignedFormulae
 import LCS.FirstOrder.Gentzen.Hintikka
 import LCS.FirstOrder.Completeness
-import LCS.FirstOrder.Equality.Part1
-import LCS.FirstOrder.Equality.Part2
+import LCS.FirstOrder.Equality.HintikkaSets
+import LCS.FirstOrder.Equality.SystemGEq
+import LCS.FirstOrder.Equality.Soundness
 
 /-! # FirstOrder.Equality
     Formalization of Chapter 5, Sections 5.6.1-5.6.3.
     Hintikka sets for languages with equality, the Gentzen system G_=,
     and soundness.
     Source: Logic for Computer Science, Gallier 2015
+
+    Content modules, in book order:
+    - `Equality.HintikkaSets` — Section 5.6.1, Definition 5.6.1 and Lemma 5.6.1 (Hintikka sets for languages with equality and their satisfiability)
+    - `Equality.SystemGEq` — Section 5.6.2, Definition 5.6.2 and Examples 5.6.1-5.6.2 (equality rules of the Gentzen system, G= proof and deduction trees)
+    - `Equality.Soundness` — Section 5.6.3, Lemmas 5.6.2-5.6.3 (soundness of the system G=)
 -/
 
 namespace LCS.FirstOrder.Equality
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.SemanticsN.Substitution (formulaSubstEvalDirectN)
-open LCS.FirstOrder.Gentzen
-open LCS.FirstOrder.Gentzen.SignedFormulae
-open LCS.FirstOrder.Gentzen.Hintikka
-open LCS.FirstOrder.Completeness
-
--- ===================================================================
--- Definition 5.6.1 (companion def): conjoinFormulae
--- ===================================================================
-
-
-namespace GEqDeductionTree
-
-
-end GEqDeductionTree
-
-
--- ===================================================================
--- Example 5.6.1 (companion type): ExPredEq1
--- ===================================================================
-
-
--- ===================================================================
--- Definition 5.6.2 (companion def): GEqProofTree.conclusion (shim)
--- ===================================================================
-
-namespace GEqProofTree
-
-
-end GEqProofTree
-
--- ===================================================================
--- Definition 5.6.2 (companion): Well-formedness of GEqProofTree (shim)
--- ===================================================================
-
--- ===================================================================
--- Definition 5.6.2 (companion def): sequentProvableEq
--- ===================================================================
-
-
--- ===================================================================
--- Lemma 5.6.1 (companion theorem): eqCongruence_func
--- ===================================================================
-
-
 
 end LCS.FirstOrder.Equality

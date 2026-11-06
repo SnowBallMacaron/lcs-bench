@@ -78,15 +78,6 @@ proof_of subset_of_newInputs_empty := open LCS.Resolution.Method.ReverseTree.Pro
         exact LCS.Finset.mem_filter.mpr ⟨hC, by simp [hs]⟩
       exact (LCS.Finset.not_mem_empty (h ▸ hn)).elim
 
-
-helper /-- The source's inequality in subtraction-free form, before transporting
-the resolution tree's count to the nodes of an unshared input graph. -/
-theorem ResolutionTree.toGCNF_nodeCount_bound (T : ResolutionTree) (hWF : T.IsWellFormed)
-    (hEmpty : T.label = GCNF.Clause.empty) (hOrdinary : T.inputs.isOrdinary) :
-    (toGCNF T hWF hEmpty hOrdinary).val.nodeCount + 1 ≤ 2 * T.treeStepCount := by
-  rw [LCS.Resolution.GCNF.Proofs.GCNFProofTree.nodeCount_eq_two_leafCount_sub_one]
-  exact Nat.mul_le_mul_left 2 (toGCNF_leafCount_le T hWF hEmpty hOrdinary)
-
 end ResolutionTree
 
 end LCS.Resolution.Method

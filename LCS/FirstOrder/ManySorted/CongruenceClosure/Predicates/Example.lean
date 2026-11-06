@@ -26,12 +26,6 @@ example language. -/
 inductive ExamplePredSort : Type where
   | iota : ExamplePredSort
 
-/-- Example 10.6.3 (companion): decidable equality of the example sort,
-needed to type the concrete terms and conjunction. -/
-@[blueprint "chap10__example_10_6_3"]
-instance : DecidableEq ExamplePredSort := fun a b => by
-  cases a <;> cases b <;> exact isTrue rfl
-
 /-- Example 10.6.3 (companion): the function symbols `FS = {f}` — the
 single unary function symbol `f` of rank `([ι], ι)`. -/
 @[blueprint "chap10__example_10_6_3"]
@@ -299,14 +293,6 @@ theorem example_lift_f3a :
 theorem example_lift_f5a :
     msLiftTerm examplePredLanguage examplePredTerm_f5a = exampleLiftT5 
 
-/-- Example 10.6.3 (companion): the positive equation `f³(a) ≐ a` (first
-conjunct of `C'`) — the seed pair `f³(a) ~ a`. -/
-@[blueprint "chap10__example_10_6_3"]
-theorem example_contains_f3a_eq_a :
-    Decision.msConjunctContains examplePredConjunctionEncoded
-      (MSFormula.eq_ (L := boolExtendedLanguage examplePredLanguage) rfl
-        (some ExamplePredSort.iota) exampleLiftT3 exampleLiftT0) 
-
 /-- Example 10.6.3 (companion): the positive equation `f⁵(a) ≐ a` (second
 conjunct of `C'`) — the seed pair `f⁵(a) ~ a`. -/
 @[blueprint "chap10__example_10_6_3"]
@@ -374,59 +360,6 @@ noncomputable def exampleNodeT0 : exampleGraphPred.Node :=
 noncomputable def exampleNodeT1 : exampleGraphPred.Node :=
   ⟨⟨some ExamplePredSort.iota, exampleLiftT1⟩, example_memTk exampleLiftT1 example_subT5_T1⟩
 
-/-- Example 10.6.3 (companion): the `G(C')`-node for `f²(a)`. -/
-@[blueprint "chap10__example_10_6_3"]
-noncomputable def exampleNodeT2 : exampleGraphPred.Node :=
-  ⟨⟨some ExamplePredSort.iota, exampleLiftT2⟩, example_memTk exampleLiftT2 example_subT5_T2⟩
-
-/-- Example 10.6.3 (companion): the `G(C')`-node for `f³(a)`. -/
-@[blueprint "chap10__example_10_6_3"]
-noncomputable def exampleNodeT3 : exampleGraphPred.Node :=
-  ⟨⟨some ExamplePredSort.iota, exampleLiftT3⟩, example_memTk exampleLiftT3 example_subT5_T3⟩
-
-/-- Example 10.6.3 (companion): the `G(C')`-node for `f⁴(a)`. -/
-@[blueprint "chap10__example_10_6_3"]
-noncomputable def exampleNodeT4 : exampleGraphPred.Node :=
-  ⟨⟨some ExamplePredSort.iota, exampleLiftT4⟩, example_memTk exampleLiftT4 example_subT5_T4⟩
-
-/-- Example 10.6.3 (companion): the `G(C')`-node for `f⁵(a)`. -/
-@[blueprint "chap10__example_10_6_3"]
-noncomputable def exampleNodeT5 : exampleGraphPred.Node :=
-  ⟨⟨some ExamplePredSort.iota, exampleLiftT5⟩, example_memTk exampleLiftT5 example_subT5_T5⟩
-
-/-- Example 10.6.3 (companion): the seed pair `f³(a) ~ a` is in the
-congruence closure (injected from the first positive equation). -/
-@[blueprint "chap10__example_10_6_3"]
-theorem example_closure_T3_T0 :
-    exampleClosurePred exampleNodeT3 exampleNodeT0 
-
-/-- Example 10.6.3 (companion): the seed pair `f⁵(a) ~ a` is in the
-congruence closure (injected from the second positive equation). -/
-@[blueprint "chap10__example_10_6_3"]
-theorem example_closure_T5_T0 :
-    exampleClosurePred exampleNodeT5 exampleNodeT0 
-
-/-- Example 10.6.3 (companion): the `f`-congruence (backward-closure 2b)
-step — from `t_a ~ t_b` in the closure, the function nodes `f(t_a)` and
-`f(t_b)` are also related (same label `Sum.inl f`, single successor
-related by the hypothesis). Mirrors the `g`-step of Decision's
-`exampleClosureClasses`. -/
-@[attach_debt, blueprint "chap10__example_10_6_3"]
-theorem example_fStep
-    (ta tb : MSTerm (boolExtendedLanguage examplePredLanguage) (some ExamplePredSort.iota))
-    (ma : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, ta⟩)
-    (mb : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, tb⟩)
-    (mfa : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, exampleLiftTf ta⟩)
-    (mfb : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, exampleLiftTf tb⟩)
-    (h : exampleClosurePred ⟨⟨some ExamplePredSort.iota, ta⟩, ma⟩
-      ⟨⟨some ExamplePredSort.iota, tb⟩, mb⟩) :
-    exampleClosurePred ⟨⟨some ExamplePredSort.iota, exampleLiftTf ta⟩, mfa⟩
-      ⟨⟨some ExamplePredSort.iota, exampleLiftTf tb⟩, mfb⟩ 
-
 /-- Example 10.6.3: `f(a) ↔* a` in the closure. By repeated `f`-congruence
 of the two seeds and transitivity, ALL of `a, f(a), …, f⁵(a)` collapse to
 one class; in particular `f(a) ~ a`. Concretely: `f³a~a` and `f⁵a~a` ⇒
@@ -487,14 +420,6 @@ theorem example_contains_neg_Pfa_eq_top :
         (examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_fa))
         (msTopConst examplePredLanguage))) 
 
-/-- Example 10.6.3 (companion): the bool node `P(a)` lies in `TERM(C')`
-(LHS of the positive equation `P(a) ≐ ⊤`). -/
-@[blueprint "chap10__example_10_6_3"]
-theorem example_memPa :
-    Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨MSBoolSort examplePredLanguage,
-        examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_a)⟩ 
-
 /-- Example 10.6.3 (companion): the bool node `⊤` lies in `TERM(C')` (RHS
 of the positive equation `P(a) ≐ ⊤`). -/
 @[blueprint "chap10__example_10_6_3"]
@@ -530,37 +455,6 @@ noncomputable def exampleNodeA : exampleGraphPred.Node :=
 `example_lift_fa`/`example_lift_a` term equalities). -/
 @[blueprint "chap10__example_10_6_3"]
 theorem example_fa_eq_a_lifted : exampleClosurePred exampleNodeFa exampleNodeA 
-
-/-- Example 10.6.3 (companion): the `P`-congruence (backward-closure 2b)
-step — from `t_a ~ t_b` in the closure, the bool nodes `P(t_a)` and
-`P(t_b)` are also related (same label `Sum.inr P`, single successor
-related by the hypothesis). This is the NEW predicate-congruence step of
-§10.6.5. -/
-@[attach_debt, blueprint "chap10__example_10_6_3"]
-theorem example_pStep
-    (ta tb : MSTerm (boolExtendedLanguage examplePredLanguage) (some ExamplePredSort.iota))
-    (ma : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, ta⟩)
-    (mb : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨some ExamplePredSort.iota, tb⟩)
-    (mpa : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨MSBoolSort examplePredLanguage, examplePredTermP ta⟩)
-    (mpb : Decision.termSetOfConjunction examplePredConjunctionEncoded
-      ⟨MSBoolSort examplePredLanguage, examplePredTermP tb⟩)
-    (h : exampleClosurePred ⟨⟨some ExamplePredSort.iota, ta⟩, ma⟩
-      ⟨⟨some ExamplePredSort.iota, tb⟩, mb⟩) :
-    exampleClosurePred ⟨⟨MSBoolSort examplePredLanguage, examplePredTermP ta⟩, mpa⟩
-      ⟨⟨MSBoolSort examplePredLanguage, examplePredTermP tb⟩, mpb⟩ 
-
-/-- Example 10.6.3 (companion): the seed pair `P(a) ~ ⊤` is in the
-congruence closure (injected from the third, positive, bool-equation
-conjunct `P(a) ≐_bool ⊤`). -/
-@[blueprint "chap10__example_10_6_3"]
-theorem example_closure_Pa_top :
-    exampleClosurePred
-      ⟨⟨MSBoolSort examplePredLanguage,
-        examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_a)⟩, example_memPa⟩
-      ⟨⟨MSBoolSort examplePredLanguage, msTopConst examplePredLanguage⟩, example_memTop⟩ 
 
 /-- Example 10.6.3: `P(f(a)) ↔* ⊤` in the closure. From `f(a) ~ a`
 (`example_fa_eq_a_lifted`) the `P`-congruence step gives `P(f(a)) ~ P(a)`;

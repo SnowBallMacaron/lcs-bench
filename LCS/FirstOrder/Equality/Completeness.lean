@@ -5,75 +5,27 @@ import LCS.FirstOrder.Equality.Search
 import LCS.FirstOrder.Completeness
 import LCS.FirstOrder.Completeness.InfiniteSearch
 import LCS.FirstOrder.Gentzen.Search.NoFunction
-import LCS.FirstOrder.Equality.Completeness.Part1
-import LCS.FirstOrder.Equality.Completeness.Part2
+import LCS.FirstOrder.Equality.Completeness.EqualityAxiomLists
+import LCS.FirstOrder.Equality.Completeness.SearchRounds
+import LCS.FirstOrder.Equality.Completeness.HintikkaConditions
+import LCS.FirstOrder.Equality.Completeness.SignedLimitSet
+import LCS.FirstOrder.Equality.Completeness.SearchTreePaths
+import LCS.FirstOrder.Equality.Completeness.CompletenessTheorem
 
 /-! # FirstOrder.Equality.Completeness
     Formalization of Chapter 5, Sections 5.6.4-5.6.5.
     Search procedure and completeness for languages with equality.
     Source: Logic for Computer Science, Gallier 2015
+
+    Content modules, in book order:
+    - `Completeness.EqualityAxiomLists` — Section 5.6.4, the equality lists EQⱼ,ᵢ in list form and the cycling index j = (RC mod 3) + 1
+    - `Completeness.SearchRounds` — Section 5.6.4, Definition 5.6.3, search state, rounds and branch steps
+    - `Completeness.HintikkaConditions` — Section 5.6.5, proof of Theorem 5.6.1, the claim's conditions H6(i)-(iii) for the search closure and falsification in the quotient
+    - `Completeness.SignedLimitSet` — Section 5.6.5, the equality-aware signed limit set and its Hintikka property
+    - `Completeness.SearchTreePaths` — Section 5.6.5, proof of Theorem 5.6.1, search tree data and the Hintikka properties of its paths
+    - `Completeness.CompletenessTheorem` — Section 5.6.5, Theorem 5.6.1 and the corollary, via the constructed search tree
 -/
 
 namespace LCS.FirstOrder.Equality.Completeness
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Gentzen
-open LCS.FirstOrder.Gentzen.SignedFormulae
-open LCS.FirstOrder.Gentzen.Hintikka
-open LCS.FirstOrder.Equality
-open LCS.FirstOrder.Completeness
-
-
--- ===================================================================
--- Equality-aware growing closure (Section 5.6.4-5.6.5)
--- ===================================================================
--- The equality-aware signed limit set extends signedLimitSet (from
--- InfiniteSearch) with the equality axiom instances (H6 conditions).
--- This avoids the contradiction in the old eqSearchClosureSet approach
--- because signedLimitSet Gamma (with equality-free Gamma) never
--- produces falseF(eq_ ...), so injecting trueF(eq_ ...) is safe.
-
-open LCS.FirstOrder.Completeness.InfiniteSearch
-
--- ===================================================================
--- Definition: signedLimitSetEq
--- ===================================================================
-
-
--- ===================================================================
--- FormulaN-native theorems (Rounds 5+6)
--- ===================================================================
-
-open LCS.FirstOrder.Completeness
-
--- ===================================================================
--- Lemma 5.6.3 (normalized): soundnessGEq
--- ===================================================================
-
--- soundnessGEq: The fully-proved version from LCS.FirstOrder.Equality
--- (imported and opened) is used.
-
--- ===================================================================
--- Definition 5.6.3 (normalized, companion def): eqReflFormulae
--- ===================================================================
-
-
--- ===================================================================
--- Definition 5.6.3 (normalized, companion def): eqListForIndex
--- ===================================================================
-
-namespace SearchStateEq
-
-
-end SearchStateEq
-
--- ===================================================================
--- Definition 5.6.3 (normalized): injectEqFormulae
--- ===================================================================
-
 
 end LCS.FirstOrder.Equality.Completeness

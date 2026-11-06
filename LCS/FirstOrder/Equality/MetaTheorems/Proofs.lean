@@ -30,35 +30,6 @@ open LCS.FirstOrder.Completeness.MetaTheorems
 
 open Classical
 
-helper /-- G_= extends G: every G proof tree embeds into G_= via the .base
-    constructor. Therefore `sequentProvableExt s` (G-provability under
-    the §5.4.8 standing assumption) implies `sequentProvableEq s`. By
-    contrapositive, isConsistentSetEq (not G_=-provable) implies
-    isConsistentSet (not G-provable). Both sides now use Set (FormulaN L). -/
-theorem consistentEq_implies_consistent {L : Language} (hL : L.hasEquality = true)
-    (Gamma : Set (FormulaN L)) (hCon : isConsistentSetEq hL Gamma) :
-    LCS.FirstOrder.Completeness.InfiniteSearch.isConsistentSet Gamma := by
--- BEGIN PROOF
-  obtain ⟨B, hB⟩ := hCon
-  refine ⟨B, ?_⟩
-  intro cs hcs hprov
-  apply hB cs hcs
-  obtain ⟨t⟩ := hprov
-  exact ⟨GEqProofTree.base t⟩
-
-helper /-- Model existence for G_= specializes to consistent sets of equality-free
-formulae satisfying the global rectification condition. -/
-theorem consistentEq_implies_satisfiable_noEq {L : Language} (hL : L.hasEquality = true)
-    [Countable (FormulaN L)] [Countable (Term L)]
-    (Gamma : Set (FormulaN L))
-    (hCon : isConsistentSetEq hL Gamma)
-    (hNoEq : ∀ A ∈ Gamma,
-      formulaNoEq A)
-    (hGRN : LCS.FirstOrder.Completeness.MetaTheorems.globallyRectifiedN Gamma) :
-    satisfiableSetN Gamma := by
--- BEGIN PROOF
-  exact consistentEq_implies_satisfiable hL Gamma hCon
-
 proof_of satisfiable_implies_consistent_eq := by
   -- BEGIN PROOF
     obtain ⟨M, s, hsat⟩ := hSat
@@ -83,31 +54,6 @@ proof_of lowenheim_skolem_eq := by
     obtain ⟨M, s, hsat, hcount⟩ :=
       consistentEq_implies_satisfiable_countable hL Gamma hCon
     exact ⟨M, ⟨s, hsat⟩, hcount⟩
-
-
-proof_of ls_model_may_be_finite := by
-  let A : FormulaN L := .all 0 (.all 1 (.eq_ hL (.var 0) (.var 1)))
-  refine ⟨Set.singleton A, ?_, ?_⟩
-  · let M : Structure L := {
-      carrier := Unit
-      carrierNonempty := ⟨()⟩
-      interpFunc := fun _ _ => ()
-      interpConst := fun _ => ()
-      interpPred := fun _ _ => True }
-    refine ⟨M, fun _ => (), ?_⟩
-    intro B hB
-    have hBA : B = A := hB
-    subst B
-    change ∀ a b : Unit, a = b
-    intro a b
-    cases a
-    cases b
-    rfl
-  · intro M ⟨s, hs⟩
-    have hall : ∀ a b : M.carrier, a = b := hs A rfl
-    obtain ⟨a⟩ := M.carrierNonempty
-    exact ⟨1, fun _ => a, fun b => ⟨⟨0, by decide⟩, hall a b⟩⟩
-
 
 proof_of compactness_eq := by
   -- BEGIN PROOF
@@ -138,57 +84,6 @@ proof_of compactness_eq := by
 
 proof_of maximal_consistent_extension_eq := lindenbaum_eq hL Gamma hCon
   -- BEGIN PROOF
-
-
-helper /-- Example 5.6.3: Every expansion of 𝒩 interpreting c above the indices
-of all inequations in a finite subset of Γ validates that entire subset,
-including its lifted Peano axioms. For the empty list every k satisfies the
-bound and the conclusion. -/
-theorem finiteInequations_valid_above
-    (cs : List (FormulaN expandedArithLanguage))
-    (hcs : ∀ A ∈ cs, A ∈ gammaNonstandard)
-    (k : Nat)
-    (hk : ∀ n : Nat,
-      FormulaN.neg (FormulaN.eq_ rfl (numeralExpanded n) newConstantC) ∈ cs → n < k) :
-    ∀ A ∈ cs, validInN (expandedPeanoNatStructure k) A := by
-  have hTerm (s : Assignment peanoNatStructure) (t : Term peanoLanguage) :
-      termEval (expandedPeanoNatStructure k) s (liftArithTerm t) =
-        termEval peanoNatStructure s t := by
-    induction t with
-    | var x => rfl
-    | const c => rfl
-    | func f ts ih =>
-      simp only [liftArithTerm, termEval]
-      congr 1
-      funext i
-      exact ih i
-  have hFormula (s : Assignment peanoNatStructure) (A : FormulaN peanoLanguage) :
-      formulaEvalN (expandedPeanoNatStructure k) (liftArithFormula A) s ↔
-        formulaEvalN peanoNatStructure A s := by
-    induction A generalizing s with
-    | predN P ts => exact Empty.elim P
-    | eq_ h t u =>
-      simp only [liftArithFormula, formulaEvalN, hTerm]
-      rfl
-    | neg A ih => exact not_congr (ih s)
-    | conj A B ihA ihB => exact and_congr (ihA s) (ihB s)
-    | disj A B ihA ihB => exact or_congr (ihA s) (ihB s)
-    | impl A B ihA ihB => exact imp_congr (ihA s) (ihB s)
-    | all x A ih => exact forall_congr' (fun a => ih (assignUpdate s x a))
-    | ex x A ih => exact exists_congr (fun a => ih (assignUpdate s x a))
-  have hNumeral (s : Assignment (expandedPeanoNatStructure k)) (n : Nat) :
-      termEval (expandedPeanoNatStructure k) s (numeralExpanded n) = n := by
-    induction n with
-    | zero => rfl
-    | succ n ih =>
-      change Nat.succ (termEval (expandedPeanoNatStructure k) s (numeralExpanded n)) = n + 1
-      rw [ih]
-  intro A hA s
-  rcases hcs A hA with ⟨B, hB, rfl⟩ | ⟨n, rfl⟩
-  · exact (hFormula s B).mpr (peanoNatStructure_models_peanoArithAxioms B hB s)
-  · change termEval (expandedPeanoNatStructure k) s (numeralExpanded n) ≠ k
-    rw [hNumeral]
-    exact Nat.ne_of_lt (hk n hA)
 
 helper /-- Example 5.6.3: Compactness gives satisfiability of Γ = A_P ∪ I. -/
 theorem gammaNonstandard_satisfiable : satisfiableSetN gammaNonstandard := by
@@ -233,23 +128,6 @@ theorem termEval_liftArithTerm (s : Assignment nonstandardModel)
     funext i
     exact ih i
 
-helper /-- Lifting an arithmetic formula preserves its truth in M and M₀. -/
-theorem formulaEvalN_liftArithFormula (s : Assignment nonstandardModel)
-    (A : FormulaN peanoLanguage) :
-    formulaEvalN nonstandardModel0 (liftArithFormula A) s ↔
-      formulaEvalN nonstandardModel A s := by
-  induction A generalizing s with
-  | predN P ts => exact Empty.elim P
-  | eq_ h t u =>
-    simp only [liftArithFormula, formulaEvalN, termEval_liftArithTerm]
-    rfl
-  | neg A ih => exact not_congr (ih s)
-  | conj A B ihA ihB => exact and_congr (ihA s) (ihB s)
-  | disj A B ihA ihB => exact or_congr (ihA s) (ihB s)
-  | impl A B ihA ihB => exact imp_congr (ihA s) (ihB s)
-  | all x A ih => exact forall_congr' (fun a => ih (assignUpdate s x a))
-  | ex x A ih => exact exists_congr (fun a => ih (assignUpdate s x a))
-
 helper /-- Lifting a numeral gives the corresponding numeral of the expanded language. -/
 theorem liftArithTerm_numeral (n : Nat) :
     liftArithTerm (numeral n) = numeralExpanded n := by
@@ -266,13 +144,6 @@ theorem liftArithTerm_numeral (n : Nat) :
       omega
     subst i
     exact ih
-
-helper /-- Example 5.6.3: The reduct M models the Peano arithmetic axioms. -/
-theorem nonstandardModel_models_peanoArithAxioms :
-    ∀ A ∈ peanoArithAxioms, validInN nonstandardModel A := by
-  intro A hA s
-  exact (formulaEvalN_liftArithFormula s A).mp
-    (nonstandardModel0_spec.2 (liftArithFormula A) (Or.inl ⟨A, hA, rfl⟩) s)
 
 helper /-- Example 5.6.3: The element a is not the value of any numeral in M. -/
 theorem nonstandardElement_not_numeral (n : Nat) (s : Assignment nonstandardModel) :
@@ -298,51 +169,6 @@ theorem termEval_mkSucc (M : Structure peanoLanguage) (s : Assignment M)
     omega
   subst i
   rfl
-
-helper /-- Example 5.6.3: Distinct natural numbers have distinct numeral values in M. -/
-theorem nonstandardModel_numerals_distinct (m n : Nat) (hmn : m ≠ n)
-    (s : Assignment nonstandardModel) :
-    termEval nonstandardModel s (numeral m) ≠
-      termEval nonstandardModel s (numeral n) := by
-  have hZero : ∀ a : nonstandardModel.carrier,
-      nonstandardModel.interpFunc ArithFunc.succ (vec1 a) ≠
-        nonstandardModel.interpConst ArithConst.zero := by
-    intro a
-    have h := nonstandardModel_models_peanoArithAxioms paSuccZeroAxiom
-      (Or.inl rfl) s a
-    change termEval nonstandardModel (assignUpdate s 0 a) (mkSucc (.var 0)) ≠
-      nonstandardModel.interpConst ArithConst.zero at h
-    rw [termEval_mkSucc] at h
-    simpa [termEval, assignUpdate] using h
-  have hInj : ∀ a b : nonstandardModel.carrier,
-      nonstandardModel.interpFunc ArithFunc.succ (vec1 a) =
-        nonstandardModel.interpFunc ArithFunc.succ (vec1 b) → a = b := by
-    intro a b
-    have h := nonstandardModel_models_peanoArithAxioms paSuccInjectiveAxiom
-      (Or.inr (Or.inl rfl)) s a b
-    change termEval nonstandardModel (assignUpdate (assignUpdate s 0 a) 1 b)
-        (mkSucc (.var 0)) =
-      termEval nonstandardModel (assignUpdate (assignUpdate s 0 a) 1 b)
-        (mkSucc (.var 1)) → _ at h
-    simp only [formulaEvalN, termEval_mkSucc, termEval, assignUpdate] at h
-    simpa using h
-  induction m generalizing n with
-  | zero =>
-    cases n with
-    | zero => exact False.elim (hmn rfl)
-    | succ n =>
-      rw [numeral, numeral, termEval_mkSucc]
-      exact Ne.symm (hZero (termEval nonstandardModel s (numeral n)))
-  | succ m ih =>
-    cases n with
-    | zero =>
-      rw [numeral, numeral, termEval_mkSucc]
-      exact hZero (termEval nonstandardModel s (numeral m))
-    | succ n =>
-      rw [numeral, numeral, termEval_mkSucc, termEval_mkSucc]
-      intro h
-      exact ih n (fun e => hmn (congrArg Nat.succ e))
-        (hInj _ _ h)
 
 helper /-- Example 5.6.3: Under a hypothetical isomorphism f from M to 𝒩,
 every natural number differs from k = f(a). Numeral preservation and

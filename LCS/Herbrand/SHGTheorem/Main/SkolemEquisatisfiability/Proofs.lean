@@ -1,31 +1,18 @@
 import LCS.Herbrand.SHGTheorem.Main.SkolemEquisatisfiability
 
 section
-
 namespace LCS.Herbrand.SHGTheorem.Main
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.Semantics.Subformulae
-
 open LCS.Herbrand.SHGTheorem
-
 open LCS.Herbrand.SHGTheorem.Herbrand
-
 open LCS.Herbrand.PrenexForm
-
 open LCS.Herbrand.NNFHauptsatz.Theorem
-
 open LCS.CutElim.Hauptsatz
-
 open LCS.FirstOrder.SemanticsN.Substitution
 
 helper /-- Lemma 7.6.3, property (b): Given M satisfying A, construct an
@@ -87,34 +74,5 @@ proof_of skolem_form_sat_iff := by
       rw [hSource]
       exact skolemForm_forward_genN spec N sN (_hSkolem ▸ hB) M sN hExp
 
-
-
-
-
-
-
-
-
-
-
-
-helper /-- Helper: a closed term (one with empty `termFV`) evaluates to the
-same element under any assignment. -/
-theorem termEval_closed_indep {L : Language} (M : Structure L)
-    (t : Term L) (hClosed : LCS.FirstOrder.Basic.Term.isClosed t)
-    (s1 s2 : Assignment M) :
-    termEval M s1 t = termEval M s2 t := by
--- BEGIN PROOF
-  apply termCoincidence
-  intro y hy
-  exfalso
-  rw [hClosed] at hy
-  exact hy
-
-
-
-
-
 end LCS.Herbrand.SHGTheorem.Main
-
 end

@@ -1,46 +1,15 @@
 import LCS.FOResolution.Method.Soundness.ResolventValidity
 
 section
-
 namespace LCS.FOResolution.Method.Soundness
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.SemanticsN.Substitution
-
 open LCS.FOResolution.ClauseForm
-
 open LCS.FOResolution.Unification
-
 open LCS.FOResolution.Method
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 proof_of resolvent_validity := by
   intro M hA hB
@@ -98,21 +67,6 @@ proof_of resolvent_validity := by
     apply ((substLit_eval (hNoEq := by all_goals exact hNoEq)) M (fun x => termEval M s (sigma x)) rho litA
       (hQFA litA hlitA_mem)).mpr
     rw [← sA_eq]; exact hlitA_eval
-proof_of resolution_soundness_fo := by
-  obtain ⟨T, _hD, hLeaves, hWF, hEmpty⟩ := hRef
-  intro ⟨M, hSat⟩
-  have hValid := tree_label_valid hNoEq S M hSat T hLeaves hWF
-  obtain ⟨lit, hMem, _⟩ := hValid (fun _ => Classical.choice M.carrierNonempty)
-  rw [hEmpty] at hMem
-  exact List.not_mem_nil hMem
-
-
-proof_of resolution_soundness_empty_clause := by
-  classical
-  exact resolution_soundness_fo (L := L) hNoEq (fun C => C = [])
-    [FOResolutionTree.axiom_ []]
-    ⟨FOResolutionTree.axiom_ [], rfl, rfl, trivial, rfl⟩
 
 end LCS.FOResolution.Method.Soundness
-
 end

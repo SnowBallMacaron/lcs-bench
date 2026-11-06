@@ -2,8 +2,13 @@ import LCS.Item
 import LCS.Util
 import LCS.CutElim.Hauptsatz
 import LCS.CutElim.Hauptsatz.Completeness
-import LCS.CutElim.Hauptsatz.CutElimination.Trees
+import LCS.CutElim.Hauptsatz.CutElimination.ProofTrees
+import LCS.CutElim.Hauptsatz.CutElimination.CutRank
+import LCS.CutElim.Hauptsatz.CutElimination.NotBound
 import LCS.CutElim.Hauptsatz.CutElimination.VariableSupport
+import LCS.CutElim.Hauptsatz.CutElimination.Eigenvariables
+import LCS.CutElim.Hauptsatz.CutElimination.TreeTransport
+import LCS.CutElim.Hauptsatz.CutElimination.FormulaSubstitution
 import LCS.CutElim.Hauptsatz.CutElimination.FormulaRenaming
 
 section
@@ -472,7 +477,6 @@ private theorem alphaRenameBinderBody_isFreeForN {L : Language}
 -- ===================================================================
 -- Private substitution preparation: rule-level bound renaming
 -- ===================================================================
-
 private noncomputable def alphaRenameBoundRule {L : Language}
     (v z : Nat) : G1nnfRule L → G1nnfRule L
   | .axiomPosAtomic A hAtom Γ Δ =>
@@ -830,29 +834,6 @@ private theorem alphaRenameBoundRule_premises_nth_eq {L : Language}
     simp [hEq]
   rw [hGet, List.getElem_map]
 
-theorem alphaRenameBoundRule_eigenvariable_eq {L : Language}
-    (rule : G1nnfRule L) (v z w : Nat) :
-    (match alphaRenameBoundRule v z rule with
-     | .allRight _ _ ev => w = ev
-     | .exLeft _ _ ev => w = ev
-     | _ => False) =
-    (match rule with
-     | .allRight _ _ ev => w = ev
-     | .exLeft _ _ ev => w = ev
-     | _ => False) := by
-  cases rule <;> rfl
-
-end LCS.CutElim.Hauptsatz
-end
-
-section
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.CutElim.Hauptsatz
-open LCS.CutElim.Hauptsatz.Completeness
-namespace LCS.CutElim.Hauptsatz
 namespace G1nnfProofTree
 
 /-- Rename one unsafe binder label throughout a proof tree.  The selected
@@ -1094,7 +1075,226 @@ noncomputable def alphaRenameBoundTree {L : Language} {hL : L.withoutEquality} :
           hPremLen hAC' sub1Cast sub2Cast
       hEq1 ▸ hEq2 ▸ core
 
+private theorem alphaRenameBoundTree_depth {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
+    (T.alphaRenameBoundTree v z hvz hz).depth = T.depth := by
+  induction T with
+  | axiom_ rule Γ Δ hAxiom hAC =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.depth_cast]
+      rfl
+  | onePremise rule Γ Δ hPrem hAC sub ih =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.depth_cast]
+      simp only [G1nnfProofTree.depth]
+      rw [G1nnfProofTree.depth_cast, ih]
+  | twoPremise rule Γ Δ hPrem hAC sub1 sub2 ih1 ih2 =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.depth_cast]
+      simp only [G1nnfProofTree.depth]
+      rw [G1nnfProofTree.depth_cast, G1nnfProofTree.depth_cast,
+        ih1, ih2]
+
+private theorem alphaRenameBoundTree_cutRank {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
+    (T.alphaRenameBoundTree v z hvz hz).cutRank = T.cutRank := by
+  induction T with
+  | axiom_ rule Γ Δ hAxiom hAC =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.cutRank_cast]
+      rfl
+  | onePremise rule Γ Δ hPrem hAC sub ih =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.cutRank_cast]
+      simp only [G1nnfProofTree.cutRank]
+      rw [G1nnfProofTree.cutRank_cast, ih]
+  | twoPremise rule Γ Δ hPrem hAC sub1 sub2 ih1 ih2 =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.cutRank_cast]
+      simp only [G1nnfProofTree.cutRank]
+      rw [alphaRenameBoundRule_cutFormula,
+        G1nnfProofTree.cutRank_cast,
+        G1nnfProofTree.cutRank_cast, ih1, ih2]
+      cases hCut : rule.cutFormula with
+      | none => rfl
+      | some A =>
+          simp only [Option.map, alphaRenameBound_degree]
+
+private theorem allFormulae_alphaRenameBoundTree {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
+    (T.alphaRenameBoundTree v z hvz hz).allFormulae =
+      alphaRenameFormulaFinset T.allFormulae v z := by
+  induction T with
+  | axiom_ rule Γ Δ hAxiom hAC =>
+      simp only [alphaRenameBoundTree]
+      rw [allFormulae_transport]
+      simp only [G1nnfProofTree.allFormulae]
+      rw [alphaRenameBoundRule_conclusion_eq,
+        alphaRenameFormulaFinset_union]
+  | onePremise rule Γ Δ hPrem hAC sub ih =>
+      simp only [alphaRenameBoundTree]
+      rw [allFormulae_transport]
+      simp only [G1nnfProofTree.allFormulae]
+      rw [allFormulae_transport, ih,
+        alphaRenameBoundRule_conclusion_eq,
+        alphaRenameFormulaFinset_union,
+        alphaRenameFormulaFinset_union]
+  | twoPremise rule Γ Δ hPrem hAC sub1 sub2 ih1 ih2 =>
+      simp only [alphaRenameBoundTree]
+      rw [allFormulae_transport]
+      simp only [G1nnfProofTree.allFormulae]
+      rw [allFormulae_transport, allFormulae_transport, ih1, ih2,
+        alphaRenameBoundRule_conclusion_eq,
+        alphaRenameFormulaFinset_union,
+        alphaRenameFormulaFinset_union,
+        alphaRenameFormulaFinset_union]
+
+private theorem alphaRenameBoundTree_notBound_target {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
+    (T.alphaRenameBoundTree v z hvz hz).notBoundIn v := by
+  intro A hA
+  rw [allFormulae_alphaRenameBoundTree] at hA
+  obtain ⟨B, _, rfl⟩ := LCS.Finset.mem_image.mp hA
+  exact alphaRenameBound_removes_binder B v z hvz
+
+private theorem alphaRenameBoundTree_preserves_notBound {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z w : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hwz : w ≠ z) (hw : T.notBoundIn w) :
+    (T.alphaRenameBoundTree v z hvz hz).notBoundIn w := by
+  intro A hA
+  rw [allFormulae_alphaRenameBoundTree] at hA
+  obtain ⟨B, hB, rfl⟩ := LCS.Finset.mem_image.mp hA
+  exact alphaRenameBound_preserves_binder_absence
+    B v z w hwz (hw B hB)
+
+/-- Root-exact wrapper for one bound-label hygiene step.  Its root remains
+definitionally indexed by the original sequent because the public
+non-binding hypothesis makes the alpha map the identity there. -/
+noncomputable def alphaRenameBoundAtRoot {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A)) :
+    G1nnfProofTree hL Γ Δ :=
+  (T.alphaRenameBoundTree v z hvz hz).castTree
+    (alphaRenameFormulaFinset_eq_self_of_not_bound
+      Γ v z hRoot.1)
+    (alphaRenameFormulaFinset_eq_self_of_not_bound
+      Δ v z hRoot.2)
+
+theorem alphaRenameBoundAtRoot_depth {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A)) :
+    (T.alphaRenameBoundAtRoot v z hvz hz hRoot).depth =
+      T.depth := by
+  rw [alphaRenameBoundAtRoot, depth_castTree,
+    T.alphaRenameBoundTree_depth v z hvz hz]
+
+theorem alphaRenameBoundAtRoot_cutRank {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A)) :
+    (T.alphaRenameBoundAtRoot v z hvz hz hRoot).cutRank =
+      T.cutRank := by
+  rw [alphaRenameBoundAtRoot, cutRank_castTree,
+    T.alphaRenameBoundTree_cutRank v z hvz hz]
+
+theorem alphaRenameBoundAtRoot_notBound_target {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A)) :
+    (T.alphaRenameBoundAtRoot v z hvz hz hRoot).notBoundIn v := by
+  apply
+    (notBoundIn_cast
+      (T.alphaRenameBoundTree v z hvz hz)
+      (alphaRenameFormulaFinset_eq_self_of_not_bound
+        Γ v z hRoot.1)
+      (alphaRenameFormulaFinset_eq_self_of_not_bound
+        Δ v z hRoot.2) v).2
+  exact T.alphaRenameBoundTree_notBound_target v z hvz hz
+
+theorem alphaRenameBoundAtRoot_preserves_notBound {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z w : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A))
+    (hwz : w ≠ z) (hw : T.notBoundIn w) :
+    (T.alphaRenameBoundAtRoot v z hvz hz hRoot).notBoundIn w := by
+  apply
+    (notBoundIn_cast
+      (T.alphaRenameBoundTree v z hvz hz)
+      (alphaRenameFormulaFinset_eq_self_of_not_bound
+        Γ v z hRoot.1)
+      (alphaRenameFormulaFinset_eq_self_of_not_bound
+        Δ v z hRoot.2) w).2
+  exact
+    T.alphaRenameBoundTree_preserves_notBound
+      v z w hvz hz hwz hw
+
+private theorem alphaRenameBoundTree_eigenvariables_eq {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport) (w : Nat) :
+    (T.alphaRenameBoundTree v z hvz hz).eigenvariables w =
+      T.eigenvariables w := by
+  induction T with
+  | axiom_ rule Γ Δ hAxiom hAC =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.eigenvariables_cast]
+      rfl
+  | onePremise rule Γ Δ hPrem hAC sub ih =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.eigenvariables_cast]
+      rw [G1nnfProofTree.eigenvariables_onePremise,
+        G1nnfProofTree.eigenvariables_onePremise,
+        G1nnfProofTree.eigenvariables_cast, ih]
+      cases rule <;> rfl
+  | twoPremise rule Γ Δ hPrem hAC sub1 sub2 ih1 ih2 =>
+      simp only [alphaRenameBoundTree]
+      rw [G1nnfProofTree.eigenvariables_cast]
+      rw [G1nnfProofTree.eigenvariables_twoPremise,
+        G1nnfProofTree.eigenvariables_twoPremise,
+        G1nnfProofTree.eigenvariables_cast,
+        G1nnfProofTree.eigenvariables_cast, ih1, ih2]
+      cases rule <;> rfl
+
+theorem alphaRenameBoundAtRoot_eigenvariables_eq {L : Language} {hL : L.withoutEquality}
+    {Γ Δ : LCS.Finset (FormulaN L)}
+    (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
+    (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
+    (hRoot :
+      (∀ A ∈ Γ, FormulaN.notBoundIn v A) ∧
+      (∀ A ∈ Δ, FormulaN.notBoundIn v A))
+    (w : Nat) :
+    (T.alphaRenameBoundAtRoot v z hvz hz hRoot).eigenvariables w =
+      T.eigenvariables w := by
+  rw [alphaRenameBoundAtRoot, eigenvariables_castTree,
+    T.alphaRenameBoundTree_eigenvariables_eq v z hvz hz w]
+
 end G1nnfProofTree
 end LCS.CutElim.Hauptsatz
 end
-

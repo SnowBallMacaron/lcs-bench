@@ -3,69 +3,13 @@ import LCS.FirstOrder.Gentzen.Search.NoFunction.Search
 section
 
 namespace LCS.FirstOrder.Gentzen.Search.NoFunction
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.Gentzen
-
 open LCS.FirstOrder.Gentzen.Hintikka
-
-helper /-- Expanding the original leaves preserves every existing inference node. -/
-theorem expandTree_extends {L : Language} {supply : TermStream L}
-    (hNoEq : L.hasEquality = false) (hNoFunc : L.funSymbols → False)
-    {seq : Sequent L} {bound : Nat} (hCNFB : crossNoFreeBound seq)
-    {s : Sequent L} (t : SearchTree s) (st : SearchState L supply)
-    (hInv : SearchState.Inv seq bound st)
-    (hTLI : TreeLeafInv supply t seq st.availNext) :
-    t.Extends (expandTree hNoEq hNoFunc hCNFB t st hInv hTLI).tree := by
-  induction t generalizing st with
-  | leaf s records => exact .leaf records _
-  | onePremise rule t ih =>
-      exact .onePremise rule (ih _ _ _)
-  | twoPremise rule t1 t2 ih1 ih2 =>
-      exact .twoPremise rule (ih1 _ _ _) (ih2 _ _ _)
-
-helper /-- A complete round extends its input tree, including the record commit. -/
-theorem searchRound_extends {L : Language} {supply : TermStream L}
-    (hNoEq : L.hasEquality = false) (hNoFunc : L.funSymbols → False)
-    {seq : Sequent L} {bound : Nat} (hCNFB : crossNoFreeBound seq)
-    {s : Sequent L} (t : SearchTree s) (st : SearchState L supply)
-    (hInv : SearchState.Inv seq bound st)
-    (hTLI : TreeLeafInv supply t seq st.availNext) :
-    t.Extends (searchRound hNoEq hNoFunc hCNFB t st hInv hTLI).tree :=
-  (expandTree_extends hNoEq hNoFunc hCNFB t st hInv hTLI).commitRound _
-
-helper /-- Each additional round extends the preceding finite approximant. -/
-theorem searchAux_mono {L : Language} {supply : TermStream L}
-    (hNoEq : L.hasEquality = false) (hNoFunc : L.funSymbols → False)
-    {seq : Sequent L} {bound : Nat} (hCNFB : crossNoFreeBound seq)
-    (k : Nat) {s : Sequent L} (t : SearchTree s) (st : SearchState L supply)
-    (hInv : SearchState.Inv seq bound st)
-    (hTLI : TreeLeafInv supply t seq st.availNext) :
-    (searchAux hNoEq hNoFunc hCNFB k t st hInv hTLI).tree.Extends
-      (searchAux hNoEq hNoFunc hCNFB (k + 1) t st hInv hTLI).tree := by
-  induction k generalizing s st with
-  | zero => exact searchRound_extends hNoEq hNoFunc hCNFB t st hInv hTLI
-  | succ k ih =>
-      let out := searchRound hNoEq hNoFunc hCNFB t st hInv hTLI
-      exact ih out.tree out.state out.state_inv out.tree_leaf_inv
-
-helper /-- Definition 5.4.9 (companion): For a fixed admissible initialization,
-    round `k + 1` extends round `k` by replacing leaves with subtrees. -/
-theorem search_mono {L : Language} (hNoEq : L.hasEquality = false)
-    (hNoFunc : L.funSymbols → False) (seq : Sequent L)
-    (hCNFB : crossNoFreeBound seq) (initial : Init seq) (k : Nat) :
-    (search hNoEq hNoFunc seq hCNFB initial k).1.Extends
-      (search hNoEq hNoFunc seq hCNFB initial (k + 1)).1 :=
-  searchAux_mono hNoEq hNoFunc hCNFB k _ _ _ _
 
 proof_of search_halts_with_proof_or_falsifying_model := by
   -- BEGIN PROOF
@@ -111,16 +55,6 @@ proof_of search_halts_with_proof_or_falsifying_model := by
         -- Extract a countably infinite falsifying model from an infinite path.
         -- REPAIR(T88): proof pending
         sorry
-
-
-proof_of search_goedel_corollary := by
-  -- BEGIN PROOF
-    let initial := Init.default seq
-    obtain ⟨hPart1, _⟩ :=
-      search_halts_with_proof_or_falsifying_model hNoEq hNoFunc seq hCNFB initial
-    obtain ⟨k, hProof⟩ := hPart1 hValid
-    exact ⟨(search hNoEq hNoFunc seq hCNFB initial k).1.toDeductionTree.toProofTree hProof⟩
-
 
 end LCS.FirstOrder.Gentzen.Search.NoFunction
 

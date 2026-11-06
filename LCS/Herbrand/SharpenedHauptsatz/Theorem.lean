@@ -1,10 +1,6 @@
-import LCS.Item
-import LCS.Util
-import LCS.Herbrand.SharpenedHauptsatz
-import LCS.Herbrand.SharpenedHauptsatz.Permutability
-import LCS.Herbrand.PrenexForm
-import LCS.Herbrand.SharpenedHauptsatz.Theorem.Part1
-import LCS.Herbrand.SharpenedHauptsatz.Theorem.Part2
+import LCS.Herbrand.SharpenedHauptsatz.Theorem.SharpenedHauptsatz
+import LCS.Herbrand.SharpenedHauptsatz.Theorem.PermutationExample
+import LCS.Herbrand.SharpenedHauptsatz.Theorem.MidsequentExample
 
 /-! # Herbrand.SharpenedHauptsatz.Theorem
     Formalization of Chapter 7, Section 3.3: Gentzen's Sharpened Hauptsatz
@@ -12,6 +8,12 @@ import LCS.Herbrand.SharpenedHauptsatz.Theorem.Part2
 
     Covers Theorem 7.3.1 (the sharpened Hauptsatz with midsequent)
     and Examples 7.3.3-7.3.4.
+
+    Content modules, in book order:
+    - `SharpenedHauptsatz`: Theorem 7.3.1, the midsequent conditions and the
+      proof by induction on the measures m(T), n(T).
+    - `PermutationExample`: Example 7.3.3.
+    - `MidsequentExample`: Example 7.3.4.
 
     Source: Logic for Computer Science, Gallier 2015
 
@@ -27,30 +29,5 @@ import LCS.Herbrand.SharpenedHauptsatz.Theorem.Part2
 -/
 
 namespace LCS.Herbrand.SharpenedHauptsatz.Theorem
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Gentzen
-open LCS.CutElim.LK
-open LCS.CutElim.LKe
-open LCS.CutElim.LKe.Equivalence
-open LCS.Herbrand.SharpenedHauptsatz
-open LCS.Herbrand.SharpenedHauptsatz.Permutability
-open LCS.Herbrand.PrenexForm
-
--- ===================================================================
--- Example 7.3.3 (companion type): PermExPred
--- ===================================================================
-
-
-
--- ===================================================================
--- Example 7.3.4: midsequentExampleTree
--- ===================================================================
-
-open LCS.FirstOrder.SyntaxN.Variables
-
 
 end LCS.Herbrand.SharpenedHauptsatz.Theorem

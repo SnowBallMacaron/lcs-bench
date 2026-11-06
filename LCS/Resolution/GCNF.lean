@@ -364,38 +364,7 @@ inductive GCNFDeductionTree : ClauseSequent → Type where
         (ClauseSequent.mapSet As (fun A => clauseWithLiteral A B)))) :
       GCNFDeductionTree (LCS.Finset.union Gamma (ClauseSequent.mapSet As (fun A => clauseWithLiteral A B)))
 
-namespace GCNFDeductionTree
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-def allLeavesAxioms : {S : ClauseSequent} → GCNFDeductionTree S → Prop
-  | _, .leaf S _ => S.isTrivial
-  | _, .rule _ _ _ _ _ _ _ _ left right _ _ _ _ => allLeavesAxioms left ∧ allLeavesAxioms right
-
-
-
-end GCNFDeductionTree
-
-namespace GCNFProofTree
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-def toDeduction : {S : ClauseSequent} → GCNFProofTree S → GCNFDeductionTree S
-  | _, .axiom_ S hOrd _ => .leaf S hOrd
-  | _, .rule Gamma As B Cs Gamma1 Gamma2 hGamma hAs left right hNe hCs hG1 hG2 =>
-    .rule Gamma As B Cs Gamma1 Gamma2 hGamma hAs left.toDeduction right.toDeduction
-      hNe hCs hG1 hG2
-
-
-
-end GCNFProofTree
-
 -- ========= Lemma 4.2.2 (supporting defs): Normal form predicates =========
-
-/-- Lemma 4.2.2 (companion def): Normalized-formula version of isLiteral. -/
-@[blueprint "chap4__lemma_4_2_2"]
-def isLiteralN : PropFormulaNormalized → Prop
-  | .var _ => True
-  | .neg (.var _) => True
-  | _ => False
 
 /-- Lemma 4.2.2 (companion def): Normalized-formula version of isClause. -/
 @[blueprint "chap4__lemma_4_2_2"]
@@ -517,14 +486,6 @@ def exGCNFProofTree (P Q R : Nat) : GCNFProofTree (exGCNFClauseSet P Q R) := by
     (by intro a ha; rw [LCS.Finset.mem_singleton] at ha; subst ha; simp [outerGamma, outerAs, outerB, outerCs, outerGamma1, outerGamma2, innerGamma, innerAs, innerB, innerCs, innerGamma1, innerGamma2, exGCNFClauseSet, ClauseSequent.mapSet, ClauseSequent.single, LCS.Finset.mem_image, LCS.Finset.mem_ofList, LCS.Finset.mem_union, clauseWithLiteral_single, or_comm, or_left_comm, or_assoc, eq_comm])
     (by intro a ha; rw [LCS.Finset.mem_singleton] at ha; subst ha; simp [outerGamma, outerAs, outerB, outerCs, outerGamma1, outerGamma2, innerGamma, innerAs, innerB, innerCs, innerGamma1, innerGamma2, exGCNFClauseSet, ClauseSequent.mapSet, ClauseSequent.single, LCS.Finset.mem_image, LCS.Finset.mem_ofList, LCS.Finset.mem_union, clauseWithLiteral_single, or_comm, or_left_comm, or_assoc, eq_comm])
     (by intro a ha; rw [LCS.Finset.mem_ofList] at ha; simp [List.mem_cons] at ha; rcases ha with rfl | rfl <;> simp [outerGamma, outerAs, outerB, outerCs, outerGamma1, outerGamma2, innerGamma, innerAs, innerB, innerCs, innerGamma1, innerGamma2, exGCNFClauseSet, ClauseSequent.mapSet, ClauseSequent.single, LCS.Finset.mem_image, LCS.Finset.mem_ofList, LCS.Finset.mem_union, clauseWithLiteral_single, or_comm, or_left_comm, or_assoc, eq_comm])
-
--- ========= Example 4.2.1 (companion theorem) =========
-
-/-- Example 4.2.1 (companion theorem): The conclusion of the example proof tree
-    equals the example clause set. -/
-@[blueprint "chap4__example_4_2_1"]
-theorem exGCNFProofTree_conclusion_eq (P Q R : Nat) :
-    (exGCNFProofTree P Q R).conclusion = exGCNFClauseSet P Q R 
 
 -- ========= Helpers for LCS.Finset.image membership =========
 
@@ -1036,36 +997,6 @@ theorem gcnf_completeness (S : ClauseSequent)
     (ClauseSequent.isNontrivial S →
       ∃ t : GCNFProofTree S, t.axiomsMinimal) 
 
-
-
-
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Inside a clause, union has disjunctive semantics. -/
-theorem Clause.satisfiedBy_union (A B : Clause) (v : Nat → Bool) :
-    Clause.satisfiedBy (LCS.Finset.union A B) v ↔
-      Clause.satisfiedBy A v ∨ Clause.satisfiedBy B v := by
-  simp only [Clause.satisfiedBy, LCS.Finset.mem_union]
-  constructor
-  · rintro ⟨L, hA | hB, hL⟩
-    · exact Or.inl ⟨L, hA, hL⟩
-    · exact Or.inr ⟨L, hB, hL⟩
-  · rintro (⟨L, hA, hL⟩ | ⟨L, hB, hL⟩)
-    · exact ⟨L, Or.inl hA, hL⟩
-    · exact ⟨L, Or.inr hB, hL⟩
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Between clauses, the sequent comma has conjunctive semantics. -/
-theorem ClauseSequent.satisfiedBy_union (S T : ClauseSequent) (v : Nat → Bool) :
-    ClauseSequent.satisfiedBy (LCS.Finset.union S T) v ↔
-      ClauseSequent.satisfiedBy S v ∧ ClauseSequent.satisfiedBy T v := by
-  simp only [ClauseSequent.satisfiedBy, LCS.Finset.mem_union]
-  constructor
-  · intro h; exact ⟨fun C hC => h C (Or.inl hC), fun C hC => h C (Or.inr hC)⟩
-  · rintro ⟨hS, hT⟩ C (hC | hC)
-    · exact hS C hC
-    · exact hT C hC
-
 /-- The ordinary disjunction-only system after absorbing negation-left into
     trivial axioms. Both displayed disjuncts are whole ordinary clauses. -/
 @[blueprint "chap4__example_4_2_1"]
@@ -1235,29 +1166,6 @@ theorem exProof_leaf_comparison (P Q R : Nat) :
 theorem exProof_node_comparison (P Q R : Nat) :
     (exGCNFProofTree P Q R).nodeCount = 5 ∧
     (exOrdinaryProofTree P Q R).nodeCount = 11 
-
-namespace ProofTree
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Every node is in the clause/atomic-succedent fragment and every actual
-    inference is either negation-left on an atom or disjunction-left. -/
-def clauseFragment : {s : Sequent} → LCS.Propositional.Systems.G.ProofTree s → Prop
-  | s, .axiom_ _ _ => isClauseCompatible s
-  | s, .onePremise rule t => isClauseCompatible s ∧ clauseFragment t ∧
-      match rule with
-      | .negLeft _ _ _ (.var _) => True
-      | _ => False
-  | s, .twoPremise rule left right => isClauseCompatible s ∧
-      clauseFragment left ∧ clauseFragment right ∧
-      match rule with
-      | .orLeft _ _ _ _ _ => True
-      | _ => False
-
-end ProofTree
-
-
-
-
 
 namespace OrdinaryClauseProof
 

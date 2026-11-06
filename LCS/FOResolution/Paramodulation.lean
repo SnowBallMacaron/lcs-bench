@@ -363,44 +363,12 @@ def IsParamodulant {L : Language} (parents : ParentOccurrences L) (result : Clau
     ∃ computed, paramodulant choice = some computed ∧
       ∀ lit, lit ∈ result ↔ lit ∈ computed
 
-/-- Every addressed subterm admits replacement by any term. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem literalSubtermAt_replace_exists {L : Language}
-    (lit : Literal L) (addr : LiteralTermAddress) (r replacement : Term L)
-    (found : literalSubtermAt lit addr = some r) :
-    ∃ newLit, replaceLiteralAt lit addr replacement = some newLit
-
 /-- A legal computed candidate is a paramodulant of the apart parents. -/
 @[blueprint "chap8__example_8_6_1"]
 theorem paramodulant_isParamodulant {L : Language}
     (parents : ParentOccurrences L) (choice : ParamodulationSelection L) (result : Clause L)
     (legal : IsLegalParamodulationSelection parents choice)
     (computed : paramodulant choice = some result) : IsParamodulant parents result
-
-/-- Every legal choice computes a clause and certifies that inference. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem legalParamodulation_computes {L : Language}
-    (parents : ParentOccurrences L) (choice : ParamodulationSelection L)
-    (legal : IsLegalParamodulationSelection parents choice) :
-    ∃ result, paramodulant choice = some result ∧ IsParamodulant parents result
-
-/-- Forward orientation: the MGU guard selects s, and replacement uses t. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem paramodulation_leftToRight {L : Language}
-    (parents : ParentOccurrences L) (choice : ParamodulationSelection L) (newQ : Literal L)
-    (legal : IsLegalParamodulationSelection parents { choice with orientation := .leftToRight })
-    (replaced : replaceLiteralAt choice.recipient choice.address choice.right = some newQ) :
-    IsParamodulant parents
-      (substClause choice.sigma (choice.donorRemainder ++ [newQ] ++ choice.recipientRemainder))
-
-/-- Reverse orientation: the MGU guard selects t, and replacement uses s. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem paramodulation_rightToLeft {L : Language}
-    (parents : ParentOccurrences L) (choice : ParamodulationSelection L) (newQ : Literal L)
-    (legal : IsLegalParamodulationSelection parents { choice with orientation := .rightToLeft })
-    (replaced : replaceLiteralAt choice.recipient choice.address choice.left = some newQ) :
-    IsParamodulant parents
-      (substClause choice.sigma (choice.donorRemainder ++ [newQ] ++ choice.recipientRemainder))
 
 -- ===================================================================
 -- factor: factoring rule
@@ -452,23 +420,6 @@ def factor {L : Language} (A C : Clause L) : Prop :=
     IsLiteralMGU sigma selected ∧
     (∀ lit, lit ∈ C ↔ lit ∈ substClause sigma A)
 
-/-- Example 8.6.1 (companion): a singleton literal set has the identity MGU. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem identity_isLiteralMGU_singleton {L : Language} (lit : Literal L) :
-    IsLiteralMGU identitySubst [lit]
-
-/-- Example 8.6.1 (companion): selecting any one literal yields the identity
-    factor of the whole clause, even when that clause has only one literal. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem factor_identity {L : Language} (A : Clause L) (lit : Literal L)
-    (hLit : lit ∈ A) : factor A A
-
-/-- Example 8.6.1 (companion): the adopted nonempty-subset rule has no
-    factor of the empty input clause. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem empty_clause_has_no_factor {L : Language} (C : Clause L) :
-    ¬ factor ([] : Clause L) C
-
 -- ===================================================================
 -- binaryResolvent: binary resolution
 -- ===================================================================
@@ -506,117 +457,6 @@ def binaryResolvent {L : Language} (A B C : Clause L) : Prop :=
             source ≠ pivotA ∧ substLitP sigma source = lit) ∨
           (∃ source ∈ substClause renameB B,
             source ≠ pivotB ∧ substLitP sigma source = lit))
-
-/-- Example 8.6.1 (companion): an empty parent supplies no singleton pivot. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem binaryResolvent_empty_left {L : Language} (B C : Clause L) :
-    ¬ binaryResolvent [] B C
-
--- ===================================================================
--- reflexivityAxiom: the reflexivity axiom clause {x = x}
--- ===================================================================
-
-/-- Example 8.6.1 (companion): The reflexivity axiom clause {x = x},
-    required for completeness of the paramodulation method.
-    Uses variable 0. -/
-@[blueprint "chap8__example_8_6_1"]
-def reflexivityAxiom {L : Language} (hEq : L.hasEquality = true) : Clause L :=
-  [.pos (.eq_ hEq (Term.var 0) (Term.var 0))]
-
--- ===================================================================
--- functionalReflexivityAxiom: {f(x1,...,xn) = f(x1,...,xn)}
--- ===================================================================
-
-/-- Example 8.6.1 (companion): the per-symbol unit-clause matrix
-    {f(x1,...,xn) = f(x1,...,xn)}, with the same ordered distinct variables
-    on both sides. The S-indexed family below imposes occurrence and positive
-    rank; this matrix builder alone imposes neither family condition. -/
-@[blueprint "chap8__example_8_6_1"]
-def functionalReflexivityAxiom {L : Language} (hEq : L.hasEquality = true)
-    (f : L.funSymbols) : Clause L :=
-  let args : Fin (L.funArity f) → Term L := fun i => Term.var i.val
-  [.pos (.eq_ hEq (Term.func f args) (Term.func f args))]
-
-/-- Function-symbol occurrences in a finite term, retaining duplicates. -/
-def termFunctionSymbolsCore {L : Language} : Term L → List L.funSymbols
-  | .var _ => []
-  | .const _ => []
-  | .func f args => f :: (List.ofFn fun i => termFunctionSymbolsCore (args i)).flatten
-
-/-- Function-symbol occurrences in every argument or equality side of a signed atom. -/
-def literalFunctionSymbolsCore {L : Language} (lit : Literal L) : List L.funSymbols :=
-  let atom := match lit with | .pos a | .neg a => a
-  match atom with
-  | .predN _ args => (List.ofFn fun i => termFunctionSymbolsCore (args i)).flatten
-  | .eq_ _ s t => termFunctionSymbolsCore s ++ termFunctionSymbolsCore t
-
-/-- Example 8.6.2 (companion): symbols occurring in the original finite input S.
-    Every term occurrence is visited, in both literal signs and both equality
-    sides. Constants are a separate symbol sort. Repetitions do not affect
-    membership in the resulting family of clauses. -/
-@[blueprint "chap8__example_8_6_2"]
-def originalFunctionSymbols {L : Language} (S : List (Clause L)) : List L.funSymbols :=
-  S.flatMap fun C => C.flatMap literalFunctionSymbolsCore
-
-/-- Example 8.6.2 (companion): the functional reflexivity axioms indexed by
-    the original S, for exactly its occurring function symbols of rank n > 0.
-    This is a concrete finite list representing the family extensionally;
-    symbols and clauses need no decidable equality. A clause already in S is
-    still included. Ordinary reflexivity is a separate axiom. -/
-@[blueprint "chap8__example_8_6_2"]
-def functionalReflexivityAxioms {L : Language} (hEq : L.hasEquality = true)
-    (S : List (Clause L)) : List (Clause L) :=
-  ((originalFunctionSymbols S).filter fun f => decide (0 < L.funArity f)).map
-    (functionalReflexivityAxiom hEq)
-
-/-- Family membership is exactly an occurring positive-rank symbol's unit equation. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem mem_functionalReflexivityAxioms {L : Language} (hEq : L.hasEquality = true)
-    (S : List (Clause L)) (C : Clause L) :
-    C ∈ functionalReflexivityAxioms hEq S ↔
-      ∃ f, f ∈ originalFunctionSymbols S ∧ 0 < L.funArity f ∧
-        functionalReflexivityAxiom hEq f = C
-
-/-- A particular function contributes its clause exactly when it occurs
-    in original S and has positive rank. Unused and nullary functions contribute none. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem functionalReflexivityAxioms_for_symbol {L : Language} (hEq : L.hasEquality = true)
-    (S : List (Clause L)) (f : L.funSymbols) :
-    functionalReflexivityAxiom hEq f ∈ functionalReflexivityAxioms hEq S ↔
-      f ∈ originalFunctionSymbols S ∧ 0 < L.funArity f
-
-/-- The empty original input contributes no functional reflexivity axioms. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem functionalReflexivityAxioms_empty {L : Language} (hEq : L.hasEquality = true) :
-    functionalReflexivityAxioms hEq [] = []
-
-/-- Functional reflexivity uses exactly one positive repeated-term equation. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem functionalReflexivityAxiom_shape {L : Language} (hEq : L.hasEquality = true)
-    (f : L.funSymbols) :
-    functionalReflexivityAxiom hEq f =
-      [.pos (.eq_ hEq (Term.func f (fun i => Term.var i.val))
-        (Term.func f (fun i => Term.var i.val)))]
-
-/-- The ordered variable arguments of a functional reflexivity clause are distinct. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem functionalReflexivity_variables_distinct {L : Language} (f : L.funSymbols)
-    (i j : Fin (L.funArity f)) (different : i ≠ j) :
-    (Term.var i.val : Term L) ≠ Term.var j.val
-
-/-- Occurrence in an existing positive-rank functional clause still includes
-    that clause in the family; the family is not subtracted from S. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem functionalReflexivityAxioms_alreadyPresent {L : Language}
-    (hEq : L.hasEquality = true) (S : List (Clause L)) (f : L.funSymbols)
-    (positive : 0 < L.funArity f) (present : functionalReflexivityAxiom hEq f ∈ S) :
-    functionalReflexivityAxiom hEq f ∈ functionalReflexivityAxioms hEq S
-
-/-- Ordinary variable reflexivity remains separate from the functional family. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem reflexivityAxiom_not_functional {L : Language} (hEq : L.hasEquality = true)
-    (S : List (Clause L)) :
-    reflexivityAxiom hEq ∉ functionalReflexivityAxioms hEq S
 
 -- ===================================================================
 -- Finite derivations for the binary and equality calculi
@@ -662,18 +502,6 @@ def BinaryRefutation {L : Language} (premises : List (Clause L)) : Prop :=
 @[blueprint "chap8__example_8_6_2"]
 def BinaryFactoringRefutation {L : Language} (premises : List (Clause L)) : Prop :=
   ClauseDerivationCore premises true false []
-
-/-- Example 8.6.2 (companion): a finite empty-clause derivation in the
-    equality-enabled three-rule calculus: binary resolution, factoring and
-    either selected-side paramodulation orientation. Equality atoms use the
-    canonical FOAtomCore.toFormula embedding, whose formulaEvalN interpretation
-    is identity of term values. The supplied premises are the entire allowed
-    leaf family; ordinary and functional reflexivity must be added explicitly
-    by the corresponding completeness statement. -/
-@[blueprint "chap8__example_8_6_2"]
-def EqualityRefutation {L : Language} (_hEq : L.hasEquality = true)
-    (premises : List (Clause L)) : Prop :=
-  ClauseDerivationCore premises true true []
 
 -- ===================================================================
 -- Helper: build Fin-indexed argument vectors
@@ -811,12 +639,6 @@ theorem exampleSubst1_images :
       mkG (mkH (Term.var 2)) mkA ∧
     substLitP exampleSubst1 (FOLiteralCore.pos (mkPredP (Term.var 0))) =
       FOLiteralCore.pos (mkPredP (mkH (Term.var 2)))
-
-/-- Example 8.6.1 (companion): the calculated second argument of g is a,
-    which differs from the printed h(a). -/
-@[blueprint "chap8__example_8_6_1"]
-theorem exampleSubst1_printedConflict :
-    termSubstAll (Term.var 1) exampleSubst1.apply ≠ mkH mkA
 
 -- ===================================================================
 -- Example 8.6.2: Language variant with unary g
@@ -973,146 +795,6 @@ theorem exampleSubst2_images :
     termSubstAll (mkH' mkA') exampleSubst2.apply = mkH' mkA' ∧
     termSubstAll (mkH' (Term.var 4)) exampleSubst2.apply = mkH' (Term.var 0)
 
-/-- Example 8.6.2 (companion): replacing A's left side at its own root
-    by B's right side, then substituting, gives {h(z) = h(a)} with z = 0.
-    The explicit equalityLeft root is whole-literal address 1; the printed
-    root e remains stored separately. This equation calculates the left-side
-    reading without selecting a correction of the printed example. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem exampleSubst2_leftSideRoot :
-    (replaceLiteralAt
-      (.pos (.eq_ rfl (mkF' (mkG' (Term.var 0)) (Term.var 0)) (mkH' mkA')))
-      (LiteralTermAddress.equalityLeft TreeAddress.root) (mkH' (Term.var 4))).map
-        (fun lit => substClause exampleSubst2 [lit]) =
-      some [.pos (.eq_ rfl (mkH' (Term.var 0)) (mkH' mkA'))]
-
-/-- Example 8.6.2 (companion): exchange variables 0 and 4, fixing every
-    other variable, to express the result with the printed output's z = 4. -/
-@[blueprint "chap8__example_8_6_2"]
-def exampleResultRename2 : Substitution ExampleLang2 where
-  support := [0, 4]
-  map := fun
-    | 0 => Term.var 4
-    | 4 => Term.var 0
-    | n => Term.var n
-  outsideSupport := by
-    intro n hn
-    match n with
-    | 0 => simp at hn
-    | 1 => rfl
-    | 2 => rfl
-    | 3 => rfl
-    | 4 => simp at hn
-    | n + 5 => rfl
-
-/-- Example 8.6.2 (companion): the calculated clause and the stored printed
-    clause differ only by the displayed finite exchange of variable names. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem exampleSubst2_printedRenaming :
-    substClause exampleResultRename2
-      [.pos (.eq_ rfl (mkH' (Term.var 0)) (mkH' mkA'))] = paramodulant_8_6_2
-
-/-- Example 8.6.1 (companion): substitution preserves negative equality,
-    substituting both sides and retaining its equality witness. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem substLitP_negativeEquality {L : Language} (hEq : L.hasEquality = true)
-    (sigma : Substitution L) (s t : Term L) :
-    substLitP sigma (.neg (.eq_ hEq s t)) =
-      .neg (.eq_ hEq (termSubstAll s sigma.apply) (termSubstAll t sigma.apply))
-
-/-- Example 8.6.1 (companion): replacement in a negative equality keeps
-    its negative sign and the unchanged right side. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem replaceLiteralAt_negativeEquality {L : Language} (hEq : L.hasEquality = true)
-    (s t r : Term L) (addr : TreeAddress) :
-    replaceLiteralAt (.neg (.eq_ hEq s t)) (.equalityLeft addr) r =
-      (replaceAt s addr r).map (fun s' => FOLiteralCore.neg (.eq_ hEq s' t))
-
-/-- Example 8.6.1 (companion): equal positive signs do not make the
-    distinct rigid predicate atoms P(a) and Q(a) unifiable. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem distinct_predicates_not_unifiable (sigma : Substitution ExampleLang) :
-    ¬ IsLiteralUnifier sigma
-      [.pos (mkPredP mkA), .pos (mkPredQ mkA)]
-
-/-- Example 8.6.1 (companion): the ground unit equality clauses have
-    disjoint empty variable sets and admit the finite identity separating pair. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem binaryEqualityUnits_separating :
-    IsSeparatingPairP identitySubst identitySubst
-      [FOLiteralCore.pos (.eq_ (L := ExampleLang) rfl mkA mkA)]
-      [FOLiteralCore.neg (.eq_ rfl mkA mkA)]
-
-/-- Example 8.6.1 (companion): explicit positive and negative ground equality
-    parent occurrences for the singleton-pivot rule. -/
-@[blueprint "chap8__example_8_6_1"]
-def binaryEqualityUnits : ParentOccurrences ExampleLang where
-  equalityEnabled := rfl
-  sourceA := [.pos (.eq_ rfl mkA mkA)]
-  sourceB := [.neg (.eq_ rfl mkA mkA)]
-  renameA := identitySubst
-  renameB := identitySubst
-  separating := binaryEqualityUnits_separating
-
-/-- Example 8.6.1 (companion): the opposing unit equalities resolve to the
-    empty clause, using the identity MGU of the selected equality atoms. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem binaryEqualityUnits_resolve :
-    binaryResolvent binaryEqualityUnits.sourceA binaryEqualityUnits.sourceB []
-
-/-- Example 8.6.1 (companion): opposite signs on distinct rigid predicates
-    P(a) and Q(a) do not provide legal binary pivots under any substitution. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem distinct_predicates_not_complementary (sigma : Substitution ExampleLang) :
-    ¬ literalsComplementary (substLitP sigma (.pos (mkPredP mkA)))
-      (substLitP sigma (.neg (mkPredQ mkA)))
-
-/-- Example 8.6.1 (companion): the literal root is not a term occurrence. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem decodeLiteralAddress_root {L : Language} (lit : Literal L) :
-    decodeLiteralAddress lit .root = none
-
-/-- Example 8.6.1 (companion): any predicate argument is accessible at its
-    whole-literal child address, for either sign. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem literalSubtermAt_predicateArgument {L : Language} (P : L.predSymbols)
-    (args : Fin (L.predArity P) → Term L) (i : Fin (L.predArity P)) :
-    literalSubtermAt (.pos (.predN P args)) (.predicateArgument (i.val + 1) .root) =
-      some (args i) ∧
-    literalSubtermAt (.neg (.predN P args)) (.predicateArgument (i.val + 1) .root) =
-      some (args i)
-
-/-- Example 8.6.1 (companion): replace any one predicate argument and keep
-    every other argument and the literal sign unchanged. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem replaceLiteralAt_predicateArgument {L : Language} (P : L.predSymbols)
-    (args : Fin (L.predArity P) → Term L) (i : Fin (L.predArity P)) (r : Term L) :
-    replaceLiteralAt (.pos (.predN P args)) (.predicateArgument (i.val + 1) .root) r =
-      some (.pos (.predN P (fun j => if j.val = i.val then r else args j))) ∧
-    replaceLiteralAt (.neg (.predN P args)) (.predicateArgument (i.val + 1) .root) r =
-      some (.neg (.predN P (fun j => if j.val = i.val then r else args j)))
-
-/-- Example 8.6.1 (companion): every term suffix in the right equality side
-    is looked up in that side, for either literal sign. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem literalSubtermAt_equalityRight {L : Language} (hEq : L.hasEquality = true)
-    (s t : Term L) (suffix : TreeAddress) :
-    literalSubtermAt (.pos (.eq_ hEq s t)) (.equalityRight suffix) = subtermAt t suffix ∧
-    literalSubtermAt (.neg (.eq_ hEq s t)) (.equalityRight suffix) = subtermAt t suffix
-
-/-- Example 8.6.1 (companion): replacement in the right side of a negative
-    equality preserves its left side, equality witness, and negative sign. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem replaceLiteralAt_negativeEquality_right {L : Language} (hEq : L.hasEquality = true)
-    (s t r : Term L) (suffix : TreeAddress) :
-    replaceLiteralAt (.neg (.eq_ hEq s t)) (.equalityRight suffix) r =
-      (replaceAt t suffix r).map (fun t' => FOLiteralCore.neg (.eq_ hEq s t'))
-
-/-- Example 8.6.1 (companion): argument zero is not a whole-literal child. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem literalSubtermAt_zero_argument {L : Language} (lit : Literal L)
-    (suffix : TreeAddress) : literalSubtermAt lit (.predicateArgument 0 suffix) = none
-
 /-- Example 8.6.1 (companion): printed address 11 selects the f-subterm
     in Q(h(f(h(z),h(a)))), starting at the predicate's root. -/
 @[blueprint "chap8__example_8_6_1"]
@@ -1131,17 +813,6 @@ theorem example1_address_replacement (r : Term ExampleLang) :
     clauseB_8_6_1.head?.bind (fun lit =>
       replaceLiteralAt lit (.predicateArgument 1 (.child 1 .root)) r) =
         some (.pos (mkPredQ (mkH r)))
-
-/-- Regression for the reverse rule: a non-head donor a = h(a) and a
-    non-head negative equality recipient rewrite h(a) to a. Both residual
-    literals survive. These ground parents are already apart. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem paramodulation_reverse_regression :
-    ∃ parents : ParentOccurrences ExampleLang,
-      parents.sourceA = [.pos (mkPredP mkA), .pos (.eq_ rfl mkA (mkH mkA))] ∧
-      parents.sourceB = [.pos (mkPredQ mkA), .neg (.eq_ rfl (mkH mkA) mkA)] ∧
-      IsParamodulant parents
-        [.pos (mkPredP mkA), .neg (.eq_ rfl mkA mkA), .pos (mkPredQ mkA)]
 
 /-- Example 8.6.1 (companion): the separately named rule-consistent
     result contains a as the second argument of g. The printed output is retained. -/
@@ -1170,13 +841,6 @@ def exampleSelection1 : ParamodulationSelection ExampleLang where
 theorem exampleSubst1_isMGU :
     IsMGU exampleSubst1
       [mkF (Term.var 0) (mkH (Term.var 1)), mkF (mkH (Term.var 2)) (mkH mkA)]
-
-/-- Example 8.6.2 (companion): the separately named left-side-root result
-    uses the recipient's variable z = 0. The printed z = 4 is related by the
-    existing finite exchange; the printed address remains e. -/
-@[blueprint "chap8__example_8_6_2"]
-def leftSideRootResult2 : Clause ExampleLang2 :=
-  [.pos (.eq_ rfl (mkH' (Term.var 0)) (mkH' mkA'))]
 
 /-- Example 8.6.2 (companion): B donates its left-to-right equation to
     A's left equality side, at whole-literal address 1, using x ↦ g(z), y ↦ z. -/
@@ -1216,38 +880,10 @@ theorem exampleSelection1_computes :
 theorem example1_ruleConsistent_isParamodulant :
     IsParamodulant paramodulationExample1.parents ruleConsistentResult1
 
-/-- Example 8.6.1 (companion): the alternative and the printed output
-    differ even as sets of literals, at the second argument of g. -/
-@[blueprint "chap8__example_8_6_1"]
-theorem example1_printed_obstruction :
-    ¬ (∀ lit, lit ∈ ruleConsistentResult1 ↔ lit ∈ paramodulant_8_6_1)
-
 /-- Example 8.6.2 (companion): the donor is B, the recipient is A, and
     the selected legal term address is the root of A's left equality side. -/
 @[blueprint "chap8__example_8_6_2"]
 theorem exampleSelection2_legal : IsLegalParamodulationSelection exampleParents2 exampleSelection2
-
-/-- Example 8.6.2 (companion): compute the separate left-side-root reading. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem exampleSelection2_computes : paramodulant exampleSelection2 = some leftSideRootResult2
-
-/-- Example 8.6.2 (companion): the left-side-root alternative is a
-    paramodulant of the stored, donor-first apart parents. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem example2_leftSideRoot_isParamodulant :
-    IsParamodulant paramodulationExample2.parents leftSideRootResult2
-
-/-- Example 8.6.2 (companion): the printed literal-root address is not a
-    term address in the selected recipient. This preserves SQ36's distinction. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem example2_printed_address_obstruction :
-    decodeLiteralAddress exampleSelection2.recipient paramodulationExample2.address = none
-
-/-- Example 8.6.2 (companion): the legal alternative's result agrees with
-    the printed data after the separately displayed finite variable exchange. -/
-@[blueprint "chap8__example_8_6_2"]
-theorem example2_alternative_printedRenaming :
-    substClause exampleResultRename2 leftSideRootResult2 = paramodulant_8_6_2
 
 /-- Example 8.6.2 (companion): an equivalent MGU retaining the printed
     result variable z = 4: recipient variable 0 ↦ 4 and donor variable 3 ↦ g(4).
@@ -1386,31 +1022,5 @@ theorem binary_only_incomplete :
 theorem binary_factoring_complete {L : Language} (hNoEq : L.withoutEquality)
     (S : List (Clause L)) (unsatisfiable : ClausesUnsatisfiable S) :
     BinaryFactoringRefutation S
-
-/-- Example 8.6.2 (companion): the three-rule equality calculus is
-    refutationally complete for a finite clause family S, with equality
-    interpreted as identity. Its leaves belong to S, ordinary reflexivity,
-    or the functional reflexivity family for positive-rank symbols occurring
-    in the original S. The finite derivation uses legal binary resolution,
-    factoring and either paramodulation orientation on apart parent occurrences.
-    This is refutation existence, with no effective proof-search assertion. -/
-@[attach_debt, blueprint "chap8__example_8_6_2"]
-theorem paramodulation_complete_with_functional_reflexivity {L : Language}
-    (hEq : L.hasEquality = true) (S : List (Clause L))
-    (unsatisfiable : ClausesUnsatisfiable S) :
-    EqualityRefutation hEq
-      (S ++ [reflexivityAxiom hEq] ++ functionalReflexivityAxioms hEq S)
-
-/-- Example 8.6.2 (companion): the same three-rule equality calculus is
-    refutationally complete for every finite identity-unsatisfiable S with
-    ordinary reflexivity as its only added axiom. Binary resolution, factoring
-    and both paramodulation orientations on apart parents remain available.
-    Every clause already in S remains an allowed leaf, including any functional
-    reflexivity clauses. This asserts a finite refutation, not a search algorithm. -/
-@[attach_debt, blueprint "chap8__example_8_6_2"]
-theorem paramodulation_complete_with_reflexivity {L : Language}
-    (hEq : L.hasEquality = true) (S : List (Clause L))
-    (unsatisfiable : ClausesUnsatisfiable S) :
-    EqualityRefutation hEq (S ++ [reflexivityAxiom hEq])
 
 end LCS.FOResolution.Paramodulation

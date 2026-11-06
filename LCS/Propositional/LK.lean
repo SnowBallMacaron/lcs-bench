@@ -612,35 +612,6 @@ theorem lk_gprime_equivalence (s : Sequent) :
     (lkProvable s → sequentProvable s) ∧
     (sequentProvable s → lkCutFreeProvable s) 
 
-/-- Gentzen's Hauptsatz: provability is equivalent to cut-free provability. -/
-@[blueprint "chap3__theorem_3_6_1"]
-theorem hauptsatz (s : Sequent) : lkProvable s ↔ lkCutFreeProvable s 
-
-/-- LK' provability of an infinite sequent uses a finite subsequent. -/
-@[blueprint "chap3__theorem_3_6_1"]
-def infLKProvable (seq : Infinite.InfSequent) : Prop :=
-  ∃ Γ Δ : List PropFormulaNormalized,
-    (∀ A ∈ Γ, ∃ n, seq.antecedent n = some A) ∧
-    (∀ B ∈ Δ, ∃ n, seq.succedent n = some B) ∧ lkProvable ⟨Γ, Δ⟩
-
-/-- Cut-free LK' provability of an infinite sequent uses a finite subsequent. -/
-@[blueprint "chap3__theorem_3_6_1"]
-def infLKCutFreeProvable (seq : Infinite.InfSequent) : Prop :=
-  ∃ Γ Δ : List PropFormulaNormalized,
-    (∀ A ∈ Γ, ∃ n, seq.antecedent n = some A) ∧
-    (∀ B ∈ Δ, ∃ n, seq.succedent n = some B) ∧ lkCutFreeProvable ⟨Γ, Δ⟩
-
-/-- Theorem 3.6.1 for possibly infinite sequents: conversions preserve
-    the finite subsequent witnessing provability. -/
-@[blueprint "chap3__theorem_3_6_1"]
-theorem inf_lk_gprime_equivalence (seq : Infinite.InfSequent) :
-    (infLKProvable seq ↔ Infinite.infSeqProvable seq) ∧
-    (Infinite.infSeqProvable seq ↔ infLKCutFreeProvable seq) 
-
-@[blueprint "chap3__theorem_3_6_1"]
-theorem inf_hauptsatz (seq : Infinite.InfSequent) :
-    infLKProvable seq ↔ infLKCutFreeProvable seq 
-
 -- ========= Lemma 3.6.2: Consistency for arbitrary sets =========
 
 /-- A proof from a possibly infinite set has a finite list of assumptions. -/

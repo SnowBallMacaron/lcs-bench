@@ -6,7 +6,9 @@ import LCS.FirstOrder.Equality.Completeness
 import LCS.FirstOrder.Semantics.Subformulae
 import LCS.CutElim.LKe.Equivalence.AtomicLeaves
 import LCS.CutElim.LKe.Equivalence.ContextPermutation
+import LCS.CutElim.LKe.Equivalence.RootRules
 import LCS.CutElim.LKe.Equivalence.ConjunctionPermutation
+import LCS.CutElim.LKe.Equivalence.ImplicationPermutation.PropositionalCases
 import Attach
 import LCS.CutElim.LKe.Equivalence.ImplicationPermutation.ProofsStamp
 
@@ -27,7 +29,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.CompletenessBridge
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
       GEqProofTree hL s), geqDepth T = m → ∀ (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)), s = (Sequent.mk
@@ -36,8 +37,173 @@ variable
       Γ ++ Δ) (Λ))), 1 + max (geqDepth p1) (geqDepth p2) = geqDepth T ∧ (∀ (s' : Sequent L), s' ∈
       geqLeafSequents p1 → seqAllAtomicOrQuantified s') ∧ ∀ (s' : Sequent L), s' ∈ geqLeafSequents p2 →
       seqAllAtomicOrQuantified s')
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ih
+
+theorem geqImplLeft_allLeft
+    (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
+      (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
+      [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p :
+      GEqProofTree hL s₁), geqDepth (heq ▸ p) = geqDepth p) (geqLeaf_transport : ∀ {s₁ s₂ : Sequent L} (heq :
+      s₁ = s₂) (p : GEqProofTree hL s₁), geqLeafSequents (heq ▸ p) = geqLeafSequents p) (A B : FormulaN L) (Γ
+      Δ Λ : List (FormulaN L)) (ts : List (Term L)) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L)
+      (hne : ts ≠ []) (hfree : ∀ (t : Term L), t ∈ ts → isFreeForN t x X) (sub : GEqProofTree hL (Sequent.mk
+      (Γr ++ List.map (fun (t : Term L) => formulaSubstN X t x) ts ++ [FormulaN.all x X] ++ Δr) (Λr)))
+      (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub →
+      seqAllAtomicOrQuantified s') (hconc : (Sequent.mk (Γr ++ [FormulaN.all x X] ++ Δr) (Λr)) = (Sequent.mk
+      (Γ ++ [A.impl B] ++ Δ) (Λ)))
+    : ∃ (p1 : GEqProofTree hL (Sequent.mk (Γ ++ Δ) (Λ ++ [A]))), ∃ (p2 : GEqProofTree hL (Sequent.mk ([B] ++ Γ
+      ++ Δ) (Λ))), 1 + max (geqDepth p1) (geqDepth p2) = 1 + geqDepth sub ∧ (∀ (s' : Sequent L), s' ∈
+      geqLeafSequents p1 → seqAllAtomicOrQuantified s') ∧ ∀ (s' : Sequent L), s' ∈ geqLeafSequents p2 →
+      seqAllAtomicOrQuantified s' := by
+  injection hconc with hant hsuc
+  subst Λ
+  rcases markedSplit hant (by simp) with
+    ⟨K, hΓ, hΔr⟩ | ⟨K, hΓr, hΔ⟩
+  · subst Γ
+    subst Δr
+    obtain ⟨q1, q2, hq, hq1leaf, hq2leaf⟩ := ih (geqDepth sub) hsubdepth sub rfl A B (Γr ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ K)
+        Δ Λr (by simp [List.append_assoc]) hsubleaf
+    obtain ⟨q1', hq1'd, hq1'leaf⟩ := geqPermuteContexts q1 (Γr ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ (K ++ Δ))
+        (Λr ++ [A]) (by simp [List.append_assoc])
+        (List.Perm.refl _) hq1leaf
+    obtain ⟨q2', hq2'd, hq2'leaf⟩ := geqPermuteContexts q2 (([B] ++ Γr) ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ (K ++ Δ))
+        Λr (by simp [List.append_assoc])
+        (List.Perm.refl _) hq2leaf
+    let r1 := GEqProofTree.onePremise (GentzenStep1Ext.allLeft ts Γr (K ++ Δ) (Λr ++ [A]) x X hne hfree) q1'
+    let r2 := GEqProofTree.onePremise (GentzenStep1Ext.allLeft ts ([B] ++ Γr) (K ++ Δ) Λr x X hne hfree) q2'
+    have hout1 : Sequent.mk (Γr ++ [FormulaN.all x X] ++ (K ++ Δ)) (Λr ++ [A]) = Sequent.mk
+            ((Γr ++ [FormulaN.all x X] ++ K) ++ Δ)
+            (Λr ++ [A]) := by
+      simp [List.append_assoc]
+    have hout2 : Sequent.mk (([B] ++ Γr) ++ [FormulaN.all x X] ++ (K ++ Δ)) Λr = Sequent.mk
+            ([B] ++ (Γr ++ [FormulaN.all x X] ++ K) ++ Δ)
+            Λr := by
+      simp [List.append_assoc]
+    let p1 := hout1 ▸ r1
+    let p2 := hout2 ▸ r2
+    have hp1d : geqDepth p1 = 1 + geqDepth q1 := by
+      rw [geqDepth_transport hout1 r1]
+      simp only [r1, geqDepth]
+      omega
+    have hp2d : geqDepth p2 = 1 + geqDepth q2 := by
+      rw [geqDepth_transport hout2 r2]
+      simp only [r2, geqDepth]
+      omega
+    refine ⟨p1, p2, by omega, ?_, ?_⟩
+    · intro s' hs'
+      rw [geqLeaf_transport hout1 r1] at hs'
+      exact hq1'leaf s' (by
+        simpa [r1, geqLeafSequents] using hs')
+    · intro s' hs'
+      rw [geqLeaf_transport hout2 r2] at hs'
+      exact hq2'leaf s' (by
+        simpa [r2, geqLeafSequents] using hs')
+  · subst Γr
+    subst Δ
+    obtain ⟨q1, q2, hq, hq1leaf, hq2leaf⟩ := ih (geqDepth sub) hsubdepth sub rfl A B Γ (K ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ Δr)
+        Λr (by simp [List.append_assoc]) hsubleaf
+    obtain ⟨q1', hq1'd, hq1'leaf⟩ := geqPermuteContexts q1 ((Γ ++ K) ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ Δr)
+        (Λr ++ [A]) (by simp [List.append_assoc])
+        (List.Perm.refl _) hq1leaf
+    obtain ⟨q2', hq2'd, hq2'leaf⟩ := geqPermuteContexts q2 (([B] ++ Γ ++ K) ++
+          ts.map (fun t => Substitution.formulaSubstN X t x) ++
+          [FormulaN.all x X] ++ Δr)
+        Λr (by simp [List.append_assoc])
+        (List.Perm.refl _) hq2leaf
+    let r1 := GEqProofTree.onePremise (GentzenStep1Ext.allLeft ts (Γ ++ K) Δr (Λr ++ [A]) x X hne hfree) q1'
+    let r2 := GEqProofTree.onePremise (GentzenStep1Ext.allLeft ts ([B] ++ Γ ++ K) Δr Λr x X hne hfree) q2'
+    have hout1 : Sequent.mk ((Γ ++ K) ++ [FormulaN.all x X] ++ Δr) (Λr ++ [A]) = Sequent.mk
+            (Γ ++ (K ++ [FormulaN.all x X] ++ Δr))
+            (Λr ++ [A]) := by
+      simp [List.append_assoc]
+    have hout2 : Sequent.mk (([B] ++ Γ ++ K) ++ [FormulaN.all x X] ++ Δr) Λr = Sequent.mk ([B] ++ Γ ++
+              (K ++ [FormulaN.all x X] ++ Δr)) Λr := by
+      simp [List.append_assoc]
+    let p1 := hout1 ▸ r1
+    let p2 := hout2 ▸ r2
+    have hp1d : geqDepth p1 = 1 + geqDepth q1 := by
+      rw [geqDepth_transport hout1 r1]
+      simp only [r1, geqDepth]
+      omega
+    have hp2d : geqDepth p2 = 1 + geqDepth q2 := by
+      rw [geqDepth_transport hout2 r2]
+      simp only [r2, geqDepth]
+      omega
+    refine ⟨p1, p2, by omega, ?_, ?_⟩
+    · intro s' hs'
+      rw [geqLeaf_transport hout1 r1] at hs'
+      exact hq1'leaf s' (by
+        simpa [r1, geqLeafSequents] using hs')
+    · intro s' hs'
+      rw [geqLeaf_transport hout2 r2] at hs'
+      exact hq2'leaf s' (by
+        simpa [r2, geqLeafSequents] using hs')
+
+theorem geqImplLeft_allRight
+    (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁), geqDepth (heq ▸ p) =
+      geqDepth p) (geqLeaf_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁),
+      geqLeafSequents (heq ▸ p) = geqLeafSequents p) (implFresh1 : ∀ (y : Nat) (A B : FormulaN L) (Γ Δ Λ :
+      List (FormulaN L)), (∀ (F : FormulaN L), F ∈ Γ ++ [A.impl B] ++ Δ ++ Λ → ¬y ∈ formulaFVN F) → ∀ (F :
+      FormulaN L), F ∈ Γ ++ Δ ++ (Λ ++ [A]) → ¬y ∈ formulaFVN F) (implFresh2 : ∀ (y : Nat) (A B : FormulaN L)
+      (Γ Δ Λ : List (FormulaN L)), (∀ (F : FormulaN L), F ∈ Γ ++ [A.impl B] ++ Δ ++ Λ → ¬y ∈ formulaFVN F) → ∀
+      (F : FormulaN L), F ∈ [B] ++ Γ ++ Δ ++ Λ → ¬y ∈ formulaFVN F) (A B : FormulaN L) (Γ Δ Λ : List (FormulaN
+      L)) (y : Nat) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L) (hfresh : ∀ (F : FormulaN L), F
+      ∈ (Γr) ++ (Δr ++ [FormulaN.all x X] ++ Λr) → ¬y ∈ formulaFVN F) (hfree : isFreeForN (Term.var y) x X)
+      (sub : GEqProofTree hL (Sequent.mk (Γr) (Δr ++ [formulaSubstN X (Term.var y) x] ++ Λr))) (hsubdepth :
+      geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub → seqAllAtomicOrQuantified
+      s') (hconc : (Sequent.mk (Γr) (Δr ++ [FormulaN.all x X] ++ Λr)) = (Sequent.mk (Γ ++ [A.impl B] ++ Δ)
+      (Λ)))
+    : ∃ (p1 : GEqProofTree hL (Sequent.mk (Γ ++ Δ) (Λ ++ [A]))), ∃ (p2 : GEqProofTree hL (Sequent.mk ([B] ++ Γ
+      ++ Δ) (Λ))), 1 + max (geqDepth p1) (geqDepth p2) = 1 + geqDepth sub ∧ (∀ (s' : Sequent L), s' ∈
+      geqLeafSequents p1 → seqAllAtomicOrQuantified s') ∧ ∀ (s' : Sequent L), s' ∈ geqLeafSequents p2 →
+      seqAllAtomicOrQuantified s' := by
+  injection hconc with hant hsuc
+  subst Γr
+  subst Λ
+  obtain ⟨q1, q2, hq, hq1leaf, hq2leaf⟩ := ih (geqDepth sub) hsubdepth sub rfl A B Γ Δ (Δr ++
+        [Substitution.formulaSubstN X (Term.var y) x] ++ Λr)
+      rfl hsubleaf
+  obtain ⟨q1', hq1'd, hq1'leaf⟩ := geqPermuteContexts q1 (Γ ++ Δ) (Δr ++
+        [Substitution.formulaSubstN X (Term.var y) x] ++
+        (Λr ++ [A]))
+      (by simp [List.append_assoc])
+      (by simp [List.append_assoc]) hq1leaf
+  have hfresh1 : ∀ F ∈ (Sequent.mk (Γ ++ Δ) (Δr ++ [FormulaN.all x X] ++ (Λr ++ [A]))).antecedent ++
+          (Sequent.mk (Γ ++ Δ) (Δr ++ [FormulaN.all x X] ++ (Λr ++ [A]))).succedent,
+        y ∉ Variables.formulaFVN F := by
+    simpa [List.append_assoc] using implFresh1 y A B Γ Δ (Δr ++ [FormulaN.all x X] ++ Λr) hfresh
+  have hfresh2 : ∀ F ∈ (Sequent.mk ([B] ++ Γ ++ Δ) (Δr ++ [FormulaN.all x X] ++ Λr)).antecedent ++
+          (Sequent.mk ([B] ++ Γ ++ Δ) (Δr ++ [FormulaN.all x X] ++ Λr)).succedent,
+        y ∉ Variables.formulaFVN F := by
+    exact implFresh2 y A B Γ Δ (Δr ++ [FormulaN.all x X] ++ Λr) hfresh
+  let r1 := GEqProofTree.onePremise (GentzenStep1Ext.allRight y (Γ ++ Δ) Δr (Λr ++ [A]) x X hfresh1 hfree) q1'
+  let r2 := GEqProofTree.onePremise (GentzenStep1Ext.allRight y ([B] ++ Γ ++ Δ) Δr Λr x X hfresh2 hfree) q2
+  have hout1 : Sequent.mk (Γ ++ Δ) (Δr ++ [FormulaN.all x X] ++ (Λr ++ [A])) = Sequent.mk (Γ ++ Δ)
+          ((Δr ++ [FormulaN.all x X] ++ Λr) ++ [A]) := by
+    simp [List.append_assoc]
+  let p1 := hout1 ▸ r1
+  let p2 := r2
+  have hp1d : geqDepth p1 = 1 + geqDepth q1 := by
+    rw [geqDepth_transport hout1 r1]
+    simp only [r1, geqDepth]
+    omega
+  have hp2d : geqDepth p2 = 1 + geqDepth q2 := rfl
+  refine ⟨p1, p2, by omega, ?_, ?_⟩
+  · intro s' hs'
+    rw [geqLeaf_transport hout1 r1] at hs'
+    exact hq1'leaf s' (by
+      simpa [r1, geqLeafSequents] using hs')
+  · simpa [p2, r2, geqLeafSequents] using hq2leaf
 
 -- ATTACH-BLOCKER: private declaration
 private theorem geqImplLeft_exLeft
@@ -738,25 +904,6 @@ private theorem geqImplLeft_eqGeneral
   · simpa [p2, geqLeafSequents] using hq2'leaf
 
 end
-end LCS.CutElim.LKe.Equivalence
-end
-
-section
-namespace LCS.CutElim.LKe.Equivalence
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.FirstOrder.Gentzen
-open LCS.FirstOrder.Gentzen.Hintikka
-open LCS.FirstOrder.Equality
-open LCS.FirstOrder.Completeness
-open LCS.FirstOrder.Equality.Completeness
-open LCS.CutElim.LK
-open LCS.CutElim.LKe
-open LCS.CutElim.CompletenessBridge
 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper for Lemma 6.3.2: directly commute implication-left to the
@@ -904,54 +1051,9 @@ theorem geqPermute_implLeft_withLeaves {L : Language}
     | eqGeneral axioms hne haxioms Γe Λe sub =>
       exact geqImplLeft_eqGeneral L hL n ih A B Γ Δ Λ axioms hne haxioms Γe Λe sub hseq hdepth hleaf
 
--- The equality rules are essential here: G= proves reflexivity even
--- though the same conclusion has no pure-G proof tree.  This bounded
--- regression prevents a future helper from restoring the false
--- same-conclusion flattening route.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} (hL : L.hasEquality = true) (t : Term L) :
-    Nonempty
-        (GEqProofTree hL
-          (Sequent.mk [] [FormulaN.eq_ hL t t])) ∧
-      ¬ Nonempty
-        (GProofTreeExt
-          (Sequent.mk [] [FormulaN.eq_ hL t t])) := by
-  constructor
-  · let A := FormulaN.eq_ hL t t
-    let ax : GEqProofTree hL (Sequent.mk [A] [A]) :=
-      .axiom_ (Sequent.mk [A] [A]) ⟨A, by simp, by simp⟩
-    exact ⟨.eqRefl t [] [A] ax⟩
-  · have noStep1 :
-        ∀ {prem conc : Sequent L},
-          GentzenStep1Ext prem conc →
-          conc = Sequent.mk [] [FormulaN.eq_ hL t t] → False := by
-      intro prem conc rule hconc
-      cases rule <;> simp_all [List.append_eq_singleton_iff]
-    have noStep2 :
-        ∀ {prem1 prem2 conc : Sequent L},
-          GentzenStep2Ext prem1 prem2 conc →
-          conc = Sequent.mk [] [FormulaN.eq_ hL t t] → False := by
-      intro prem1 prem2 conc rule hconc
-      cases rule <;> simp_all [List.append_eq_singleton_iff]
-    have noTree :
-        ∀ {s : Sequent L},
-          GProofTreeExt s →
-          s = Sequent.mk [] [FormulaN.eq_ hL t t] → False := by
-      intro s g
-      cases g with
-      | axiom_ s hax =>
-          intro hs
-          subst s
-          simp [isAxiom] at hax
-      | onePremise rule sub => exact noStep1 rule
-      | twoPremise rule sub1 sub2 => exact noStep2 rule
-    rintro ⟨g⟩
-    exact noTree g rfl
-
 -- ===================================================================
 -- Lemma 6.3.2: conjRight_implLeft_permutation
 -- ===================================================================
-
 /-- Lemma 6.3.2: (i) Given a G=-proof tree T for a sequent
 Gamma -> Delta, A /\ B, Lambda satisfying the conclusion of Lemma 6.3.1,
 another G=-proof T' can be constructed with the same depth, where
@@ -981,331 +1083,5 @@ theorem conjRight_implLeft_permutation {L : Language} {hL : L.hasEquality = true
         geqDepth T' = geqDepth T ∧
         rootIsImplLeft T' A B Γ Δ Λ) 
 
--- ===================================================================
--- Lemma 6.3.3 (required def): sequentHasConjImplTarget
--- ===================================================================
-
-/-- Lemma 6.3.3 (required def): A sequent has a pending normalization
-target when its succedent contains a conjunction or its antecedent
-contains an implication. -/
-@[blueprint "chap6__lemma_6_3_3"]
-def sequentHasConjImplTarget {L : Language} (s : Sequent L) : Prop :=
-  (∃ (A B : FormulaN L), FormulaN.conj A B ∈ s.succedent) ∨
-  (∃ (A B : FormulaN L), FormulaN.impl A B ∈ s.antecedent)
-
--- ===================================================================
--- Lemma 6.3.3 (required def): gIsConjImplNormalized
--- ===================================================================
-
-/-- Lemma 6.3.3 (required def): A G proof is in conjunction/implication
-normal form when every non-leaf node with a pending target selects one
-actual target occurrence using conjunction-right or implication-left.
-The indexed rule constructor fixes the selected formula and its exact
-prefix/suffix contexts.  All subtrees satisfy the same condition. -/
-@[blueprint "chap6__lemma_6_3_3"]
-def gIsConjImplNormalized {L : Language} :
-    {s : Sequent L} → GProofTreeExt s → Prop
-  | _, .axiom_ _ _ => True
-  | s, .onePremise _ sub =>
-    ¬ sequentHasConjImplTarget s ∧
-    gIsConjImplNormalized sub
-  | s, .twoPremise rule sub1 sub2 =>
-    (match rule with
-     | .conjRight _ _ _ _ _ => True
-     | .implLeft _ _ _ _ _ => True
-     | _ => ¬ sequentHasConjImplTarget s) ∧
-    gIsConjImplNormalized sub1 ∧
-    gIsConjImplNormalized sub2
-
--- ===================================================================
--- Lemma 6.3.3 (required def): geqIsConjImplNormalized
--- ===================================================================
-
-/-- Lemma 6.3.3 (required def): The conjunction/implication progress
-invariant for G=.  A pending target at a non-leaf node must be selected
-by an indexed conjunction-right or implication-left constructor.
-Equality rules and unrelated logical rules may occur only after the
-node has no pending target, and the invariant holds recursively. -/
-@[blueprint "chap6__lemma_6_3_3"]
-def geqIsConjImplNormalized {L : Language}
-    {hL : L.hasEquality = true} :
-    {s : Sequent L} → GEqProofTree hL s → Prop
-  | _, .base g => gIsConjImplNormalized g
-  | _, .axiom_ _ _ => True
-  | s, .onePremise _ sub =>
-    ¬ sequentHasConjImplTarget s ∧
-    geqIsConjImplNormalized sub
-  | s, .twoPremise rule sub1 sub2 =>
-    (match rule with
-     | .conjRight _ _ _ _ _ => True
-     | .implLeft _ _ _ _ _ => True
-     | _ => ¬ sequentHasConjImplTarget s) ∧
-    geqIsConjImplNormalized sub1 ∧
-    geqIsConjImplNormalized sub2
-  | _, .eqRefl _ Γ Δ sub =>
-    ¬ sequentHasConjImplTarget (Sequent.mk Γ Δ) ∧
-    geqIsConjImplNormalized sub
-  | _, .eqFuncCong _ _ _ Γ Δ sub =>
-    ¬ sequentHasConjImplTarget (Sequent.mk Γ Δ) ∧
-    geqIsConjImplNormalized sub
-  | _, .eqPredCong _ _ _ Γ Δ sub =>
-    ¬ sequentHasConjImplTarget (Sequent.mk Γ Δ) ∧
-    geqIsConjImplNormalized sub
-  | _, .eqGeneral _ _ _ Γ Δ sub =>
-    ¬ sequentHasConjImplTarget (Sequent.mk Γ Δ) ∧
-    geqIsConjImplNormalized sub
-
--- Both target kinds may occur at a node: the indexed implication-left
--- root selects one of them, and the axiom subtrees end the recursion.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} {hL : L.hasEquality = true}
-    (A B C D : FormulaN L) :
-    let T : GEqProofTree hL
-        (Sequent.mk
-          ([A] ++ [FormulaN.impl A B] ++ [])
-          [B, FormulaN.conj C D]) :=
-      .twoPremise
-        (.implLeft [A] [] [B, FormulaN.conj C D] A B)
-        (.axiom_ _
-          ⟨A, by simp, by simp⟩)
-        (.axiom_ _
-          ⟨B, by simp, by simp⟩)
-    geqIsConjImplNormalized T := by
-  simp [geqIsConjImplNormalized]
-
--- Two conjunction-right targets may occur at one node; selecting either
--- actual occurrence is progress and does not require one rule to target both.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} {hL : L.hasEquality = true}
-    (A B C D : FormulaN L) :
-    let T : GEqProofTree hL
-        (Sequent.mk [A, B]
-          ([] ++ [FormulaN.conj A B] ++ [FormulaN.conj C D])) :=
-      .twoPremise
-        (.conjRight [A, B] [] [FormulaN.conj C D] A B)
-        (.axiom_ _
-          ⟨A, by simp, by simp⟩)
-        (.axiom_ _
-          ⟨B, by simp, by simp⟩)
-    geqIsConjImplNormalized T := by
-  simp [geqIsConjImplNormalized]
-
--- An unrelated logical root is rejected while a target remains.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} {hL : L.hasEquality = true}
-    (A B C X Y : FormulaN L) :
-    let T : GEqProofTree hL
-        (Sequent.mk
-          ([] ++ [FormulaN.disj X Y] ++ [C])
-          [C, FormulaN.conj A B]) :=
-      .twoPremise
-        (.disjLeft [] [C] [C, FormulaN.conj A B] X Y)
-        (.axiom_ _
-          ⟨C, by simp, by simp⟩)
-        (.axiom_ _
-          ⟨C, by simp, by simp⟩)
-    ¬ geqIsConjImplNormalized T := by
-  dsimp
-  intro hnorm
-  exact hnorm.1 (Or.inl ⟨A, B, by simp⟩)
-
--- An equality root is likewise rejected while a target remains.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} (hL : L.hasEquality = true)
-    (t : Term L) (A B : FormulaN L) :
-    let E := FormulaN.eq_ hL t t
-    let inner : GEqProofTree hL
-        (Sequent.mk [A, B, E] [FormulaN.conj A B]) :=
-      .twoPremise
-        (.conjRight [A, B, E] [] [] A B)
-        (.axiom_ _
-          ⟨A, by simp, by simp⟩)
-        (.axiom_ _
-          ⟨B, by simp, by simp⟩)
-    let T : GEqProofTree hL
-        (Sequent.mk [A, B] [FormulaN.conj A B]) :=
-      .eqRefl t [A, B] [FormulaN.conj A B] inner
-    ¬ geqIsConjImplNormalized T := by
-  simp [geqIsConjImplNormalized, sequentHasConjImplTarget]
-
--- Leaves have no applied rule, so an axiom is normalized even when its
--- sequent contains a target formula.
--- ATTACH-BLOCKER: unsupported untagged example
-example {L : Language} {hL : L.hasEquality = true}
-    (A B : FormulaN L) :
-    let C := FormulaN.conj A B
-    let T : GEqProofTree hL (Sequent.mk [C] [C]) :=
-      .axiom_ _ ⟨C, by simp, by simp⟩
-    geqIsConjImplNormalized T := by
-  simp [geqIsConjImplNormalized]
-
 end LCS.CutElim.LKe.Equivalence
 end
-
-section
-namespace LCS.CutElim.LKe.Equivalence
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.FirstOrder.Gentzen
-open LCS.FirstOrder.Gentzen.Hintikka
-open LCS.FirstOrder.Equality
-open LCS.FirstOrder.Completeness
-open LCS.FirstOrder.Equality.Completeness
-open LCS.CutElim.LK
-open LCS.CutElim.LKe
-open LCS.CutElim.CompletenessBridge
-section
--- ATTACH-BLOCKER: variable
-variable
-    (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
-      GEqProofTree hL s), geqDepth T = m → (∀ (s' : Sequent L), s' ∈ geqLeafSequents T →
-      seqAllAtomicOrQuantified s') → ∃ (T' : GEqProofTree hL s), geqIsConjImplNormalized T' ∧ geqDepth T' =
-      geqDepth T)
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
-include ih
-
--- ATTACH-BLOCKER: section variables: helper requires front context
-theorem geqNormalize_target
-    (s : Sequent L) (T : GEqProofTree hL s) (hleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents T →
-      seqAllAtomicOrQuantified s') (htarget : sequentHasConjImplTarget s) (hdepth : geqDepth T = n)
-    : ∃ (T' : GEqProofTree hL s), geqIsConjImplNormalized T' ∧ geqDepth T' = geqDepth T := by
-  classical
-  rcases s with ⟨Γ, succ⟩
-  change (∃ A B : FormulaN L, FormulaN.conj A B ∈ succ) ∨
-    (∃ A B : FormulaN L, FormulaN.impl A B ∈ Γ) at htarget
-  rcases htarget with
-    ⟨A, B, hAB⟩ | ⟨A, B, hAB⟩
-  · obtain ⟨Δ, Λ, hsucc⟩ := perm_mem_split (FormulaN.conj A B) succ hAB
-    subst succ
-    obtain ⟨p1, p2, hpdepth, hp1leaf, hp2leaf⟩ := geqPermute_conjRight_withLeaves A B Γ Δ Λ T hleaf
-    have hp1depth : geqDepth p1 < n := by omega
-    have hp2depth : geqDepth p2 < n := by omega
-    obtain ⟨q1, hq1norm, hq1depth⟩ := ih (geqDepth p1) hp1depth p1 rfl hp1leaf
-    obtain ⟨q2, hq2norm, hq2depth⟩ := ih (geqDepth p2) hp2depth p2 rfl hp2leaf
-    let p : GEqProofTree hL (Sequent.mk Γ (Δ ++ [FormulaN.conj A B] ++ Λ)) := .twoPremise
-        (.conjRight Γ Δ Λ A B) q1 q2
-    refine ⟨p, ?_, ?_⟩
-    · exact ⟨trivial, hq1norm, hq2norm⟩
-    · simp only [p, geqDepth]
-      omega
-  · obtain ⟨Γ₁, Γ₂, hΓ⟩ := perm_mem_split (FormulaN.impl A B) Γ hAB
-    subst Γ
-    obtain ⟨p1, p2, hpdepth, hp1leaf, hp2leaf⟩ := geqPermute_implLeft_withLeaves A B Γ₁ Γ₂ succ T hleaf
-    obtain ⟨p1, hp1perm, hp1leaf⟩ := geqPermuteContexts p1 (Γ₁ ++ Γ₂) ([A] ++ succ)
-        (List.Perm.refl _) (by exact List.perm_append_comm) hp1leaf
-    have hp1depth : geqDepth p1 < n := by omega
-    have hp2depth : geqDepth p2 < n := by omega
-    obtain ⟨q1, hq1norm, hq1depth⟩ := ih (geqDepth p1) hp1depth p1 rfl hp1leaf
-    obtain ⟨q2, hq2norm, hq2depth⟩ := ih (geqDepth p2) hp2depth p2 rfl hp2leaf
-    let p : GEqProofTree hL (Sequent.mk (Γ₁ ++ [FormulaN.impl A B] ++ Γ₂) succ) := .twoPremise
-        (.implLeft Γ₁ Γ₂ succ A B) q1 q2
-    refine ⟨p, ?_, ?_⟩
-    · exact ⟨trivial, hq1norm, hq2norm⟩
-    · simp only [p, geqDepth]
-      omega
-
--- ATTACH-BLOCKER: section variables: helper requires front context
-theorem geqNormalize_other
-    (s : Sequent L) (T : GEqProofTree hL s) (hdepth : geqDepth T = n) (hleaf : ∀ (s' : Sequent L), s' ∈
-      geqLeafSequents T → seqAllAtomicOrQuantified s') (normOne : ∀ {prem conc : Sequent L} (rule :
-      GentzenStep1Ext prem conc) (sub : GEqProofTree hL prem), geqDepth sub < n → (∀ (s' : Sequent L), s' ∈
-      geqLeafSequents sub → seqAllAtomicOrQuantified s') → ¬sequentHasConjImplTarget conc → ∃ (p :
-      GEqProofTree hL conc), geqIsConjImplNormalized p ∧ geqDepth p = 1 + geqDepth sub) (normTwo : ∀ {prem1
-      prem2 conc : Sequent L} (rule : GentzenStep2Ext prem1 prem2 conc) (sub1 : GEqProofTree hL prem1) (sub2 :
-      GEqProofTree hL prem2), geqDepth sub1 < n → geqDepth sub2 < n → (∀ (s' : Sequent L), s' ∈
-      geqLeafSequents sub1 → seqAllAtomicOrQuantified s') → (∀ (s' : Sequent L), s' ∈ geqLeafSequents sub2 →
-      seqAllAtomicOrQuantified s') → ¬sequentHasConjImplTarget conc → ∃ (p : GEqProofTree hL conc),
-      geqIsConjImplNormalized p ∧ geqDepth p = 1 + max (geqDepth sub1) (geqDepth sub2)) (htarget :
-      ¬sequentHasConjImplTarget s)
-    : ∃ (T' : GEqProofTree hL s), geqIsConjImplNormalized T' ∧ geqDepth T' = geqDepth T := by
-  classical
-  cases T with
-  | base g =>
-    cases g with
-    | axiom_ s hAx =>
-      exact ⟨.base (.axiom_ s hAx), trivial, rfl⟩
-    | onePremise rule sub =>
-      simpa only [geqDepth, gProofTreeDepth] using normOne rule (.base sub) (by
-          simp only [geqDepth, gProofTreeDepth] at hdepth ⊢
-          omega) (by
-          simpa [geqLeafSequents, gProofTreeLeafSequents] using hleaf) htarget
-    | twoPremise rule sub1 sub2 =>
-      simpa only [geqDepth, gProofTreeDepth] using normTwo rule (.base sub1) (.base sub2) (by
-          simp only [geqDepth, gProofTreeDepth] at hdepth ⊢
-          omega) (by
-          simp only [geqDepth, gProofTreeDepth] at hdepth ⊢
-          omega) (by
-          intro s' hs'
-          exact hleaf s' (by
-            simp only [geqLeafSequents, gProofTreeLeafSequents, List.mem_append]
-            exact Or.inl hs')) (by
-          intro s' hs'
-          exact hleaf s' (by
-            simp only [geqLeafSequents, gProofTreeLeafSequents, List.mem_append]
-            exact Or.inr hs')) htarget
-  | axiom_ s hAx =>
-    exact ⟨.axiom_ s hAx, trivial, rfl⟩
-  | onePremise rule sub =>
-    simpa only [geqDepth] using normOne rule sub (by
-        simp only [geqDepth] at hdepth
-        omega) (by
-        simpa [geqLeafSequents] using hleaf) htarget
-  | twoPremise rule sub1 sub2 =>
-    simpa only [geqDepth] using normTwo rule sub1 sub2 (by
-        simp only [geqDepth] at hdepth
-        omega) (by
-        simp only [geqDepth] at hdepth
-        omega) (by
-        intro s' hs'
-        exact hleaf s' (by
-          simp only [geqLeafSequents, List.mem_append]
-          exact Or.inl hs')) (by
-        intro s' hs'
-        exact hleaf s' (by
-          simp only [geqLeafSequents, List.mem_append]
-          exact Or.inr hs')) htarget
-  | eqRefl t Γ Δ sub =>
-    have hsubdepth : geqDepth sub < n := by
-      simp only [geqDepth] at hdepth
-      omega
-    obtain ⟨q, hqnorm, hqdepth⟩ := ih (geqDepth sub) hsubdepth sub rfl (by
-        simpa [geqLeafSequents] using hleaf)
-    refine ⟨.eqRefl t Γ Δ q, ⟨htarget, hqnorm⟩, ?_⟩
-    simp only [geqDepth]
-    omega
-  | eqFuncCong f ss ts Γ Δ sub =>
-    have hsubdepth : geqDepth sub < n := by
-      simp only [geqDepth] at hdepth
-      omega
-    obtain ⟨q, hqnorm, hqdepth⟩ := ih (geqDepth sub) hsubdepth sub rfl (by
-        simpa [geqLeafSequents] using hleaf)
-    refine ⟨.eqFuncCong f ss ts Γ Δ q, ⟨htarget, hqnorm⟩, ?_⟩
-    simp only [geqDepth]
-    omega
-  | eqPredCong P ss ts Γ Δ sub =>
-    have hsubdepth : geqDepth sub < n := by
-      simp only [geqDepth] at hdepth
-      omega
-    obtain ⟨q, hqnorm, hqdepth⟩ := ih (geqDepth sub) hsubdepth sub rfl (by
-        simpa [geqLeafSequents] using hleaf)
-    refine ⟨.eqPredCong P ss ts Γ Δ q, ⟨htarget, hqnorm⟩, ?_⟩
-    simp only [geqDepth]
-    omega
-  | eqGeneral axioms hne haxioms Γ Δ sub =>
-    have hsubdepth : geqDepth sub < n := by
-      simp only [geqDepth] at hdepth
-      omega
-    obtain ⟨q, hqnorm, hqdepth⟩ := ih (geqDepth sub) hsubdepth sub rfl (by
-        simpa [geqLeafSequents] using hleaf)
-    refine ⟨.eqGeneral axioms hne haxioms Γ Δ q, ⟨htarget, hqnorm⟩, ?_⟩
-    simp only [geqDepth]
-    omega
-
-end
-end LCS.CutElim.LKe.Equivalence
-end
-

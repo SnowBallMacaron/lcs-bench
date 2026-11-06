@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Propositional.Systems.G.NormalForms : UInt64 := 416061749202397014
+def AttachStamp.LCS.Propositional.Systems.G.NormalForms : UInt64 := 4115115216079558454

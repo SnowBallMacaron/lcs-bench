@@ -17,25 +17,6 @@ helper theorem leavesFrom_iff_inputs_subset (T : ResolutionTree) (S : ClauseSequ
     exact ⟨fun ⟨hA, hB⟩ C h => h.elim (hA C) (hB C),
       fun h => ⟨fun C hc => h C (Or.inl hc), fun C hc => h C (Or.inr hc)⟩⟩
 
-helper theorem leavesFrom_inputs (T : ResolutionTree) : T.leavesFrom T.inputs :=
-  (leavesFrom_iff_inputs_subset T T.inputs).mpr (fun _ h => h)
-
-helper theorem inputs_nonempty (T : ResolutionTree) : ∃ C, C ∈ T.inputs := by
-  induction T with
-  | axiom_ C => exact ⟨C, (LCS.Finset.mem_singleton _ _).mpr rfl⟩
-  | resolve A B P ihA _ =>
-    obtain ⟨C, hC⟩ := ihA
-    exact ⟨C, LCS.Finset.mem_union.mpr (Or.inl hC)⟩
-
-helper theorem inputs_ordinary (T : ResolutionTree) (S : ClauseSequent)
-    (hT : T.leavesFrom S) (hS : S.isOrdinary) : T.inputs.isOrdinary := by
-  intro C hC
-  exact hS C ((leavesFrom_iff_inputs_subset T S).mp hT C hC)
-
-helper theorem eraseLiteral_eq_self (T : ResolutionTree) (L : Literal)
-    (h : L ∉ T.label) : T.eraseLiteral L = T := by
-  rw [eraseLiteral.eq_def, if_neg h]
-
 helper theorem replayResolve_isWellFormed (A B : ResolutionTree) (P : Literal)
     (hA : A.IsWellFormed) (hB : B.IsWellFormed) :
     (replayResolve A B P).IsWellFormed := by
@@ -133,19 +114,6 @@ proof_of eraseLiteral_treeStepCount_le := by
       · simp only [treeStepCount]; omega
     · exact Nat.le_refl _
 
-
-helper theorem eraseLiteral_left_steps_lt (A B : ResolutionTree) (P L : Literal) :
-    (A.eraseLiteral L).treeStepCount < (resolve A B P).treeStepCount := by
-  have h := eraseLiteral_treeStepCount_le A L
-  simp only [treeStepCount]
-  omega
-
-helper theorem eraseLiteral_right_steps_lt (A B : ResolutionTree) (P L : Literal) :
-    (B.eraseLiteral L).treeStepCount < (resolve A B P).treeStepCount := by
-  have h := eraseLiteral_treeStepCount_le B L
-  simp only [treeStepCount]
-  omega
-
 helper theorem replayResolve_inputs (A B : ResolutionTree) (P : Literal) :
     LCS.Finset.Subset (replayResolve A B P).inputs
       (LCS.Finset.union A.inputs B.inputs) := by
@@ -180,18 +148,6 @@ theorem eraseLiteral_inputs (T : ResolutionTree) (L : Literal) (C : Clause)
         · exact Or.inl (LCS.Finset.mem_union.mpr (Or.inr h))
         · exact Or.inr ⟨D, LCS.Finset.mem_union.mpr (Or.inr hD), hL, he⟩
     · exact Or.inl hC
-
-helper theorem eraseLiteral_leavesFrom (T : ResolutionTree) (L : Literal)
-    (S S' : ClauseSequent) (hT : T.leavesFrom S)
-    (hKeep : ∀ C ∈ S, C ∈ S')
-    (hErase : ∀ C ∈ S, L ∈ C → GCNF.Clause.remove C L ∈ S') :
-    (T.eraseLiteral L).leavesFrom S' := by
-  apply (leavesFrom_iff_inputs_subset _ _).mpr
-  have hInputs := (leavesFrom_iff_inputs_subset T S).mp hT
-  intro C hC
-  rcases eraseLiteral_inputs T L C hC with h | ⟨A, hA, hL, rfl⟩
-  · exact hKeep C (hInputs C h)
-  · exact hErase A (hInputs A hA) hL
 
 proof_of eraseLiteral_novel_input_restore := by
   rcases eraseLiteral_inputs T L C hC with h | ⟨A, hA, hL, rfl⟩

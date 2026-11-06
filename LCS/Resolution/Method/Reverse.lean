@@ -43,17 +43,6 @@ theorem toGCNF_leafCount_le_unfold (g : FiniteGraph) (S : ClauseSequent)
   rw [weakenTo_leafCount]
   exact LCS.Resolution.Method.ResolutionTree.toGCNF_leafCount_le _ _ _ _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The graph conversion's counted output is exactly the executable recursive
-leaf count, after the final weakening restores the ambient input clauses. -/
-theorem toGCNF_leafCount_eq_conversionLeafCount (g : FiniteGraph) (S : ClauseSequent)
-    (hRef : g.IsRefutationFor S) (hOrdinary : S.isOrdinary) :
-    (g.toGCNF S hRef hOrdinary).leafCount =
-      ResolutionTree.conversionLeafCount (g.unfold hRef.1) := by
-  unfold toGCNF
-  rw [weakenTo_leafCount]
-  exact ResolutionTree.toGCNF_leafCount_eq_conversionLeafCount _ _ _ _
-
 /-- Proof of Lemma 4.3.4: count the constructed proof and the actual graph
 vertices. The source inequality is stated in ordinary, subtraction-free
 arithmetic, so the zero-step empty-input boundary remains visible. -/
@@ -62,79 +51,6 @@ theorem toGCNF_nodeCount_bound (g : FiniteGraph) (S : ClauseSequent)
     (hRef : g.IsRefutationFor S) (hOrdinary : S.isOrdinary)
     (hTree : (g.toResolutionDAG hRef.1).isTreeShaped) :
     (g.toGCNF S hRef hOrdinary).nodeCount + 3 ≤ 2 * g.nodeCount 
-
-/-- The same count bound, using the quotient vertices of the source DAG. -/
-@[blueprint "chap4__lemma_4_3_4"]
-theorem toGCNF_quotient_nodeCount_bound (g : FiniteGraph) (S : ClauseSequent)
-    (hRef : g.IsRefutationFor S) (hOrdinary : S.isOrdinary)
-    (hTree : (g.toResolutionDAG hRef.1).isTreeShaped) :
-    (g.toGCNF S hRef hOrdinary).nodeCount + 3 ≤
-      2 * (g.toResolutionDAG hRef.1).nodeCount 
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Vertices on paths beginning at `i` on which every label contains `L`.
-The IDs are retained, including when two such paths share a vertex. -/
-def persistentFrom (g : FiniteGraph) (L : Literal) : Nat → Nat → List Nat
-  | 0, _ => []
-  | fuel + 1, i =>
-    match g.node i with
-    | none => []
-    | some n =>
-      if L ∈ n.clause then
-        i :: (match n.inference with
-          | none => []
-          | some r => g.persistentFrom L fuel r.left ++
-              g.persistentFrom L fuel r.right)
-      else []
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-def persistentIds (g : FiniteGraph) (L : Literal) : List Nat :=
-  (g.persistentFrom L g.table.length g.root).eraseDups
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The operation described literally in the proof of Theorem 4.3.3:
-erase a persistent literal and retain all edges.  It is a raw graph operation;
-the counterexample below shows why it cannot carry unconditional validity. -/
-def erasePersistent (g : FiniteGraph) (L : Literal) : FiniteGraph :=
-  g.mapLabels fun i C => if i ∈ g.persistentIds L then GCNF.Clause.remove C L else C
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 end FiniteGraph
 end LCS.Resolution.Method

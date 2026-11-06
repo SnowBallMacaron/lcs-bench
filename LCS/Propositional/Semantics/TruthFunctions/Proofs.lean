@@ -16,16 +16,6 @@ def extendAssign {n : Nat} (a : Fin n → BoolVal) (b : BoolVal) :
     Fin (n + 1) → BoolVal :=
   fun i => if h : i.val < n then a ⟨i.val, h⟩ else b
 
-helper theorem extendAssign_init {n : Nat} (a : Fin n → BoolVal) (b : BoolVal)
-    (i : Fin n) : extendAssign a b ⟨i.val, Nat.lt_of_lt_of_le i.isLt (Nat.le_succ _)⟩ = a i := by
--- BEGIN PROOF
-  simp [extendAssign, i.isLt]
-
-helper theorem extendAssign_last {n : Nat} (a : Fin n → BoolVal) (b : BoolVal) :
-    extendAssign a b ⟨n, Nat.lt_succ_self _⟩ = b := by
--- BEGIN PROOF
-  simp [extendAssign, Nat.lt_irrefl]
-
 helper /-- Shannon expansion witness: build a formula using only var, neg, conj, disj
     that computes the same truth function as f, using variables 0..n-1.
     Uses Shannon decomposition: f(x₀,...,xₙ) = (xₙ ∧ f[xₙ:=T]) ∨ (¬xₙ ∧ f[xₙ:=F]). -/
@@ -762,86 +752,5 @@ proof_of logEquiv_contradiction := (logEquivIffTranslated _ _).mpr
 
 
 end PropFormulaExtended
-
-namespace BProp
-
-proof_of ofFormulaEqIff := ⟨Quotient.exact, fun h => @Quotient.sound _ logEquivSetoid A B h⟩
-
-
-proof_of addOfFormula := rfl
-
-
-proof_of mulOfFormula := rfl
-
-
-proof_of negOfFormula := rfl
-
-
-proof_of addAssoc := Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (PropFormulaExtended.logEquiv_disj_assoc A B C))
-
-
-proof_of mulAssoc := Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (PropFormulaExtended.logEquiv_conj_assoc A B C))
-
-
-proof_of addComm := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_disj_comm A B))
-
-
-proof_of mulComm := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_conj_comm A B))
-
-
-proof_of addMulDistrib := Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (PropFormulaExtended.logEquiv_disj_conj_distrib A B C))
-
-
-proof_of mulAddDistrib := Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (PropFormulaExtended.logEquiv_conj_disj_distrib A B C))
-
-
-proof_of negAdd := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_demorgan_disj A B))
-
-
-proof_of negMul := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_demorgan_conj A B))
-
-
-proof_of addIdempotent := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_disj_idempotent A))
-
-
-proof_of mulIdempotent := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_conj_idempotent A))
-
-
-proof_of negNeg := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_double_neg A))
-
-
-proof_of addAbsorption := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_disj_absorption A B))
-
-
-proof_of mulAbsorption := Quotient.inductionOn₂ a b (fun A B => Quotient.sound (PropFormulaExtended.logEquiv_conj_absorption A B))
-
-
-proof_of addZero := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_disj_identity A))
-
-
-proof_of mulZero := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_conj_annihilation A))
-
-
-proof_of addOne := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_disj_top A))
-
-
-proof_of mulOne := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_conj_identity_top A))
-
-
-proof_of addNeg := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_excluded_middle A))
-
-
-proof_of mulNeg := Quotient.inductionOn a (fun A => Quotient.sound (PropFormulaExtended.logEquiv_contradiction A))
-
-
-proof_of zeroNeOne := by
-  intro h
-  have hEquiv := (ofFormulaEqIff .fls .top).mp h
-  have hEval := (PropFormulaExtended.logEquivIffEqualEval .fls .top).mp hEquiv
-    (fun _ => BoolVal.F)
-  cases hEval
-
-
-end BProp
 
 end LCS.Propositional.Semantics.TruthFunctions

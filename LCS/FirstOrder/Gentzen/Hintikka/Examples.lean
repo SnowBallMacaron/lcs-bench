@@ -2,12 +2,14 @@ import LCS.Item
 import LCS.Util
 import LCS.FirstOrder.Gentzen
 import LCS.FirstOrder.Gentzen.SignedFormulae
-import LCS.FirstOrder.Gentzen.Hintikka.Model
-import LCS.FirstOrder.Gentzen.Hintikka.SearchClosure
-import LCS.FirstOrder.Gentzen.Hintikka.PathModel
-import LCS.FirstOrder.Gentzen.Hintikka.Construction
 import Attach
 import LCS.FirstOrder.Gentzen.Hintikka.Examples.ProofsStamp
+
+/-! # Examples 5.4.3 and 5.4.4 (Section 5.4.7)
+
+The proof tree found for Example 5.4.3 and the counter-examples of Example 5.4.4.
+Source: Logic for Computer Science, Gallier 2015
+-/
 
 section
 namespace LCS.FirstOrder.Gentzen.Hintikka
@@ -228,4 +230,3 @@ theorem exSearchCounterModelTwo_falsifies :
 
 end LCS.FirstOrder.Gentzen.Hintikka
 end
-

@@ -12,54 +12,6 @@ open LCS.FirstOrder.Semantics
 
 namespace LCS.FirstOrder.Semantics.Substitution
 
-helper /-- Definition 5.3.8 (companion): Binary sequences admit no surjective
-enumeration by natural numbers, by Cantor's diagonal argument. -/
-theorem binarySequences_not_countable : ¬ Nonempty (Countable (Nat → Bool)) := by
-  rintro ⟨e⟩
-  obtain ⟨n, hn⟩ := e.enumerate_surj (fun k => !(e.enumerate k k))
-  have h := congrFun hn n
-  cases hv : e.enumerate n n <;> simp [hv] at h
-
-helper /-- Definition 5.3.8 (companion): Every signature has a structure on
-binary sequences; functions and constants take the constant-false sequence,
-and predicate symbols are interpreted as false. -/
-def binarySequenceStructure (L : Language) : Structure L where
-  carrier := Nat → Bool
-  carrierNonempty := ⟨fun _ => false⟩
-  interpFunc := fun _ _ _ => false
-  interpConst := fun _ _ => false
-  interpPred := fun _ _ => False
-
-proof_of extendedConstants_not_countable := by
-  refine ⟨binarySequenceStructure L, ?_⟩
-  rintro ⟨e⟩
-  letI : Countable (L.constSymbols ⊕ (Nat → Bool)) := e
-  let decode : L.constSymbols ⊕ (Nat → Bool) → (Nat → Bool)
-    | .inl _ => fun _ => false
-    | .inr f => f
-  apply binarySequences_not_countable
-  exact ⟨Countable.ofSurjection decode (fun f => ⟨Sum.inr f, rfl⟩)⟩
-
-
-proof_of extendedFormulae_not_countable := by
-  refine ⟨binarySequenceStructure L, ?_⟩
-  rintro ⟨e⟩
-  letI : Countable (Formula (extendedLanguage L (Nat → Bool))) := e
-  let decode : Formula (extendedLanguage L (Nat → Bool)) → (Nat → Bool)
-    | .eq_ _ (.const (.inr f)) _ => f
-    | .predN _ hP ts =>
-      match ts ⟨0, hP⟩ with
-      | .const (.inr f) => f
-      | _ => fun _ => false
-    | _ => fun _ => false
-  apply binarySequences_not_countable
-  refine ⟨Countable.ofSurjection decode ?_⟩
-  intro f
-  rcases h with hEq | ⟨P, hP⟩
-  · exact ⟨Formula.eq_ hEq (namingConst f) (namingConst f), rfl⟩
-  · exact ⟨Formula.predN P hP (fun _ => namingConst f), rfl⟩
-
-
 proof_of termSubstEval := by
   -- BEGIN PROOF
     induction t with
@@ -240,41 +192,5 @@ proof_of coincidenceLemma := by
           unfold assignUpdate; split
           · rfl
           · rename_i hne; exact h y ⟨hy, hne⟩)).mpr ha⟩
-
-
-helper /-- Lemma 5.3.3 (companion, consequence): For a sentence (FV = empty set), the
-truth value is the same for all assignments. Since a sentence has no
-free variables, the agreement condition is vacuously satisfied. -/
-theorem sentenceTruthIndep {L : Language} (S : Structure L)
-    (A : Formula L) (hSent : Formula.isSentence A)
-    (s1 s2 : Assignment S) :
-    formulaEval S A s1 ↔ formulaEval S A s2 :=
--- BEGIN PROOF
-by
-  exact coincidenceLemma S A s1 s2 (fun y hy => by
-    have hfv : formulaFV A = ∅ := hSent
-    have : ¬ (formulaFV A y) := by rw [hfv]; exact id
-    exact absurd hy this)
-
-proof_of sentenceExcludedMiddle := by
-  classical
-  by_cases h : validIn S A
-  · exact Or.inl h
-  · right
-    intro s hs
-    apply h
-    intro s'
-    exact (sentenceTruthIndep S A hSent s s').mp hs
-
-
-helper /-- Pointwise excluded middle for a sentence under a fixed assignment. -/
-theorem excludedMiddleAt {L : Language} (S : Structure L)
-    (A : Formula L) (_hSent : Formula.isSentence A)
-    (s : Assignment S) :
-    formulaEval S A s ∨ formulaEval S (Formula.neg A) s :=
--- BEGIN PROOF
-by
-  simp [formulaEval]
-  exact Classical.em (formulaEval S A s)
 
 end LCS.FirstOrder.Semantics.Substitution

@@ -32,15 +32,6 @@ inductive RankedTreeLabel (Symbol : Type) where
   | rigid (symbol : Symbol)
   deriving DecidableEq
 
--- ATTACH-BLOCKER: unsupported untagged instance
-instance {Symbol : Type} [DecidableEq Symbol] : BEq (RankedTreeLabel Symbol) where
-  beq a b := decide (a = b)
-
--- ATTACH-BLOCKER: unsupported untagged instance
-instance {Symbol : Type} [DecidableEq Symbol] : LawfulBEq (RankedTreeLabel Symbol) where
-  eq_of_beq := by intro a b h; exact of_decide_eq_true h
-  rfl := by intro a; exact decide_eq_true rfl
-
 -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Variable labels have rank zero; rigid labels retain their prescribed rank. -/
 def RankedTreeLabel.rank {Symbol : Type} (rank : Symbol → Nat) :
@@ -73,110 +64,6 @@ def SyntaxTreeSymbol.rank {L : LCS.FirstOrder.Basic.Language} :
   | .function f => L.funArity f
   | .predicate p => L.predArity p
   | .equality _ => 2
-
-/-- One ranked carrier shared by term and atom encodings. -/
-@[blueprint "chap8__definition_8_4_1"]
-abbrev SyntaxRankedTree (L : LCS.FirstOrder.Basic.Language) :=
-  RankedTreeData (SyntaxTreeSymbol L) SyntaxTreeSymbol.rank
-
-/-- The term-sorted restriction: variables, constants and function nodes with
-    term-sorted children; predicate and equality nodes are excluded. -/
-@[blueprint "chap8__definition_8_4_1"]
-def IsTermTree {L : LCS.FirstOrder.Basic.Language} : SyntaxRankedTree L → Prop
-  | .var _ => True
-  | .node (.constant _) _ => True
-  | .node (.function _) children => ∀ i, IsTermTree (children i)
-  | .node (.predicate _) _ => False
-  | .node (.equality _) _ => False
-
-/-- The atom-sorted restriction: a predicate or equality at the root and
-    term-sorted arguments. Terms alone are not atomic formulae. -/
-@[blueprint "chap8__definition_8_4_1"]
-def IsAtomTree {L : LCS.FirstOrder.Basic.Language} : SyntaxRankedTree L → Prop
-  | .node (.predicate _) children => ∀ i, IsTermTree (children i)
-  | .node (.equality _) children => ∀ i, IsTermTree (children i)
-  | _ => False
-
-@[blueprint "chap8__definition_8_4_1"]
-abbrev SortedTermTree (L : LCS.FirstOrder.Basic.Language) := {t : SyntaxRankedTree L // IsTermTree t}
-@[blueprint "chap8__definition_8_4_1"]
-abbrev SortedAtomTree (L : LCS.FirstOrder.Basic.Language) := {t : SyntaxRankedTree L // IsAtomTree t}
-
-/-- Definition 8.4.1 (representation companion): recursively encode a term,
-    keeping variables distinct from rigid constants and retaining argument order. -/
-@[blueprint "chap8__definition_8_4_1"]
-def termToRankedTree {L : LCS.FirstOrder.Basic.Language} :
-    LCS.FirstOrder.Basic.Term L → SyntaxRankedTree L
-  | .var x => .var x
-  | .const c => .node (.constant c) Fin.elim0
-  | .func f args => .node (.function f) (fun i => termToRankedTree (args i))
-
-/-- The structural term encoding belongs to the term-sorted restriction. -/
-@[blueprint "chap8__definition_8_4_1"]
-theorem termToRankedTree_sorted {L : LCS.FirstOrder.Basic.Language}
-    (t : LCS.FirstOrder.Basic.Term L) : IsTermTree (termToRankedTree t)
-
-/-- Definition 8.4.1 (representation companion): decode a term-sorted tree
-    by structural recursion, excluding the two atomic root sorts by their proofs. -/
-@[blueprint "chap8__definition_8_4_1"]
-def rankedTreeToTerm {L : LCS.FirstOrder.Basic.Language} :
-    (t : SyntaxRankedTree L) → IsTermTree t → LCS.FirstOrder.Basic.Term L
-  | .var x, _ => .var x
-  | .node (.constant c) _, _ => .const c
-  | .node (.function f) children, h =>
-      .func f (fun i => rankedTreeToTerm (children i) (h i))
-  | .node (.predicate _) _, h => False.elim h
-  | .node (.equality _) _, h => False.elim h
-
-/-- Definition 8.4.1 (representation companion): terms are in bijection with
-    exactly the term-sorted restriction of the ranked-tree carrier. -/
-@[blueprint "chap8__definition_8_4_1"]
-theorem termToRankedTree_bijective {L : LCS.FirstOrder.Basic.Language} :
-    let encode := fun t : LCS.FirstOrder.Basic.Term L =>
-      (⟨termToRankedTree t, termToRankedTree_sorted t⟩ : SortedTermTree L)
-    Function.Injective encode ∧ Function.Surjective encode
-
-/-- Definition 8.4.1 (representation companion): encode an atomic formula
-    with its predicate at the root and recursively encoded term arguments.
-    Equality has its own binary label, with left then right argument. -/
-@[blueprint "chap8__definition_8_4_1"]
-def atomToRankedTree {L : LCS.FirstOrder.Basic.Language} :
-    LCS.FOResolution.ClauseForm.FOAtomCore L → SyntaxRankedTree L
-  | .predN p args => .node (.predicate p) (fun i => termToRankedTree (args i))
-  | .eq_ hL lhs rhs =>
-      .node (.equality hL) (fun i =>
-        if i.val = 0 then termToRankedTree lhs else termToRankedTree rhs)
-
-/-- The structural atomic encoding belongs to the atom-sorted restriction. -/
-@[blueprint "chap8__definition_8_4_1"]
-theorem atomToRankedTree_sorted {L : LCS.FirstOrder.Basic.Language}
-    (a : LCS.FOResolution.ClauseForm.FOAtomCore L) :
-    IsAtomTree (atomToRankedTree a)
-
-/-- Definition 8.4.1 (representation companion): decode an atom-sorted
-    tree, recursively decoding its term-sorted children. Equality retains
-    its language witness and the order of its two arguments. -/
-@[blueprint "chap8__definition_8_4_1"]
-def rankedTreeToAtom {L : LCS.FirstOrder.Basic.Language} :
-    (t : SyntaxRankedTree L) → IsAtomTree t →
-      LCS.FOResolution.ClauseForm.FOAtomCore L
-  | .var _, h => False.elim h
-  | .node (.constant _) _, h => False.elim h
-  | .node (.function _) _, h => False.elim h
-  | .node (.predicate p) children, h =>
-      .predN p (fun i => rankedTreeToTerm (children i) (h i))
-  | .node (.equality hL) children, h =>
-      .eq_ hL
-        (rankedTreeToTerm (children ⟨0, Nat.zero_lt_succ 1⟩) (h ⟨0, Nat.zero_lt_succ 1⟩))
-        (rankedTreeToTerm (children ⟨1, Nat.lt_succ_self 1⟩) (h ⟨1, Nat.lt_succ_self 1⟩))
-
-/-- Definition 8.4.1 (representation companion): atomic formulae are in
-    bijection with exactly the atom-sorted restriction of ranked trees. -/
-@[attach_debt, blueprint "chap8__definition_8_4_1"]
-theorem atomToRankedTree_bijective {L : LCS.FirstOrder.Basic.Language} :
-    let encode := fun a : LCS.FOResolution.ClauseForm.FOAtomCore L =>
-      (⟨atomToRankedTree a, atomToRankedTree_sorted a⟩ : SortedAtomTree L)
-    Function.Injective encode ∧ Function.Surjective encode
 
 -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The actual root label of a ranked tree. -/
@@ -223,28 +110,6 @@ structure TreeNavCore (Tree : Type) (Addr : Type) (Subst : Type) :
   /-- dosubstitution(t, sigma) applies substitution sigma to
   tree t -/
   doSubstitution : Tree → Subst → Tree
-
-/-- Definition 8.4.3 (companion): an address belongs to a ranked tree's
-    domain exactly when structural subtree lookup succeeds. -/
-@[blueprint "chap8__definition_8_4_3"]
-def inDom {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) : Prop :=
-  (t.subtreeAt u).isSome = true
-
-/-- Definition 8.4.3 (companion): every tree contains its root address. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem inDom_root {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) : inDom t [] 
-
-/-- Definition 8.4.3 (companion): child zero is never a source tree address. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem not_inDom_zero {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) : ¬ inDom t (0 :: u) 
-
-/-- Definition 8.4.3 (companion): a variable tree has only its root address. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem inDom_var_iff {Symbol : Type} {rank : Symbol → Nat} (x : Nat) (u : TreeAddr) :
-    inDom (RankedTreeData.var (Symbol := Symbol) (rank := rank) x) u ↔ u = [] 
 
 -- ATTACH-BLOCKER: unsupported untagged structure
 /-- A finite-support substitution on ranked trees. The support list may
@@ -313,45 +178,6 @@ def TreeNav (Symbol : Type) (rank : Symbol → Nat) :
   right := RankedTreeData.nextSibling
   doSubstitution t sigma := t.substitute sigma.map
 
-/-- Definition 8.4.3 (leaf law): at a valid address, leafhood is exactly
-    absence of children, equivalently absence of the first child. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem TreeNav_leaf_iff {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) (hu : inDom t u) :
-    (TreeNav Symbol rank).isLeaf t u = true ↔
-      ∀ i : Nat, (t.subtreeAt u).bind (fun s => s.subtreeAt [i + 1]) = none 
-
-/-- Definition 8.4.3 (variable law): precisely the distinguished variable labels. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem TreeNav_variable_iff {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) :
-    (TreeNav Symbol rank).isVariable t u = true ↔
-      ∃ x, t.labelAt u = some (.variable x) 
-
-/-- Definition 8.4.3 (left law): nil at a leaf, otherwise the first child u1. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem TreeNav_left_eq {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) (hu : inDom t u) :
-    (TreeNav Symbol rank).left t u =
-      if (TreeNav Symbol rank).isLeaf t u then none else some (u ++ [1]) 
-
-/-- Definition 8.4.3 (right law): test the next sibling's actual current-tree domain. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem TreeNav_right_eq {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) (i : Nat) :
-    (TreeNav Symbol rank).right t (u ++ [i]) =
-      if (t.subtreeAt (u ++ [i + 1])).isSome then some (u ++ [i + 1]) else none 
-
-/-- Definition 8.4.3 (substitution law): replace variables simultaneously and
-    preserve each rigid symbol and the order of every child. -/
-@[blueprint "chap8__definition_8_4_3"]
-theorem TreeNav_substitution_eq {Symbol : Type} {rank : Symbol → Nat}
-    (sigma : FiniteTreeSubstitution Symbol rank) :
-    (∀ x, (TreeNav Symbol rank).doSubstitution (.var x) sigma = sigma.map x) ∧
-    (∀ f (children : Fin (rank f) → RankedTreeData Symbol rank),
-      (TreeNav Symbol rank).doSubstitution (.node f children) sigma =
-        .node f (fun i => (TreeNav Symbol rank).doSubstitution (children i) sigma)) 
-
 /-- Preorder visits the root first, then recursively visits every child from
     left to right. Child indices are one-based in addresses. Variables and
     nullary rigid nodes both contribute just the root address. -/
@@ -362,24 +188,6 @@ def preorderAddresses {Symbol : Type} {rank : Symbol → Nat} :
   | .node _ children =>
       [] :: (List.ofFn fun i =>
         (preorderAddresses (children i)).map (fun u => (i.val + 1) :: u)).flatten
-
-/-- The preorder sequence starts at the root and lists exactly the current
-    tree's domain without repetition. In each actual subtree, a singleton
-    traversal characterizes a leaf and its second entry gives the first child.
-    The next sibling is the next numbered child precisely when that address
-    occurs in the traversal of the supplied current tree. -/
-@[attach_debt, blueprint "chap8__definition_8_4_3"]
-theorem preorderAddresses_spec {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) :
-    (preorderAddresses t).head? = some [] ∧
-    (preorderAddresses t).Nodup ∧
-    (∀ u, u ∈ preorderAddresses t ↔ inDom t u) ∧
-    (∀ u s, t.subtreeAt u = some s →
-      ((TreeNav Symbol rank).isLeaf t u = true ↔ preorderAddresses s = [[]]) ∧
-      (TreeNav Symbol rank).left t u =
-        (preorderAddresses s).tail.head?.map (fun v => u ++ v)) ∧
-    (∀ u i, (TreeNav Symbol rank).right t (u ++ [i]) =
-      if u ++ [i + 1] ∈ preorderAddresses t then some (u ++ [i + 1]) else none)
 
 -- ===================================================================
 -- Definition 8.4.4: Unification algorithm types
@@ -392,66 +200,6 @@ def treeOccurs {Symbol : Type} {rank : Symbol → Nat} (x : Nat) :
     RankedTreeData Symbol rank → Prop
   | .var y => x = y
   | .node _ children => ∃ i, treeOccurs x (children i)
-
-/-- Fatal case (1)(i): at the same valid address the two rigid labels differ.
-    The subtree witnesses enforce membership in both tree domains. -/
-@[blueprint "chap8__definition_8_4_4"]
-def FatalFixedLabelAt {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr) : Prop :=
-  ∃ (f g : Symbol) (ss : Fin (rank f) → RankedTreeData Symbol rank)
-      (ts : Fin (rank g) → RankedTreeData Symbol rank),
-    t₁.subtreeAt u = some (.node f ss) ∧
-    t₂.subtreeAt u = some (.node g ts) ∧ f ≠ g
-
-/-- The variable-first half of fatal case (1)(ii): the opposing subtree
-    is nonvariable and contains the variable at the common address. -/
-@[blueprint "chap8__definition_8_4_4"]
-def FatalOccursAtLeft {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr) : Prop :=
-  ∃ (x : Nat) (f : Symbol) (children : Fin (rank f) → RankedTreeData Symbol rank),
-    t₁.subtreeAt u = some (.var x) ∧
-    t₂.subtreeAt u = some (.node f children) ∧ treeOccurs x (.node f children)
-
-/-- Fatal case (1)(ii) includes the source's explicitly symmetric case. -/
-@[blueprint "chap8__definition_8_4_4"]
-def FatalOccursAt {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr) : Prop :=
-  FatalOccursAtLeft t₁ t₂ u ∨ FatalOccursAtLeft t₂ t₁ u
-
-/-- Repairable case (2), in the source's variable-first orientation:
-    the opposing subtree at the common valid address does not contain x.
-    It may be a different variable; the equal-variable case is excluded. -/
-@[blueprint "chap8__definition_8_4_4"]
-def RepairableAt {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr) : Prop :=
-  ∃ (x : Nat) (s : RankedTreeData Symbol rank),
-    t₁.subtreeAt u = some (.var x) ∧ t₂.subtreeAt u = some s ∧ ¬ treeOccurs x s
-
-/-- Definition 8.4.4 (companion): a disagreement classification carries
-    evidence about the actual trees at a common valid address. Repairable
-    witnesses use the written variable-first orientation. -/
-@[blueprint "chap8__definition_8_4_4"]
-inductive DisagreementKind {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr) : Type where
-  | fatalNonVariable : FatalFixedLabelAt t₁ t₂ u → DisagreementKind t₁ t₂ u
-  | fatalOccurCheck : FatalOccursAt t₁ t₂ u → DisagreementKind t₁ t₂ u
-  | repairable : RepairableAt t₁ t₂ u → DisagreementKind t₁ t₂ u
-
-/-- Distinct variables are a repairable disagreement, even though neither
-    opposing subtree has a rigid root. -/
-@[blueprint "chap8__definition_8_4_4"]
-theorem repairableAt_distinct_variables {Symbol : Type} {rank : Symbol → Nat}
-    (x y : Nat) (h : x ≠ y) :
-    RepairableAt (RankedTreeData.var (Symbol := Symbol) (rank := rank) x) (.var y) []
-
-/-- Either fatal disagreement at a common address prevents unifying the
-    whole finite trees by any finite-support simultaneous substitution. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem fatalDisagreement_not_unifiable {Symbol : Type} {rank : Symbol → Nat}
-    (t₁ t₂ : RankedTreeData Symbol rank) (u : TreeAddr)
-    (hFatal : FatalFixedLabelAt t₁ t₂ u ∨ FatalOccursAt t₁ t₂ u) :
-    ¬ ∃ sigma : FiniteTreeSubstitution Symbol rank,
-      t₁.substitute sigma.map = t₂.substitute sigma.map
 
 /-- Definition 8.4.4 (companion): The output of the unification algorithm:
 a flag indicating whether the trees are unifiable, the accumulated
@@ -689,12 +437,6 @@ def initialUnifyState {Symbol : Type} {rank : Symbol → Nat}
   unifier := (SubstOps Symbol rank).identity
   unifiable := true
 
-/-- Both store equations hold for the actual initialized state. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem initialUnifyState_stores {Symbol : Type} {rank : Symbol → Nat}
-    (t1 t2 : RankedTreeData Symbol rank) :
-    StoredTreeInvariant t1 t2 (initialUnifyState t1 t2)
-
 /-- Definition 8.4.4: compose the old accumulated map with the new component,
     in that order, on every variable. -/
 @[blueprint "chap8__definition_8_4_4"]
@@ -710,33 +452,6 @@ def newPair {Symbol : Type} {rank : Symbol → Nat}
     (t2 : RankedTreeData Symbol rank) (addr2 : TreeAddr) :
     Option (FiniteTreeSubstitution Symbol rank) :=
   (SubstOps Symbol rank).newPair t1 addr1 t2 addr2
-
-/-- Definition 8.4.4: identity fixes every variable. -/
-@[blueprint "chap8__definition_8_4_4"]
-theorem SubstOps_identity_eq {Symbol : Type} {rank : Symbol → Nat} (x : Nat) :
-    (SubstOps Symbol rank).identity.map x = .var x
-
-/-- Definition 8.4.4: composition applies the old map and then the new map. -/
-@[blueprint "chap8__definition_8_4_4"]
-theorem SubstOps_compose_eq {Symbol : Type} {rank : Symbol → Nat}
-    (old new : FiniteTreeSubstitution Symbol rank) (x : Nat) :
-    ((SubstOps Symbol rank).compose old new).map x =
-      (old.map x).substitute new.map
-
-/-- Definition 8.4.4: lookup returns precisely the structural subtree. -/
-@[blueprint "chap8__definition_8_4_4"]
-theorem SubstOps_subtreeAt_eq {Symbol : Type} {rank : Symbol → Nat}
-    (t : RankedTreeData Symbol rank) (u : TreeAddr) :
-    (SubstOps Symbol rank).subtreeAt t u = t.subtreeAt u
-
-/-- Definition 8.4.4: a selected variable x and subtree t yield the singleton
-    replacing x by t, fixing all other variable names. -/
-@[blueprint "chap8__definition_8_4_4"]
-theorem newPair_eq_singleton {Symbol : Type} {rank : Symbol → Nat}
-    (t1 t2 t : RankedTreeData Symbol rank) (u v : TreeAddr) (x : Nat)
-    (hx : t1.labelAt u = some (.variable x)) (ht : t2.subtreeAt v = some t) :
-    newPair t1 u t2 v = some (FiniteTreeSubstitution.singleton x t) ∧
-    ∀ y, (FiniteTreeSubstitution.singleton x t).map y = if y = x then t else .var y
 
 /-- Exhaustive structural occurrence checking compares variable names and
     examines every child of a rigid node. Nullary rigid nodes contain no variable. -/
@@ -757,15 +472,6 @@ def occurCheck {Symbol : Type} {rank : Symbol → Nat}
   match t1.labelAt addr1, t2.subtreeAt addr2 with
   | some (.variable x), some t => treeOccursBool x t
   | _, _ => false
-
-/-- The executable occurs check recognizes precisely occurrence of the selected
-    variable in the selected opposing subtree, independently of their addresses. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem occurCheck_eq_true_iff {Symbol : Type} {rank : Symbol → Nat}
-    (t1 t2 : RankedTreeData Symbol rank) (u v : TreeAddr) :
-    occurCheck t1 u t2 v = true ↔
-      ∃ (x : Nat) (t : RankedTreeData Symbol rank),
-        t1.labelAt u = some (.variable x) ∧ t2.subtreeAt v = some t ∧ treeOccurs x t
 
 /-- Definition 8.4.4: Procedure test-and-substitute performs the occur
     check, swapping operands when the second tree supplies the variable.
@@ -802,28 +508,6 @@ def testAndSubstitute {Symbol : Type} {rank : Symbol → Nat}
           let newTree1 := nav.doSubstitution state.tree1 np
           let newTree2 := nav.doSubstitution state.tree2 np
           { state with tree1 := newTree1, tree2 := newTree2, unifier := newUnifier }
-
-/-- A completed local step preserves both store equations. In the successful
-    repair branch this relates the old-then-new composed unifier to simultaneous
-    updates of both original stores; failure and absent-node branches retain them. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem testAndSubstitute_preserves_stores {Symbol : Type} {rank : Symbol → Nat}
-    (t1 t2 : RankedTreeData Symbol rank) (state : UnifyState Symbol rank)
-    (hStores : StoredTreeInvariant t1 t2 state) :
-    StoredTreeInvariant t1 t2 (testAndSubstitute state)
-
-/-- A live repairable disagreement succeeds in either operand orientation.
-    After the completed update both actual stores contain the same subtree
-    at the original address, which remains the current node. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem testAndSubstitute_local_agreement {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr)
-    (hNode : state.node = some u) (hLive : state.unifiable = true)
-    (hRepairable : RepairableAt state.tree1 state.tree2 u ∨
-      RepairableAt state.tree2 state.tree1 u) :
-    let result := testAndSubstitute state
-    result.unifiable = true ∧ result.node = some u ∧
-      ∃ t, result.tree1.subtreeAt u = some t ∧ result.tree2.subtreeAt u = some t
 
 /-- Distinct variable names of a finite ranked tree, obtained by structural
     traversal of every child. Rigid nullary symbols contribute no names. -/
@@ -868,87 +552,6 @@ def frameWeight {Symbol : Type} {rank : Symbol → Nat}
 def unifyMeasure {Symbol : Type} {rank : Symbol → Nat}
     (state : UnifyState Symbol rank) (frame : UnifyFrame) : Nat × Nat :=
   (varCount state.tree1 state.tree2, frameWeight state frame)
-
-/-- Theorem 8.4.1 (companion): The well-founded lexicographic
-    ordering used in the termination proof. (m1, t1) < (m2, t2) iff
-    m1 < m2, or m1 = m2 and the subtree measure decreases. The first
-    component is the number of distinct variables in tree1 union tree2,
-    and the second is the current subtree/work-frame weight. -/
-@[blueprint "chap8__theorem_8_4_1"]
-def WellFoundedLexOrder (p1 p2 : Nat × Nat) : Prop :=
-  p1.1 < p2.1 ∨ (p1.1 = p2.1 ∧ p1.2 < p2.2)
-
-/-- Theorem 8.4.1 (companion): The lexicographic ordering on
-    (Nat x Nat) is well-founded, as required for the termination proof
-    of the unification algorithm. -/
-@[blueprint "chap8__theorem_8_4_1"]
-theorem wellFoundedLexOrder_wf :
-    WellFounded (fun p1 p2 : Nat × Nat =>
-      WellFoundedLexOrder p1 p2)
-
-/-- A successful repair eliminates a variable from the union of both
-    stores, even if copying the opposing subtree increases their sizes. -/
-@[attach_debt, blueprint "chap8__theorem_8_4_1"]
-theorem repair_decreases_varCount {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr)
-    (hNode : state.node = some u) (hLive : state.unifiable = true)
-    (hRepairable : RepairableAt state.tree1 state.tree2 u ∨
-      RepairableAt state.tree2 state.tree1 u) :
-    let result := testAndSubstitute state
-    varCount result.tree1 result.tree2 < varCount state.tree1 state.tree2
-
-/-- The primary decrease allows arbitrary new work frames after a repair. -/
-@[blueprint "chap8__theorem_8_4_1"]
-theorem repair_decreases_measure {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr) (before after : UnifyFrame)
-    (hNode : state.node = some u) (hLive : state.unifiable = true)
-    (hRepairable : RepairableAt state.tree1 state.tree2 u ∨
-      RepairableAt state.tree2 state.tree1 u) :
-    WellFoundedLexOrder (unifyMeasure (testAndSubstitute state) after)
-      (unifyMeasure state before)
-
-/-- Entering the child loop consumes the visit phase of a valid node. -/
-@[attach_debt, blueprint "chap8__theorem_8_4_1"]
-theorem enterChildren_decreases_measure {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr) (hu : inDom state.tree1 u) :
-    WellFoundedLexOrder (unifyMeasure state (.children u 0))
-      (unifyMeasure state (.visit u))
-
-/-- A call on the current child is smaller than its parent's loop frame. -/
-@[attach_debt, blueprint "chap8__theorem_8_4_1"]
-theorem childVisit_decreases_measure {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr) (f : Symbol)
-    (children : Fin (rank f) → RankedTreeData Symbol rank)
-    (hSubtree : state.tree1.subtreeAt u = some (.node f children))
-    (i : Nat) (hi : i < rank f) :
-    WellFoundedLexOrder (unifyMeasure state (.visit (u ++ [i + 1])))
-      (unifyMeasure state (.children u i))
-
-/-- With fixed stores, advancing beyond an existing child consumes its work. -/
-@[attach_debt, blueprint "chap8__theorem_8_4_1"]
-theorem nextChild_decreases_measure {Symbol : Type} {rank : Symbol → Nat}
-    (state : UnifyState Symbol rank) (u : TreeAddr) (f : Symbol)
-    (children : Fin (rank f) → RankedTreeData Symbol rank)
-    (hSubtree : state.tree1.subtreeAt u = some (.node f children))
-    (i : Nat) (hi : i < rank f) :
-    WellFoundedLexOrder (unifyMeasure state (.children u (i + 1)))
-      (unifyMeasure state (.children u i))
-
-/-- The child-loop continuation also decreases after a returned child call:
-    either the variable union shrank, or its unchanged count implies that
-    the first store is unchanged, so advancing the cursor reduces the work.
-    These are the internal return invariants of the source correctness assertion. -/
-@[attach_debt, blueprint "chap8__theorem_8_4_1"]
-theorem childReturn_decreases_measure {Symbol : Type} {rank : Symbol → Nat}
-    (state returned : UnifyState Symbol rank) (u : TreeAddr) (f : Symbol)
-    (children : Fin (rank f) → RankedTreeData Symbol rank)
-    (hSubtree : state.tree1.subtreeAt u = some (.node f children))
-    (i : Nat) (hi : i < rank f)
-    (hCount : varCount returned.tree1 returned.tree2 ≤ varCount state.tree1 state.tree2)
-    (hUnchanged : varCount returned.tree1 returned.tree2 = varCount state.tree1 state.tree2 →
-      returned.tree1 = state.tree1) :
-    WellFoundedLexOrder (unifyMeasure returned (.children u (i + 1)))
-      (unifyMeasure state (.children u i))
 
 /-- Internal return invariant supporting the well-founded child loop:
     the union of variable names never grows, and equal counts imply that
@@ -1040,21 +643,6 @@ def unify {Symbol : Type} {rank : Symbol → Nat} [DecidableEq Symbol]
   | none => state
   | some addr => (unifyRun state (.visit addr)).val
 
-/-- A completed call at a common valid address preserves both accumulated
-    store equations and the caller's node reference. If it succeeds, the two
-    actual resulting subtrees at that address coincide. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem unify_subtree_postcondition {Symbol : Type} {rank : Symbol → Nat}
-    [DecidableEq Symbol] (t1 t2 : RankedTreeData Symbol rank)
-    (state : UnifyState Symbol rank) (u : TreeAddr)
-    (hStores : StoredTreeInvariant t1 t2 state)
-    (hNode : state.node = some u) (hLive : state.unifiable = true)
-    (hDom1 : inDom state.tree1 u) (hDom2 : inDom state.tree2 u) :
-    let result := unify state
-    StoredTreeInvariant t1 t2 result ∧ result.node = some u ∧
-      (result.unifiable = true →
-        ∃ s, result.tree1.subtreeAt u = some s ∧ result.tree2.subtreeAt u = some s)
-
 /-- Definition 8.4.4: take two input values, initialize the root reference and
     identity unifier, and return the updated flag, unifier and first stored tree. -/
 @[blueprint "chap8__definition_8_4_4" (main := true)]
@@ -1065,15 +653,6 @@ def unification {Symbol : Type} {rank : Symbol → Nat} [DecidableEq Symbol]
   { unifiable := finalState.unifiable
     unifier := finalState.unifier
     resultTree := finalState.tree1 }
-
-/-- The returned tree is always the accumulated image of the first input.
-    On success it is also the accumulated image of the second input. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem unification_common_image {Symbol : Type} {rank : Symbol → Nat}
-    [DecidableEq Symbol] (t1 t2 : RankedTreeData Symbol rank) :
-    let result := unification t1 t2
-    result.resultTree = t1.substitute result.unifier.map ∧
-      (result.unifiable = true → result.resultTree = t2.substitute result.unifier.map)
 
 -- ===================================================================
 -- Example 8.4.2: Concrete unification example
@@ -1385,66 +964,5 @@ def IsInfiniteRankedLabeling {Symbol : Type} (rank : Symbol → Nat)
 structure InfiniteRankedTree (Symbol : Type) (rank : Symbol → Nat) where
   labelAt : TreeAddr → Option (RankedTreeLabel Symbol)
   ranked : IsInfiniteRankedLabeling rank labelAt
-
-/-- The one-node variable tree in the possibly infinite carrier. -/
-@[blueprint "chap8__definition_8_4_4"]
-def infiniteVariable {Symbol : Type} {rank : Symbol → Nat}
-    (x : Nat) : InfiniteRankedTree Symbol rank where
-  labelAt := fun u => match u with
-    | [] => some (.variable x)
-    | _ :: _ => none
-  ranked := by
-    constructor
-    · rfl
-    · intro u i
-      cases u <;> simp
-
-/-- Simultaneous leaf replacement of a finite source tree by possibly infinite
-    values. Once a source variable is reached, its replacement's labels are
-    read directly; variables inside that replacement are not substituted again. -/
-@[blueprint "chap8__definition_8_4_4"]
-def infiniteSubstitutionLabels {Symbol : Type} {rank : Symbol → Nat}
-    (sigma : Nat → InfiniteRankedTree Symbol rank) :
-    RankedTreeData Symbol rank → TreeAddr → Option (RankedTreeLabel Symbol)
-  | .var x, u => (sigma x).labelAt u
-  | .node f _, [] => some (.rigid f)
-  | .node _ _, 0 :: _ => none
-  | .node f children, (i + 1) :: rest =>
-      if h : i < rank f then infiniteSubstitutionLabels sigma (children ⟨i, h⟩) rest
-      else none
-
-/-- Simultaneous finite-source replacement preserves the root and exact ranks. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem infiniteSubstitutionLabels_ranked {Symbol : Type} {rank : Symbol → Nat}
-    (sigma : Nat → InfiniteRankedTree Symbol rank) (t : RankedTreeData Symbol rank) :
-    IsInfiniteRankedLabeling rank (infiniteSubstitutionLabels sigma t)
-
-/-- The actual substitution action on a finite source tree. The address labels
-    are computed structurally; the accompanying obligation only certifies ranks. -/
-@[blueprint "chap8__definition_8_4_4"]
-def applyInfiniteSubstitution {Symbol : Type} {rank : Symbol → Nat}
-    (sigma : Nat → InfiniteRankedTree Symbol rank) (t : RankedTreeData Symbol rank) :
-    InfiniteRankedTree Symbol rank :=
-  ⟨infiniteSubstitutionLabels sigma t, infiniteSubstitutionLabels_ranked sigma t⟩
-
-/-- A substitution supported on at most x. Every other variable retains its
-    one-node tree, so infinite values do not require infinitely many changes. -/
-@[blueprint "chap8__definition_8_4_4"]
-def infiniteSingletonSubstitution {Symbol : Type} {rank : Symbol → Nat}
-    (x : Nat) (image : InfiniteRankedTree Symbol rank) (y : Nat) :
-    InfiniteRankedTree Symbol rank :=
-  if y = x then image else infiniteVariable y
-
-/-- The local infinite-tree aside: if a finite nonvariable tree r contains x,
-    unfolding x=r gives a possibly infinite image. The singleton substitution
-    replacing x by that image makes the two sides equal at every finite address.
-    This is the packet's guarded unfolding convention for one local equation. -/
-@[attach_debt, blueprint "chap8__definition_8_4_4"]
-theorem infiniteOccursEquation_has_solution {Symbol : Type} {rank : Symbol → Nat}
-    (x : Nat) (r : RankedTreeData Symbol rank)
-    (hNonvariable : ∀ y, r ≠ .var y) (hOccurs : treeOccurs x r) :
-    ∃ image : InfiniteRankedTree Symbol rank,
-      applyInfiniteSubstitution (infiniteSingletonSubstitution x image) (.var x) =
-        applyInfiniteSubstitution (infiniteSingletonSubstitution x image) r
 
 end LCS.FOResolution.Unification.Algorithm

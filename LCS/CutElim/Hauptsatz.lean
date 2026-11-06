@@ -213,12 +213,6 @@ theorem right {L : Language} {Gamma Delta : LCS.Finset (FormulaN L)}
     FormulaN.isNNF A :=
   h.2 A hA
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The empty Finset sequent is in NNF. -/
-theorem empty {L : Language} :
-    IsNNF ((∅ : LCS.Finset (FormulaN L)), (∅ : LCS.Finset (FormulaN L))) := by
-  constructor <;> intro A hA <;> exact (LCS.Finset.not_mem_empty hA).elim
-
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Inserting on the left preserves and reflects Finset-sequent NNF. -/
 theorem insert_left_iff {L : Language} (A : FormulaN L)
@@ -543,50 +537,6 @@ def ApplicationConditions {L : Language}
   SideConditions rule Gamma Delta ∧
     G1nnfFinsetSequent.IsNNF (rule.conclusion Gamma Delta)
 
-
-
-
-
-
-
--- retained: used by LCS.CutElim.Hauptsatz.CutElimination.Trees
-/-- A positive atomic identity axiom with empty ambient contexts is a legal
-G1nnf application. This witnesses that `ApplicationConditions` is inhabited. -/
-theorem applicationConditions_axiomPosAtomic_empty {L : Language}
-    (A : FormulaN L) (hAtom : A.isAtomic = true) :
-    ApplicationConditions
-      (.axiomPosAtomic A hAtom
-        (∅ : LCS.Finset (FormulaN L)) (∅ : LCS.Finset (FormulaN L)))
-      (∅ : LCS.Finset (FormulaN L)) (∅ : LCS.Finset (FormulaN L)) := by
-  have hNNF : FormulaN.isNNF A := by
-    cases A with
-    | predN _ _ => trivial
-    | eq_ _ _ _ => trivial
-    | neg _ => simp [FormulaN.isAtomic] at hAtom
-    | conj _ _ => simp [FormulaN.isAtomic] at hAtom
-    | disj _ _ => simp [FormulaN.isAtomic] at hAtom
-    | impl _ _ => simp [FormulaN.isAtomic] at hAtom
-    | all _ _ => simp [FormulaN.isAtomic] at hAtom
-    | ex _ _ => simp [FormulaN.isAtomic] at hAtom
-  refine ⟨trivial, ?_⟩
-  simp only [conclusion]
-  exact G1nnfFinsetSequent.IsNNF.insert_right hNNF
-    (G1nnfFinsetSequent.IsNNF.insert_left hNNF
-      G1nnfFinsetSequent.IsNNF.empty)
-
--- retained: used by LCS.CutElim.Hauptsatz.CutElimination.Trees, LCS.CutElim.Hauptsatz.Equality.Part1
-/-- An implication in a finite-set sequent is rejected by the NNF predicate,
-even when the other displayed formula is atomic or otherwise legal. -/
-theorem finsetSequent_rejects_implication {L : Language} (A : FormulaN L) :
-    ¬ G1nnfFinsetSequent.IsNNF
-      (LCS.Finset.singleton A,
-        LCS.Finset.insert (.impl A A) (LCS.Finset.singleton A)) := by
-  intro h
-  exact h.right (LCS.Finset.mem_insert.mpr (Or.inl rfl))
-
-
-
-
 -- END PROOF
 
 -- retained: used by LCS.CutElim.Hauptsatz.CutElimination.EigenWeakening, LCS.CutElim.Hauptsatz.CutElimination.Freshening, LCS.CutElim.Hauptsatz.CutElimination.Trees, LCS.CutElim.Hauptsatz.Equality.Part1
@@ -602,19 +552,6 @@ theorem sideConditions_allRight_of_fresh {L : Language}
     SideConditions (.allRight x A y) Gamma Delta :=
   ⟨hFreeFor, hFreshPrincipal, hFreshGamma, hFreshDelta⟩
 
--- retained: used by LCS.CutElim.Hauptsatz.CutElimination.Trees, LCS.CutElim.Hauptsatz.Equality.Part1
-/-- Definition 6.4.2 (companion regression): Universal-right rejects
-the known non-fresh pattern whenever the eigenvariable occurs free in
-an antecedent formula (in particular, `P(v₁) ⇒ P(v₁)` cannot yield
-`P(v₁) ⇒ ∀x P(x)` using `v₁` as eigenvariable). -/
-theorem sideConditions_allRight_rejects_nonfresh {L : Language}
-    (x y : Nat) (A C : FormulaN L)
-    (Delta : LCS.Finset (FormulaN L))
-    (hyC : y ∈ formulaFVN C) :
-    ¬ SideConditions (.allRight x A y) (LCS.Finset.singleton C) Delta := by
--- BEGIN PROOF
-  intro h
-  exact (h.2.2.1 C (by simp)) hyC
 -- END PROOF
 
 -- retained: used by LCS.CutElim.Hauptsatz.CutElimination.EigenWeakening, LCS.CutElim.Hauptsatz.CutElimination.Trees
@@ -669,10 +606,6 @@ def nnfExLang : Language where
     | .Q => 1
     | .R => 2
   hasEquality := false
-
--- retained: used by LCS.CutElim.Hauptsatz.CutElimination.Freshening, LCS.CutElim.Hauptsatz.CutElimination.Trees
-/-- Example 6.4.1: The example language has no equality. -/
-theorem nnfExLang_withoutEquality : nnfExLang.withoutEquality := rfl
 
 /-- Example 6.4.1 (helper): Build a Fin 1 -> Term from a single
 variable index. -/

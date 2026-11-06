@@ -468,10 +468,6 @@ open LCS.Propositional.Infinite.Compactness
 
 open Classical
 
-helper noncomputable def unneg : PropFormulaNormalized → Option PropFormulaNormalized
-  | .neg B => some B
-  | _ => none
-
 helper theorem unprovable_finite_subset_satisfiable (seq : InfSequent)
     (hNotProv : ¬ infSeqProvable seq) :
     finiteSubsetSatisfiable (fun C =>
@@ -593,36 +589,6 @@ by
     obtain ⟨n, B, hn, hBT⟩ := h v hAntT
     exact absurd (hSucF n B hn ▸ hBT) (by decide)
 
-helper /-- Theorem 3.5.1 (infrastructure for future proving): Alias of
-    `valid_sequent_provable` exposing the finite provable subsequent as a
-    triple. Like `valid_sequent_provable`, this is a compactness-based
-    existence result that does NOT bind the finite provable subsequent
-    to the search tree produced by `infSearchSteps`. The main textbook
-    statement `search_theorem_3_5_1` binds the subsequent to the closed
-    tree produced by the search procedure. -/
-theorem provable_finite_subsequent_exists (seq : InfSequent)
-    (h : infSeqValid seq)
-    : ∃ (Gamma' : List PropFormulaNormalized) (Delta' : List PropFormulaNormalized),
-      (∀ A ∈ Gamma', ∃ n, seq.antecedent n = some A) ∧
-      (∀ B ∈ Delta', ∃ n, seq.succedent n = some B) ∧
-      sequentProvable (Sequent.mk Gamma' Delta') :=
--- BEGIN PROOF
-  valid_sequent_provable seq h
-
-helper /-- Theorem 3.5.1 (infrastructure for future proving): The bundled dichotomy
-    "either a falsifying valuation exists or a finite provable subsequent
-    exists." This is the semantic dichotomy but DOES NOT bind the falsifying
-    valuation or the finite provable subsequent to the search tree produced
-    by `infSearchSteps`. The main textbook statement `search_theorem_3_5_1`
-    binds both pieces of data to the search procedure. -/
-theorem extended_completeness_main (seq : InfSequent)
-    : (∃ v : Valuation, infSeqFalsifies v seq) ∨ infSeqProvable seq :=
--- BEGIN PROOF
-by
-  rcases em (infSeqValid seq) with hValid | hNotValid
-  · exact Or.inr (valid_sequent_provable seq hValid)
-  · exact Or.inl (LCS.Propositional.Infinite.SignedFormulae.Proofs.falsifying_valuation_from_path seq hNotValid)
-
 helper /-- A falsified sequent cannot be an axiom. -/
 theorem falsified_not_axiom (s : Sequent) (v : Valuation)
     (h : sequentFalsifiedBy s v) : ¬ isAxiom s := by
@@ -676,7 +642,7 @@ theorem appendToLeavesCore_falsification_iff {s : Sequent}
         (∀ A, a = some A → evalExtN v A = BoolVal.T) ∧
         (∀ B, b = some B → evalExtN v B = BoolVal.F) := by
     by_cases h : isAxiomBool l = true
-    · have hn := fun hf => falsified_not_axiom l v hf ((LCS.Propositional.Infinite.Proofs.isAxiomBool_iff l).mp h)
+    · have hn := fun hf => falsified_not_axiom l v hf ((LCS.Propositional.Infinite.Search.Proofs.isAxiomBool_iff l).mp h)
       simp [h, InfDeductionTree.leaves]
       exact fun hf => False.elim (hn hf)
     · simp [h, InfDeductionTree.leaves, falsified_extendSeq_iff]
@@ -705,13 +671,13 @@ theorem infExpand_falsification_iff (state : InfSearchState) (v : Valuation) :
         (∀ A, InfSeq.head state.L = some A → evalExtN v A = BoolVal.T) ∧
         (∀ B, InfSeq.head state.R = some B → evalExtN v B = BoolVal.F) := by
     by_cases hfin : infIsFinishedLeafBool state s = true
-    · rcases (LCS.Propositional.Infinite.Proofs.infIsFinishedLeafBool_iff state s).mp hfin with hax | ⟨hl, hr, _⟩
+    · rcases (LCS.Propositional.Infinite.Search.Proofs.infIsFinishedLeafBool_iff state s).mp hfin with hax | ⟨hl, hr, _⟩
       · have hn := fun hf => falsified_not_axiom s v hf hax
         simp [hfin, InfDeductionTree.leaves]
         exact fun hf => False.elim (hn hf)
       · simp [hfin, InfDeductionTree.leaves, InfSeq.head, hl 0, hr 0]
     · simp only [hfin, Bool.false_eq_true, ↓reduceIte, appendToLeavesCore_falsification_iff,
-        LCS.Propositional.Infinite.Proofs.leaves_ofDeductionTree]
+        LCS.Propositional.Infinite.Search.Proofs.leaves_ofDeductionTree]
       rw [← deductionTree_falsification_iff v (searchRound .systematic (.leaf s))
         (deductionTree_auto_wf _)]
       rfl
@@ -887,25 +853,25 @@ theorem infExpand_unfinished_complexity (state : InfSearchState)
     apply False.elim
     apply hunf
     apply (isFinishedLeafBool_iff s).mpr
-    rcases (LCS.Propositional.Infinite.Proofs.infIsFinishedLeafBool_iff state s).mp hfin with hax | ⟨_, _, hatom⟩
+    rcases (LCS.Propositional.Infinite.Search.Proofs.infIsFinishedLeafBool_iff state s).mp hfin with hax | ⟨_, _, hatom⟩
     · exact Or.inl ⟨rfl, hax⟩
     · exact Or.inr hatom
   · simp only [hfin, Bool.false_eq_true, ↓reduceIte, hL, hR, appendToLeavesCore_none_leaves,
-      LCS.Propositional.Infinite.Proofs.leaves_ofDeductionTree] at hl
+      LCS.Propositional.Infinite.Search.Proofs.leaves_ofDeductionTree] at hl
     have hsUnf : isFinishedLeafBool .systematic s ≠ true := by
       intro hsfin
       apply hfin
-      apply (LCS.Propositional.Infinite.Proofs.infIsFinishedLeafBool_iff state s).mpr
+      apply (LCS.Propositional.Infinite.Search.Proofs.infIsFinishedLeafBool_iff state s).mpr
       rcases (isFinishedLeafBool_iff s).mp hsfin with ⟨_, hax⟩ | hatom
       · exact Or.inl hax
-      · exact Or.inr ⟨(LCS.Propositional.Infinite.Proofs.noHoles_empty_iff state.L state.L_noHoles).mpr hL,
-          (LCS.Propositional.Infinite.Proofs.noHoles_empty_iff state.R state.R_noHoles).mpr hR, hatom⟩
+      · exact Or.inr ⟨(LCS.Propositional.Infinite.Search.Proofs.noHoles_empty_iff state.L state.L_noHoles).mpr hL,
+          (LCS.Propositional.Infinite.Search.Proofs.noHoles_empty_iff state.R state.R_noHoles).mpr hR, hatom⟩
     have hsmem : s ∈ state.tree.leaves.filter (fun s => !isFinishedLeafBool .systematic s) := by
       simp only [List.mem_filter, Bool.not_eq_true']
       exact ⟨hs, Bool.eq_false_iff.mpr hsUnf⟩
     have hbound : sequentComplexity s ≤ infMaxUnfinishedComplexity state :=
-      LCS.Propositional.Systems.G.Search.Proofs.le_foldl_max_of_mem (List.mem_map.mpr ⟨s, hsmem, rfl⟩)
-    have hsmall := LCS.Propositional.Systems.G.Search.Proofs.searchRound_unfinished_lt_max (DeductionTree.leaf s)
+      LCS.Propositional.Systems.G.Search.Procedure.Proofs.le_foldl_max_of_mem (List.mem_map.mpr ⟨s, hsmem, rfl⟩)
+    have hsmall := LCS.Propositional.Systems.G.Search.Procedure.Proofs.searchRound_unfinished_lt_max (DeductionTree.leaf s)
       (by simpa [isFinishedTreeBool, DeductionTree.leaves] using hsUnf) l
       (by simp only [unfinishedLeaves, List.mem_filter, Bool.not_eq_true'];
           exact ⟨hl, Bool.eq_false_iff.mpr hunf⟩)
@@ -928,9 +894,9 @@ theorem infExpand_complexity_decrease (state : InfSearchState)
         hs (fun h => False.elim (hnot h))
     have hnot : isFinishedLeafBool .systematic s ≠ true := by
       intro h; exact hs (fun _ => (isFinishedLeafBool_iff s).mp h)
-    have hspos := LCS.Propositional.Systems.G.Search.Proofs.unfinished_pos_complexity s hnot
+    have hspos := LCS.Propositional.Systems.G.Search.Procedure.Proofs.unfinished_pos_complexity s hnot
     have hbound : sequentComplexity s ≤ infMaxUnfinishedComplexity state := by
-      apply LCS.Propositional.Systems.G.Search.Proofs.le_foldl_max_of_mem
+      apply LCS.Propositional.Systems.G.Search.Procedure.Proofs.le_foldl_max_of_mem
       apply List.mem_map.mpr
       exact ⟨s, by simp [List.mem_filter, hmem, Bool.eq_false_iff.mpr hnot], rfl⟩
     omega
@@ -939,7 +905,7 @@ theorem infExpand_complexity_decrease (state : InfSearchState)
       (fun s => !isFinishedLeafBool .systematic s)).map sequentComplexity = []
   · rw [hempty]
     exact hpos
-  · apply LCS.Propositional.Systems.G.Search.Proofs.foldl_max_lt_of_all_lt hempty
+  · apply LCS.Propositional.Systems.G.Search.Procedure.Proofs.foldl_max_lt_of_all_lt hempty
     intro n hn
     obtain ⟨s, hs, rfl⟩ := List.mem_map.mp hn
     obtain ⟨hs, hnot⟩ := List.mem_filter.mp hs
@@ -1119,7 +1085,7 @@ theorem valid_implies_search_halts_closed_finite_case
       | var n => exact ⟨n, rfl⟩
       | _ => simp [isAtomicFormula] at hat
     have hNotValid : ¬ sequentValid s := fun hv =>
-      hNotAx (LCS.Propositional.Systems.G.Search.Proofs.valid_atomic_is_axiom s hv hAllVar)
+      hNotAx (LCS.Propositional.Systems.G.Search.Completeness.Proofs.valid_atomic_is_axiom s hv hAllVar)
     obtain ⟨v, hvFalsLeaf⟩ := search_falsifying_extraction s hNotValid
     have hSeqFals := finished_leaf_falsifies_input seq k hFin s hs v hvFalsLeaf
     obtain ⟨hAntT, hSucF⟩ := hSeqFals
@@ -1185,7 +1151,7 @@ proof_of search_theorem_3_5_1 := by
           exact hopen k (infinite_seq_halt_implies_closed seq hNotFin k hfinished)
         obtain ⟨address, hp⟩ := infSearch_infinitePath_of_not_halts seq hnever
         obtain ⟨label, hl, hS, hf⟩ := infinite_search_path_canonical_countermodel seq address hp
-        exact ⟨hnever, LCS.Propositional.Infinite.Proofs.infSearch_infinite_of_not_halts seq hnever, address, label, hp, hl, hS, hf⟩
+        exact ⟨hnever, LCS.Propositional.Infinite.Search.Proofs.infSearch_infinite_of_not_halts seq hnever, address, label, hp, hl, hS, hf⟩
       · intro hFinite
         obtain ⟨k, hfinished⟩ := finite_seq_search_halts seq hFinite
         obtain ⟨leaf, labels, hp, ho, hS, hf⟩ :=

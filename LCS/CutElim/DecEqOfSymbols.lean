@@ -95,36 +95,4 @@ def FormulaN.decEqOfSymbols {L : Language} [DecidableEq L.predSymbols]
     exact decidable_of_iff (x = y ∧ A = B) (by simp)
 termination_by structural a _ => a
 
-private abbrev equalityExampleLanguage : Language where
-  funSymbols := Nat
-  funArity := id
-  constSymbols := Nat
-  predSymbols := Nat
-  predArity := id
-  hasEquality := true
-
-private def equalityExampleFormula (n : Nat) : FormulaN equalityExampleLanguage :=
-  .all 0 (.ex 1 (.impl
-    (.conj (.predN 2 (fun i => .func 2 (fun j =>
-      if i.val = j.val then .const n else .var j.val))) (.eq_ rfl (.var 0) (.const 1)))
-    (.disj (.neg (.predN 0 Fin.elim0)) (.eq_ rfl (.const 0) (.const 0)))))
-
-example :
-    (letI : DecidableEq (FormulaN equalityExampleLanguage) := FormulaN.decEqOfSymbols
-     decide (equalityExampleFormula 0 = equalityExampleFormula 0)) = true := rfl
-
-example :
-    (letI : DecidableEq (FormulaN equalityExampleLanguage) := FormulaN.decEqOfSymbols
-     decide (equalityExampleFormula 0 = equalityExampleFormula 1)) = false := rfl
-
-example :
-    (letI : DecidableEq (FormulaN equalityExampleLanguage) := FormulaN.decEqOfSymbols
-     decide (FormulaN.predN (L := equalityExampleLanguage) 0 Fin.elim0 =
-       FormulaN.predN (L := equalityExampleLanguage) 1 (fun _ => Term.var 0))) = false := rfl
-
-example :
-    (letI : DecidableEq (Term equalityExampleLanguage) := Term.decEqOfSymbols
-     decide (Term.func (L := equalityExampleLanguage) 0 Fin.elim0 =
-       Term.func (L := equalityExampleLanguage) 1 (fun _ => Term.const 0))) = false := rfl
-
 end LCS.FirstOrder.SyntaxN

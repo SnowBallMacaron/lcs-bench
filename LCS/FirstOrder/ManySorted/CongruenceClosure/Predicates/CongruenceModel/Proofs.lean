@@ -26,89 +26,8 @@ proof_of collisionUnsatPredCore := by
     intro hsatC
     exact hunsatC' (encodePreservesSat L C hsatC)
 
-
-proof_of collisionCaseNonBool := collisionUnsatPredCore L C s r v p q hcontains hp hq hcol
   -- BEGIN PROOF
 
-
-proof_of collisionCaseAtomTop := collisionUnsatPredCore L C (MSBoolSort L)
-  -- BEGIN PROOF
-    -- The negated conjunct `neg (msEncodeAtom L P args)` IS
-    -- `neg (eq_ rfl (MSBoolSort L) (msPredAsFuncTerm L P args) (msTopConst L))`,
-    -- so this is a bool-sort collision folding into the soundness core.
-      (msPredAsFuncTerm L P args) (msTopConst L) p q hcontains hp hq hcol
-
-
-proof_of semanticEqualityRelationPred_refl := by
-  intro M v _
-  exact msEqReflValid rfl s t M v
-
-
-proof_of semanticEqualityRelationPred_symm := by
-  intro M v hsat
-  apply (msFormulaEval_eq_T_iff _ _ _ _ _ _).mpr
-  exact ((msFormulaEval_eq_T_iff M rfl s t u v).mp (h M v hsat)).symm
-
-
-proof_of semanticEqualityRelationPred_trans := by
-  intro M v hsat
-  apply (msFormulaEval_eq_T_iff _ _ _ _ _ _).mpr
-  have e1 := (msFormulaEval_eq_T_iff M rfl s t u v).mp (h1 M v hsat)
-  have e2 := (msFormulaEval_eq_T_iff M rfl s u w v).mp (h2 M v hsat)
-  exact e1.trans e2
-
-
-proof_of semanticEqualityRelationPred_funcCong := by
-  intro M v hsat
-  apply (msFormulaEval_eq_T_iff _ _ _ _ _ _).mpr
-  have hargs : ∀ i, msTermEval M v (ys i) = msTermEval M v (zs i) := by
-    intro i
-    exact (msFormulaEval_eq_T_iff M rfl _ _ _ v).mp (hcong i M v hsat)
-  simp only [msTermEval, funM]
-  congr 1
-  funext i
-  exact hargs i
-
-
-proof_of predicateInterpC_case1 := by
-  -- BEGIN PROOF
-      simp only [predicateInterpC]
-      rw [if_pos hclosed]
-
-
-proof_of predicateInterpC_eq := rfl
-
-
-proof_of msTermEval_cast_congr := by
-  cases h; exact heq
-
-
-proof_of predAtomOf_cong := by
-  -- REPAIR(T10-17): proof pending — Split nullary constants and positive predicate applications in congruence.
-  sorry
-
-
-proof_of predicateInterpC_case2 := by
-  -- BEGIN PROOF
-    rw [predicateInterpC_eq, predicateInterpC_eq]
-    have hatom := predAtomOf_cong L C' P ys zs hsurrogate
-    by_cases h : semanticEqualityRelationPred L C' (MSBoolSort L)
-        (predAtomOf L P ys) (msTopConst L)
-    · rw [if_pos h, if_pos (semanticEqualityRelationPred_trans L C' _ _ _ _
-        (semanticEqualityRelationPred_symm L C' _ _ _ hatom) h)]
-    · rw [if_neg h]
-      rw [if_neg]
-      intro hz
-      exact h (semanticEqualityRelationPred_trans L C' _ _ _ _ hatom hz)
-
-
-proof_of predicateInterpC_case3 := by
-  -- BEGIN PROOF
-      simp only [predicateInterpC]
-      rw [if_neg hnone]
-
-
-proof_of closure_isAlgebraCongruence_pred := predicateInterpC_case2 L C' P ys zs hcong
   -- BEGIN PROOF
 
 
@@ -187,11 +106,6 @@ proof_of encode_literal_isEq := by
 
 
 proof_of encode_conj_eq := rfl
-
-
-proof_of encode_neg_eq := by
-  cases A <;> rfl
-
 
 proof_of encode_isConjOfLiterals := by
   intro C

@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Propositional.LK : UInt64 := 10323213403173481517
+def AttachStamp.LCS.Propositional.LK : UInt64 := 370406574577716640

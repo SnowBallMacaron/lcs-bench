@@ -578,14 +578,6 @@ theorem lowenheim_skolem_eq {L : Language} (hL : L.hasEquality = true)
     ∃ (M : Structure L),
       satisfiableSetInN M Gamma ∧ isAtMostCountable M 
 
-/-- Theorem 5.6.2 (finite-model remark): In every language with equality,
-the singleton theory {∀x ∀y (x ≐ y)} is satisfiable and forces every model
-to have a one-element, hence finite, domain. -/
-@[blueprint "chap5__theorem_5_6_2"]
-theorem ls_model_may_be_finite {L : Language} (hL : L.hasEquality = true) :
-    ∃ Γ : Set (FormulaN L), satisfiableSetN Γ ∧
-      ∀ M : Structure L, satisfiableSetInN M Γ → isFiniteDomain M 
-
 -- ===================================================================
 -- Theorem 5.6.3: compactness_eq (Compactness, equality)
 -- ===================================================================

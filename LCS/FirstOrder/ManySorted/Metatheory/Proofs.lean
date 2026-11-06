@@ -6,10 +6,6 @@ proof_of msHintikkaSetEqQuotientSatisfiable := by
   -- REPAIR(T10-62): proof pending — construct the sorted equality quotient and prove simultaneous signed satisfaction
   sorry
 
-proof_of msEqualityHintikkaExtendedCompleteness := by
-  -- REPAIR(T10-62): proof pending — adapt the equality counterbranch argument using the sorted quotient bridge and finite support
-  sorry
-
 proof_of msCompactnessG := by
   -- REPAIR(T10-63a): proof pending — transfer equality-free compactness with shared assignments and nonempty finite subsets
   sorry

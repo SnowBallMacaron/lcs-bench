@@ -30,15 +30,34 @@ Lake fetches their dependencies (Batteries, lean4-cli) as pinned in
   - `CutElim/`: cut elimination (Hauptsatz, Beth, interpolation), LK, LKe.
   - `Resolution/`, `FOResolution/`: propositional and first-order resolution.
   - `Herbrand/`: Herbrand's theorem.
-  - `SLD/`: SLD resolution.
-  - `Examples/`: Prolog examples.
-  - `Tools/`, `Util.lean`, `Item.lean`: shared utilities and textbook item tagging.
+  - `SLD/`: SLD resolution and logic programming.
+  - `Util.lean`, `Item.lean`: shared utilities and textbook item tagging.
 - `attached_units.txt`: registry of modules whose proofs are kept in separate `Proofs.lean` files.
 - `vendor/`: vendored Lean packages.
 
 Theorems tagged `@[attach_debt]` have proofs that still contain `sorry`.
 `ATTACH-BLOCKER` comments record why a helper declaration stays in a module
 instead of its `Proofs.lean` file.
+
+## Authors
+
+Yuming Feng (Johns Hopkins University), Frederick Pu (University of Toronto),
+One An (University of Pennsylvania), Osbert Bastani (University of Pennsylvania),
+Li Zhang (Drexel University), Jiani Huang (University of Pennsylvania),
+Xujie Si (University of Toronto), Ziyang Li (Johns Hopkins University).
+
+## Citation
+
+```bibtex
+@inproceedings{feng2026lcsbench,
+  title     = {Theory-Scale Auto-Formalization of Logic for Computer Science},
+  author    = {Feng, Yuming and Pu, Frederick and An, One and Bastani, Osbert and
+               Zhang, Li and Huang, Jiani and Si, Xujie and Li, Ziyang},
+  booktitle = {Advances in Neural Information Processing Systems,
+               Evaluations and Datasets Track},
+  year      = {2026}
+}
+```
 
 ## License
 

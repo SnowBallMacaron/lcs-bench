@@ -442,21 +442,4 @@ proof_of exDNFSearchTree_atomic_leaves := by
   rw [exDNFSearchTree_leaves]
   simp
 
-
-proof_of exCNFresult_leaf_characterization := by
-  rw [exCNFSearchTree_leaves]
-  simp only [exCNFresult, List.mem_cons, List.not_mem_nil,
-    forall_eq_or_imp, exists_eq_or_imp, evalExtN]
-  cases v 0 <;> cases v 1 <;> cases v 2 <;> cases v 3 <;>
-    simp [hAnd, hOr, hNeg]
-
-
-proof_of exDNFresult_leaf_characterization := by
-  rw [exDNFSearchTree_leaves]
-  simp only [exDNFresult, List.mem_cons, List.not_mem_nil,
-    forall_eq_or_imp, exists_eq_or_imp, evalExtN]
-  cases v 0 <;> cases v 1 <;> cases v 2 <;> cases v 3 <;>
-    simp [hAnd, hOr, hNeg]
-
-
 end LCS.Propositional.Systems.G.NormalForms

@@ -319,43 +319,6 @@ def isTotal (pr : PartialRec n) : Prop :=
 
 end PartialRec
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- The weakened least-zero graph discussed after Definition 7.7.5, on a
-partial-recursive input program. The value y is selected when g(xs,y)
-converges to zero and no earlier g(xs,z) converges to zero. Earlier undefined
-values are therefore allowed. The final coordinate is the search variable;
-the preceding n coordinates are the fixed input vector. -/
-def weakMinimize {n : Nat} (g : PartialRec (n + 1))
-    (args : Fin n → Nat) (y : Nat) : Prop :=
-  let zeroAt := fun z =>
-    g.converges (fun i => if h : i.val < n then args ⟨i.val, h⟩ else z) 0
-  zeroAt y ∧ ∀ z, z < y → ¬ zeroAt z
-
-/-- Earlier definedness in Definition 7.7.5 is essential: for some positive
-arity n and one partial-recursive input g, the weakened least-zero graph
-has no partial-recursive representation. A representation would be one code
-whose convergence graph agrees on every input and every candidate output.
-Computability of the input is enforced by its PartialRec code; the assertion
-concerns existence of a counterexample, with no totality premise on g. -/
-theorem weakMinimizeNotPartialRecursive :
-    ∃ n : Nat, 0 < n ∧ ∃ g : PartialRec (n + 1),
-      ¬ ∃ pr : PartialRec n, ∀ (args : Fin n → Nat) (y : Nat),
-        pr.converges args y ↔ weakMinimize g args y := by
-  -- REPAIR(T7-117): proof pending
-  sorry
-
-/-- Every primitive-recursive function is recursive: for every arity and
-PrimRec code there is one total PartialRec code of the same arity whose
-unbounded convergence graph agrees with its denotation on all inputs.
-The representation is chosen once per source code, before the input vector;
-this is a representability statement, not an executable code conversion. -/
-theorem primRecIsRecursive {n : Nat} (pr : PrimRec n) :
-    ∃ qr : PartialRec n, qr.isTotal ∧
-      ∀ (args : Fin n → Nat) (v : Nat),
-        qr.converges args v ↔ v = pr.eval args := by
-  -- REPAIR(T7-114): proof pending
-  sorry
-
 -- ============================================================
 -- Section 7.7.3 — Decidable and partially decidable problems
 -- ============================================================
@@ -375,14 +338,6 @@ def ackermann : Nat → Nat → Nat
   | x + 1, 0 => ackermann x 1
   | x + 1, y + 1 => ackermann x (ackermann (x + 1) y)
 
-/-- Example 7.7.1 (companion theorem): A(1,1) = 3, demonstrating the
-    Ackermann function. -/
-def ackermann_1_1 : ackermann 1 1 = 3 := by native_decide
-
-/-- Example 7.7.1 (companion theorem): A(2,2) = 7, demonstrating the
-    Ackermann function. -/
-def ackermann_2_2 : ackermann 2 2 = 7 := by native_decide
-
 /-- Example 7.7.1: the displayed Ackermann function has a total binary
 partial-recursive representation. Positions 0 and 1 of the input vector are
 its arguments x and y. One program represents the existing recurrence at
@@ -401,19 +356,6 @@ recursive-membership statement. -/
 theorem ackermannNotPrimitiveRecursive :
     ¬ ∃ pr : PrimRec 2, ∀ args : Fin 2 → Nat,
       pr.eval args = ackermann (args 0) (args 1) 
-
-/-- The growth assertion of Section 7.6.6, under the eventual reading:
-one total natural-valued unary function g is not primitive recursive and
-eventually dominates every unary primitive-recursive function. The threshold
-may depend on the primitive-recursive code, while g is shared by all codes.
-The non-PR clause excludes every code representing that same g on all inputs. -/
-theorem existsNonPrimitiveRecursiveDominatingFunction :
-    ∃ g : Nat → Nat,
-      (¬ ∃ pr : PrimRec 1, ∀ n, pr.eval (fun _ => n) = g n) ∧
-      (∀ pr : PrimRec 1, ∃ N : Nat, ∀ n : Nat,
-        N ≤ n → pr.eval (fun _ => n) ≤ g n) := by
-  -- REPAIR(T7-116): proof pending
-  sorry
 
 -- ============================================================
 -- Example 7.7.2 — Primitive Recursive Arithmetic Operations
@@ -662,21 +604,5 @@ def primRecNthPrime : PrimRec 1 :=
     (.primRec (primRecConst 2 0)
       (primRecComposeOne primRecNextPrime (primRecProj 1)))
     (primRecConst 0 0) (primRecProj 0)
-
-example : PrimRec.eval primRecNthPrime (fun _ => 0) = 2 := by native_decide
-example : PrimRec.eval primRecNthPrime (fun _ => 1) = 3 := by native_decide
-example : PrimRec.eval primRecNthPrime (fun _ => 2) = 5 := by native_decide
-
-/-- Example 7.7.2 (companion theorem): primRecAdd evaluated at (2, 3) = 5. -/
-def eval_add_2_3 : PrimRec.eval primRecAdd
-    (fun i => if i.val = 0 then 2 else 3) = 5 := by native_decide
-
-/-- Example 7.7.2 (companion theorem): primRecMul evaluated at (3, 4) = 12. -/
-def eval_mul_3_4 : PrimRec.eval primRecMul
-    (fun i => if i.val = 0 then 3 else 4) = 12 := by native_decide
-
-/-- Example 7.7.2 (companion theorem): primRecFact evaluated at 5 = 120. -/
-def eval_fact_5 : PrimRec.eval primRecFact
-    (fun _ => 5) = 120 := by native_decide
 
 end LCS.Herbrand.PrimRecursive

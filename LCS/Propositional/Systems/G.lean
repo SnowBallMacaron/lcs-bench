@@ -318,13 +318,6 @@ def exFalsificationSearchTree :
       (.implRight [q] [] [] (.neg q) (.neg p)
         (.leaf ⟨[q, .neg q], [.neg p]⟩)))
 
-/-- Example 3.4.1: The five displayed whole-tree snapshots in source order. -/
-@[blueprint "chap3__example_3_4_1"]
-def exFalsificationSearchTrace :
-    List (InformalImplicationTree exFalsificationSearchInitialSequent) :=
-  [exFalsificationSearchStage0, exFalsificationSearchStage1,
-   exFalsificationSearchStage2, exFalsificationSearchStage3, exFalsificationSearchTree]
-
 /-- Example 3.4.1: Both displayed terminal sequents are unfalsifiable. -/
 @[blueprint "chap3__example_3_4_1"]
 theorem exFalsificationSearchLeavesClosed :
@@ -443,15 +436,6 @@ theorem exImplLeftExtraFormulae (A B D : PropFormulaNormalized) (p q : Nat) :
     (A ∈ conc.antecedent ∧ B ∈ conc.antecedent ∧ D ∈ conc.succedent) ∧
     (A ∈ prem1.antecedent ∧ B ∈ prem1.antecedent ∧ D ∈ prem1.succedent) ∧
     (A ∈ prem2.antecedent ∧ B ∈ prem2.antecedent ∧ D ∈ prem2.succedent) 
-
--- ========= Example 3.4.3 (companion theorem) =========
-
-/-- Example 3.4.3 (companion): The conclusion of exProofTreeContrapositive
-    is the sequent → (P⊃Q)⊃(¬Q⊃¬P) (Lean-side verification). -/
-@[blueprint "chap3__example_3_4_3"]
-theorem exProofTreeContrapositive_conclusion :
-    exProofTreeContrapositive.conclusion =
-      Sequent.mk [] [exFalsificationSearchFormula] 
 
 -- ========= Lemma 3.4.1: Rule Falsification Iff (helpers + indexed versions) =========
 

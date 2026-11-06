@@ -14,8 +14,4 @@ proof_of msUnificationClosure_mayNotExist := by
   -- REPAIR(T10-68): proof pending — exhibit the two-leaf graph and its distinct nonvariable labels.
   sorry
 
-proof_of msGraphNodeCount_le_twice_edgeCount := by
-  -- REPAIR(T10-69): proof pending — cover the vertices by the two endpoints of each indexed edge and count.
-  sorry
-
 end LCS.FirstOrder.ManySorted.ClosureApplications

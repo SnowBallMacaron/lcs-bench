@@ -4,13 +4,15 @@ import LCS.FirstOrder.Gentzen.Hintikka
 import LCS.FirstOrder.SyntaxN.Variables
 import LCS.FirstOrder.SyntaxN.Substitution
 import LCS.FirstOrder.Semantics.Subformulae
-import LCS.FirstOrder.Gentzen.Search.NoFunction.Initialization
-import LCS.FirstOrder.Gentzen.Search.NoFunction.Growth
-import LCS.FirstOrder.Gentzen.Search.NoFunction.LeafInvariant
 import LCS.FirstOrder.Gentzen.Search.NoFunction.Search
-import LCS.FirstOrder.Gentzen.Search.NoFunction.Contracts
 import Attach
 import LCS.FirstOrder.Gentzen.Search.NoFunction.Examples.ProofsStamp
+
+/-! # Examples 5.4.3 and 5.4.4 (Section 5.4.7)
+
+Runs of procedure search on the sequents of Examples 5.4.3 and 5.4.4.
+Source: Logic for Computer Science, Gallier 2015
+-/
 
 section
 namespace LCS.FirstOrder.Gentzen.Hintikka
@@ -42,8 +44,6 @@ theorem exSearchCross_5_4_3 : crossNoFreeBound exSearchSeq_5_4_3 := by
 noncomputable def exSearchRun_5_4_3 (k : Nat) :=
   search rfl (fun f => Empty.elim f) exSearchSeq_5_4_3 exSearchCross_5_4_3
     (Init.default exSearchSeq_5_4_3) k
-
-
 
 /-- Example 5.4.3: The first-round diagram consists of the outer
     implication-right inference and its single open premise. -/
@@ -149,9 +149,7 @@ theorem exSearchRoundThree_5_4_3 :
       (exSearchRun_5_4_3 3).1.toDeductionTree.toProofTree h = exSearchProofTree_5_4_3 
 
 end LCS.FirstOrder.Gentzen.Hintikka
-end
 
-section
 namespace LCS.FirstOrder.Gentzen.Search.NoFunction
 open LCS.FirstOrder.Basic LCS.FirstOrder.Gentzen
 
@@ -167,21 +165,8 @@ def SearchTree.traceNodes {L : Language} : {s : Sequent L} → SearchTree s →
       (t1.traceNodes.map (fun (p, l, r) => (false :: p, l, r)) ++
        t2.traceNodes.map (fun (p, l, r) => (true :: p, l, r)))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The leaf entries of the complete diagram are exactly the tree's leaves. -/
-theorem SearchTree.traceNodes_leaves {L : Language} {s : Sequent L} (t : SearchTree s) :
-    (t.traceNodes.filterMap (fun n => n.2.2.map (fun r => (n.2.1, r)))) = t.leaves := by
-  induction t with
-  | leaf s r => rfl
-  | onePremise rule t ih =>
-      simpa [traceNodes, leaves, List.filterMap_map, Function.comp_def] using ih
-  | twoPremise rule t1 t2 ih1 ih2 =>
-      simp [traceNodes, leaves, List.filterMap_map, Function.comp_def, ih1, ih2]
-
 end LCS.FirstOrder.Gentzen.Search.NoFunction
-end
 
-section
 namespace LCS.FirstOrder.Gentzen.Hintikka
 open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN LCS.FirstOrder.SyntaxN.Variables
 open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Search.NoFunction
@@ -244,8 +229,6 @@ def exSearchExpectedNodes_5_4_4 :
      ([false, false, false, true], s5, none),
      ([false, false, false, true, false], exSearchOpenLeaf_5_4_4, some r3)]]
 
-
-
 /-- Example 5.4.4: The actual search rounds have these diagrams and records. -/
 @[attach_debt, blueprint "chap5__example_5_4_4" (main := true)]
 theorem exSearchTrace_5_4_4 :
@@ -262,10 +245,5 @@ theorem exSearchSnapshots_5_4_4 :
   -- REPAIR(T92): proof pending
   sorry
 
-
-
-
-
 end LCS.FirstOrder.Gentzen.Hintikka
 end
-

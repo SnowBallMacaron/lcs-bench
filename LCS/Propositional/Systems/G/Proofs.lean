@@ -40,12 +40,6 @@ proof_of exImplLeftExtraFormulae := by
            List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)),
            List.Mem.head _⟩
 
-
-proof_of exProofTreeContrapositive_conclusion := by
-  -- BEGIN PROOF
-    rfl
-
-
 helper theorem mem_mid {x : PropFormulaNormalized} {Γ Δ : List PropFormulaNormalized} :
     x ∈ Γ ++ [x] ++ Δ :=
 -- BEGIN PROOF
@@ -81,55 +75,6 @@ helper theorem mem_two_cases {A B y : PropFormulaNormalized} {Γ Δ : List PropF
       · exact Or.inr (Or.inl rfl)
       · simp at hB; exact Or.inr (Or.inr (Or.inl hB))
   · exact Or.inr (Or.inr (Or.inr h2))
-
-helper theorem mem_two_of_left {A B : PropFormulaNormalized} {Γ Δ : List PropFormulaNormalized}
-    {y : PropFormulaNormalized} (h : y ∈ Γ) : y ∈ Γ ++ [A, B] ++ Δ :=
--- BEGIN PROOF
-  List.mem_append.mpr (Or.inl (List.mem_append.mpr (Or.inl h)))
-
-helper theorem mem_two_of_right {A B : PropFormulaNormalized} {Γ Δ : List PropFormulaNormalized}
-    {y : PropFormulaNormalized} (h : y ∈ Δ) : y ∈ Γ ++ [A, B] ++ Δ :=
--- BEGIN PROOF
-  List.mem_append.mpr (Or.inr h)
-
-helper theorem mem_two_of_fst {A B : PropFormulaNormalized} {Γ Δ : List PropFormulaNormalized} :
-    A ∈ Γ ++ [A, B] ++ Δ :=
--- BEGIN PROOF
-  List.mem_append.mpr (Or.inl (List.mem_append.mpr
-    (Or.inr (List.mem_cons.mpr (Or.inl rfl)))))
-
-helper theorem mem_two_of_snd {A B : PropFormulaNormalized} {Γ Δ : List PropFormulaNormalized} :
-    B ∈ Γ ++ [A, B] ++ Δ :=
--- BEGIN PROOF
-  List.mem_append.mpr (Or.inl (List.mem_append.mpr
-    (Or.inr (List.mem_cons.mpr (Or.inr (List.mem_cons.mpr (Or.inl rfl)))))))
-
-helper theorem exists_in_singleton {P : Sequent → Prop} {s : Sequent}
-    (h : P s) : ∃ prem ∈ [s], P prem :=
--- BEGIN PROOF
-  ⟨s, List.mem_cons.mpr (Or.inl rfl), h⟩
-
-helper theorem of_exists_in_singleton {P : Sequent → Prop} {s : Sequent}
-    (h : ∃ prem ∈ [s], P prem) : P s := by
-  obtain ⟨prem, hprem, hp⟩ := h; simp at hprem; subst hprem; exact hp
-
-helper theorem exists_in_pair_left {P : Sequent → Prop} {s1 s2 : Sequent}
-    (h : P s1) : ∃ prem ∈ [s1, s2], P prem :=
--- BEGIN PROOF
-  ⟨s1, List.mem_cons.mpr (Or.inl rfl), h⟩
-
-helper theorem exists_in_pair_right {P : Sequent → Prop} {s1 s2 : Sequent}
-    (h : P s2) : ∃ prem ∈ [s1, s2], P prem :=
--- BEGIN PROOF
-  ⟨s2, List.mem_cons.mpr (Or.inr (List.mem_cons.mpr (Or.inl rfl))), h⟩
-
-helper theorem of_exists_in_pair {P : Sequent → Prop} {s1 s2 : Sequent}
-    (h : ∃ prem ∈ [s1, s2], P prem) : P s1 ∨ P s2 := by
--- BEGIN PROOF
-  obtain ⟨prem, hprem, hp⟩ := h
-  rcases List.mem_cons.mp hprem with rfl | h2
-  · exact Or.inl hp
-  · simp at h2; subst h2; exact Or.inr hp
 
 proof_of axiom_valid := by
   -- BEGIN PROOF

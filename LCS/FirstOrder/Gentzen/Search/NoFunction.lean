@@ -4,11 +4,14 @@ import LCS.FirstOrder.Gentzen.Hintikka
 import LCS.FirstOrder.SyntaxN.Variables
 import LCS.FirstOrder.SyntaxN.Substitution
 import LCS.FirstOrder.Semantics.Subformulae
+import LCS.FirstOrder.Gentzen.Search.NoFunction.SearchState
 import LCS.FirstOrder.Gentzen.Search.NoFunction.Initialization
-import LCS.FirstOrder.Gentzen.Search.NoFunction.Growth
-import LCS.FirstOrder.Gentzen.Search.NoFunction.LeafInvariant
+import LCS.FirstOrder.Gentzen.Search.NoFunction.FreeSubstitution
+import LCS.FirstOrder.Gentzen.Search.NoFunction.LeafExtension
+import LCS.FirstOrder.Gentzen.Search.NoFunction.GrowLeft
+import LCS.FirstOrder.Gentzen.Search.NoFunction.GrowRight
+import LCS.FirstOrder.Gentzen.Search.NoFunction.Expand
 import LCS.FirstOrder.Gentzen.Search.NoFunction.Search
-import LCS.FirstOrder.Gentzen.Search.NoFunction.Contracts
 import LCS.FirstOrder.Gentzen.Search.NoFunction.Examples
 
 /-! # FirstOrder.Gentzen.Search.NoFunction
@@ -34,94 +37,4 @@ import LCS.FirstOrder.Gentzen.Search.NoFunction.Examples
 -/
 
 namespace LCS.FirstOrder.Gentzen.Search.NoFunction
-
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Gentzen
-open LCS.FirstOrder.Gentzen.Hintikka
-
-
-namespace SearchTree
-
-
-end SearchTree
-
--- ===================================================================
--- Definition 5.4.9: SearchState
--- ===================================================================
-
-
-namespace SearchState
-
-
-end SearchState
-
--- ===================================================================
--- Definition 5.4.9: initial TERM₀ and AVAIL₀
--- ===================================================================
-
-
-namespace SearchState
-
-
-end SearchState
-
-
-namespace SearchState
-
-
-end SearchState
-
-
-
-
--- ===================================================================
--- Tree-level grow-left / grow-right (§5.4.9 "extend every nonaxiom leaf")
--- ===================================================================
-
-
 end LCS.FirstOrder.Gentzen.Search.NoFunction
-
-namespace LCS.FirstOrder.Gentzen.Search.NoFunction
-
-open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Hintikka
-
-
-end LCS.FirstOrder.Gentzen.Search.NoFunction
-
-namespace LCS.FirstOrder.Gentzen.Search.NoFunction
-
-open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Hintikka
-
-
-end LCS.FirstOrder.Gentzen.Search.NoFunction
-
-namespace LCS.FirstOrder.Gentzen.Hintikka
-
-open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Search.NoFunction
-
-
-end LCS.FirstOrder.Gentzen.Hintikka
-
-namespace LCS.FirstOrder.Gentzen.Search.NoFunction
-
-open LCS.FirstOrder.Basic LCS.FirstOrder.Gentzen
-
-
-end LCS.FirstOrder.Gentzen.Search.NoFunction
-
-namespace LCS.FirstOrder.Gentzen.Hintikka
-
-open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Search.NoFunction
-
-
-end LCS.FirstOrder.Gentzen.Hintikka

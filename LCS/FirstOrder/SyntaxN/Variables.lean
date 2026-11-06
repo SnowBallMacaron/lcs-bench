@@ -122,18 +122,6 @@ formula. -/
 abbrev isSentence {L : Language} (A : FormulaN L) : Prop :=
   isClosed A
 
--- retained: used by LCS.FirstOrder.ManySorted.CongruenceClosure.Decision, LCS.Propositional.Infinite.SignedFormulae.Proofs
-/-- A formula is open if it contains no quantifiers. -/
-def isOpen {L : Language} : FormulaN L → Prop
-  | .predN _ _ => True
-  | .eq_ _ _ _ => True
-  | .neg A => isOpen A
-  | .conj A B => isOpen A ∧ isOpen B
-  | .disj A B => isOpen A ∧ isOpen B
-  | .impl A B => isOpen A ∧ isOpen B
-  | .all _ _ => False
-  | .ex _ _ => False
-
 end FormulaN
 
 end LCS.FirstOrder.SyntaxN.Variables

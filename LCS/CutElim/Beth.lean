@@ -6,8 +6,11 @@ import LCS.CutElim.LKe
 import LCS.CutElim.Interpolation
 import LCS.FirstOrder.Syntax
 import LCS.FirstOrder.Semantics
-import LCS.CutElim.Beth.Part1
-import LCS.CutElim.Beth.Part2
+import LCS.CutElim.Beth.Definability
+import LCS.CutElim.Beth.ArithmeticExample
+import LCS.CutElim.Beth.ExplicitImpliesImplicit
+import LCS.CutElim.Beth.WithoutEquality
+import LCS.CutElim.Beth.WithEquality
 
 /-! # CutElim.Beth
     Formalization of Chapter 6, Section 6.6.

@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.ManySorted.CongruenceClosure.Predicates.Decision : UInt64 := 15678875066782255784
+def AttachStamp.LCS.FirstOrder.ManySorted.CongruenceClosure.Predicates.Decision : UInt64 := 12891291403381339767

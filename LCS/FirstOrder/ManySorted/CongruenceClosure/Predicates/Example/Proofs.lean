@@ -60,19 +60,6 @@ proof_of example_lift_f5a := by
       (examplePredApplyF (examplePredApplyF examplePredTerm_f3a)) = _
   rw [example_lift_applyF, example_lift_applyF, example_lift_f3a]; rfl
 
-
-proof_of example_contains_f3a_eq_a := by
-  have h : Decision.msConjunctContains examplePredConjunctionEncoded
-      (MSFormula.eq_ (L := boolExtendedLanguage examplePredLanguage) rfl
-        (some ExamplePredSort.iota)
-        (msLiftTerm examplePredLanguage examplePredTerm_f3a)
-        (msLiftTerm examplePredLanguage examplePredTerm_a)) := by
-    unfold examplePredConjunctionEncoded examplePredConjunction
-    simp only [msEncodeConjunction]
-    exact Or.inr (Or.inl rfl)
-  rwa [example_lift_f3a, example_lift_a] at h
-
-
 proof_of example_contains_f5a_eq_a := by
   have h : Decision.msConjunctContains examplePredConjunctionEncoded
       (MSFormula.eq_ (L := boolExtendedLanguage examplePredLanguage) rfl
@@ -110,28 +97,6 @@ proof_of example_subT5_T0 := example_sub_step exampleLiftT0 example_subT5_T1
 proof_of example_memTk := ⟨rfl, some ExamplePredSort.iota, exampleLiftT5, exampleLiftT0,
     Or.inl example_contains_f5a_eq_a, Or.inl h⟩
 
-
-proof_of example_closure_T3_T0 := by
-  rw [exampleClosurePred_eq_equationClosure]
-  exact msCongruenceClosure_contains exampleGraphPred exampleEquationSeedPred
-    (positiveEquationRelation_sortSupported examplePredConjunctionEncoded) _ _
-    ⟨rfl, some ExamplePredSort.iota, exampleLiftT3, exampleLiftT0,
-      example_contains_f3a_eq_a, rfl, rfl⟩
-
-
-proof_of example_closure_T5_T0 := by
-  rw [exampleClosurePred_eq_equationClosure]
-  exact msCongruenceClosure_contains exampleGraphPred exampleEquationSeedPred
-    (positiveEquationRelation_sortSupported examplePredConjunctionEncoded) _ _
-    ⟨rfl, some ExamplePredSort.iota, exampleLiftT5, exampleLiftT0,
-      example_contains_f5a_eq_a, rfl, rfl⟩
-
-
-proof_of example_fStep := by
-  -- REPAIR(T10-17): proof pending — Transport the function successor step through occurring-symbol graph labels.
-  sorry
-
-
 proof_of example_fa_eq_a := by
   -- REPAIR(T10-17): proof pending — Use sort-fiber symmetry and transitivity for the six data nodes.
   sorry
@@ -165,13 +130,6 @@ proof_of example_contains_neg_Pfa_eq_top := by
   match iv, hiv with
   | 0, _ => rfl
 
-
-proof_of example_memPa := ⟨rfl, MSBoolSort examplePredLanguage,
-    examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_a),
-    msTopConst examplePredLanguage, Or.inl example_contains_Pa_eq_top,
-    Or.inl (Decision.msTermSubterms_self _)⟩
-
-
 proof_of example_memTop := ⟨rfl, MSBoolSort examplePredLanguage,
     examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_a),
     msTopConst examplePredLanguage, Or.inl example_contains_Pa_eq_top,
@@ -194,21 +152,6 @@ proof_of example_fa_eq_a_lifted := by
       (fun t => (⟨some ExamplePredSort.iota, t⟩ :
         Decision.MSTermSig (boolExtendedLanguage examplePredLanguage))) example_lift_a)
   rw [e1, e2]; exact example_fa_eq_a
-
-
-proof_of example_pStep := by
-  -- REPAIR(T10-17): proof pending — Transport the predicate successor step through occurring-symbol graph labels.
-  sorry
-
-
-proof_of example_closure_Pa_top := by
-  rw [exampleClosurePred_eq_equationClosure]
-  exact msCongruenceClosure_contains exampleGraphPred exampleEquationSeedPred
-    (positiveEquationRelation_sortSupported examplePredConjunctionEncoded) _ _
-    ⟨rfl, MSBoolSort examplePredLanguage,
-      examplePredTermP (msLiftTerm examplePredLanguage examplePredTerm_a),
-      msTopConst examplePredLanguage, example_contains_Pa_eq_top, rfl, rfl⟩
-
 
 proof_of example_Pfa_top := by
   -- REPAIR(T10-17): proof pending — Compose the Boolean-sort closure facts using fiber transitivity.

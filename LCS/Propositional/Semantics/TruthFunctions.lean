@@ -677,11 +677,6 @@ namespace BProp
 @[blueprint "chap3__lemma_3_3_6"]
 def ofFormula (A : PropFormulaExtended) : BProp := Quotient.mk logEquivSetoid A
 
-/-- Equality of classes is exactly logical equivalence of representatives. -/
-@[blueprint "chap3__lemma_3_3_6"]
-theorem ofFormulaEqIff (A B : PropFormulaExtended) :
-    ofFormula A = ofFormula B ↔ PropFormulaExtended.logEquiv A B 
-
 /-- [A] + [B] = [A ∨ B], well-defined by congruence of disjunction. -/
 @[blueprint "chap3__lemma_3_3_6"]
 def add (a b : BProp) : BProp :=
@@ -708,81 +703,8 @@ def zero : BProp := ofFormula .fls
 @[blueprint "chap3__lemma_3_3_6"]
 def one : BProp := ofFormula .top
 
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addOfFormula (A B : PropFormulaExtended) :
-    add (ofFormula A) (ofFormula B) = ofFormula (.disj A B) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulOfFormula (A B : PropFormulaExtended) :
-    mul (ofFormula A) (ofFormula B) = ofFormula (.conj A B) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem negOfFormula (A : PropFormulaExtended) :
-    neg (ofFormula A) = ofFormula (.neg A) 
-
 /- Proof of Lemma 3.3.6: Quotient induction transfers each formula law
    to every equivalence class in B_PROP. -/
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addAssoc (a b c : BProp) : add (add a b) c = add a (add b c) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulAssoc (a b c : BProp) : mul (mul a b) c = mul a (mul b c) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addComm (a b : BProp) : add a b = add b a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulComm (a b : BProp) : mul a b = mul b a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addMulDistrib (a b c : BProp) : add a (mul b c) = mul (add a b) (add a c) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulAddDistrib (a b c : BProp) : mul a (add b c) = add (mul a b) (mul a c) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem negAdd (a b : BProp) : neg (add a b) = mul (neg a) (neg b) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem negMul (a b : BProp) : neg (mul a b) = add (neg a) (neg b) 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addIdempotent (a : BProp) : add a a = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulIdempotent (a : BProp) : mul a a = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem negNeg (a : BProp) : neg (neg a) = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addAbsorption (a b : BProp) : add a (mul a b) = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulAbsorption (a b : BProp) : mul a (add a b) = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addZero (a : BProp) : add a zero = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulZero (a : BProp) : mul a zero = zero 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addOne (a : BProp) : add a one = one 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulOne (a : BProp) : mul a one = a 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem addNeg (a : BProp) : add a (neg a) = one 
-
-@[blueprint "chap3__lemma_3_3_6"]
-theorem mulNeg (a : BProp) : mul a (neg a) = zero 
-
-/-- The Boolean zero and one are distinct logical-equivalence classes. -/
-@[blueprint "chap3__lemma_3_3_6"]
-theorem zeroNeOne : zero ≠ one 
 
 end BProp
 

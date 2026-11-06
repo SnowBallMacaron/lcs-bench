@@ -39,12 +39,6 @@ under the rank function `r(f) = (u_1…u_n, s)`. -/
 def argSorts (A : MSRankedAlphabet) (f : A.symbols) : List A.SortType :=
   (A.rank f).1
 
-/-- Definition 10.6.1 (companion): A symbol has empty-arity rank `(e, s)`
-— a constant/leaf symbol whose argument string is empty. -/
-@[blueprint "chap10__definition_10_6_1"]
-def emptyArityRank (A : MSRankedAlphabet) (f : A.symbols) : Prop :=
-  (A.rank f).1 = []
-
 end MSRankedAlphabet
 
 end LCS.FirstOrder.ManySorted.CongruenceClosure

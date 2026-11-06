@@ -2,15 +2,28 @@ import LCS.Item
 import LCS.Util
 import LCS.CutElim.Hauptsatz
 import LCS.CutElim.Hauptsatz.Completeness
-import LCS.CutElim.Hauptsatz.CutElimination.Trees
+import LCS.CutElim.Hauptsatz.CutElimination.ProofTrees
+import LCS.CutElim.Hauptsatz.CutElimination.CutRank
+import LCS.CutElim.Hauptsatz.CutElimination.NotBound
 import LCS.CutElim.Hauptsatz.CutElimination.VariableSupport
+import LCS.CutElim.Hauptsatz.CutElimination.Eigenvariables
+import LCS.CutElim.Hauptsatz.CutElimination.TreeTransport
+import LCS.CutElim.Hauptsatz.CutElimination.SetDerivations
+import LCS.CutElim.Hauptsatz.CutElimination.FormulaSubstitution
 import LCS.CutElim.Hauptsatz.CutElimination.FormulaRenaming
 import LCS.CutElim.Hauptsatz.CutElimination.TreeRenaming
-import LCS.CutElim.Hauptsatz.CutElimination.Substitution
-import LCS.CutElim.Hauptsatz.CutElimination.Hygiene
-import LCS.CutElim.Hauptsatz.CutElimination.EigenWeakening
-import LCS.CutElim.Hauptsatz.CutElimination.Freshening
-import LCS.CutElim.Hauptsatz.CutElimination.SubstitutionRegression
+import LCS.CutElim.Hauptsatz.CutElimination.TreeSubstitution
+import LCS.CutElim.Hauptsatz.CutElimination.SubstitutionPreservation
+import LCS.CutElim.Hauptsatz.CutElimination.SubstitutionPreparation
+import LCS.CutElim.Hauptsatz.CutElimination.PreparationRegression
+import LCS.CutElim.Hauptsatz.CutElimination.SubstitutionLemma
+import LCS.CutElim.Hauptsatz.CutElimination.Weakening.Constructions
+import LCS.CutElim.Hauptsatz.CutElimination.Weakening.Measures
+import LCS.CutElim.Hauptsatz.CutElimination.Weakening.Eigenvariables
+import LCS.CutElim.Hauptsatz.CutElimination.Weakening
+import LCS.CutElim.Hauptsatz.CutElimination.Inversion
+import LCS.CutElim.Hauptsatz.CutElimination.Reduction
+import LCS.CutElim.Hauptsatz.CutElimination.Theorem
 
 /-! # CutElim.Hauptsatz.CutElimination
     Formalization of Chapter 6, Section 6.4.

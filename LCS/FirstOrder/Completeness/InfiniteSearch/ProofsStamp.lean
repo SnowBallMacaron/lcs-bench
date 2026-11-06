@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.Completeness.InfiniteSearch : UInt64 := 16843669535119749061
+def AttachStamp.LCS.FirstOrder.Completeness.InfiniteSearch : UInt64 := 5415239418182144134

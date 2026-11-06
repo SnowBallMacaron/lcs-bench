@@ -4,7 +4,7 @@ import LCS.FirstOrder.ManySorted
 import LCS.FirstOrder.ManySorted.Semantics
 import LCS.FirstOrder.ManySorted.Semantics.Substitution
 import LCS.Propositional.Semantics
-import LCS.FirstOrder.ManySorted.Gentzen.Calculus
+import LCS.FirstOrder.ManySorted.Gentzen.Soundness
 import Attach
 import LCS.FirstOrder.ManySorted.Gentzen.Completeness.ProofsStamp
 
@@ -14,62 +14,349 @@ open LCS.FirstOrder.ManySorted
 open LCS.FirstOrder.ManySorted.Semantics
 open LCS.Propositional.Semantics
 
-/-- An arbitrarily indexed ordered family of many-sorted formulae.
-The strict total order records positions, including repeated formulae. -/
-structure MSFormulaSequence (L : MSLanguage) where
-  Index : Type
-  before : Index → Index → Prop
-  irrefl : ∀ i, ¬ before i i
-  trans : ∀ i j k, before i j → before j k → before i k
-  total : ∀ i j, i = j ∨ before i j ∨ before j i
-  formula : Index → MSFormula L
+-- ===================================================================
+-- Theorem 10.4.1 (companion type): MSSignedFormula
+-- ===================================================================
 
-/-- General carrier of possibly infinite ordered sequents, shared with G=. -/
-structure MSInfSequentCore (L : MSLanguage) where
-  antecedent : MSFormulaSequence L
-  succedent : MSFormulaSequence L
+/-- Theorem 10.4.1 (companion): A signed many-sorted formula `T A` /
+`F A`, used by the many-sorted Hintikka-set definition in the
+completeness proof. Direct many-sorted analogue of one-sorted
+`SignedFormula` (chap5 Def 5.4.3). -/
+@[blueprint "chap10__theorem_10_4_1"]
+inductive MSSignedFormula (L : MSLanguage) : Type where
+  /-- The signed formula `T A` ("A is true"). -/
+  | trueF : MSFormula L → MSSignedFormula L
+  /-- The signed formula `F A` ("A is false"). -/
+  | falseF : MSFormula L → MSSignedFormula L
 
-/-- All formulae of an indexed sequent belong to the six-connective domain. -/
-def MSInfSequentCore.IsSixConnective {L : MSLanguage} (seq : MSInfSequentCore L) : Prop :=
-  (∀ i, msIsSixConnective (seq.antecedent.formula i)) ∧
-  (∀ i, msIsSixConnective (seq.succedent.formula i))
+-- ===================================================================
+-- Theorem 10.4.1 (companion def): many-sorted Hintikka set
+-- ===================================================================
 
-/-- Lemma 10.4.1: possibly infinite sequents of equality-free G. -/
+/-- Theorem 10.4.1 (companion): A many-sorted Hintikka set — the
+modification of the Hintikka-set definition "so that it applies to a
+many-sorted algebra" (the textbook explicitly calls for this in the
+completeness proof). Here `H` is an `S`-indexed family of per-sort
+term-carriers `H s : Set (MSTerm L s)`, and the closure conditions
+H0–H6 are sort-aware: in particular the quantifier conditions (H3 for
+`∀`-true / `∃`-false universal premises, H4 for `∀`-false / `∃`-true
+witness premises) instantiate over terms `t : MSTerm L s` of the sort
+`s` matching the quantifier's bound variable, drawn from `H s`.
+
+  * H0: no atomic formula and its conjugate both lie in `S`.
+  * H1 (type-A / conjunctive): both components of a conjunctive signed
+    formula are in `S` (covering `T (A ∧ B)`, `F (A ∨ B)`,
+    `F (A ⊃ B)`, `T ¬A`, `F ¬A`).
+  * H2 (type-B / disjunctive): at least one component of a disjunctive
+    signed formula is in `S` (covering `F (A ∧ B)`, `T (A ∨ B)`,
+    `T (A ⊃ B)`).
+  * H3 (type-C / universal): if a universally-acting quantified signed
+    formula is in `S`, its sort-`s` instance is in `S` for every
+    `t ∈ H s`.
+  * H4 (type-D / existential): if an existentially-acting quantified
+    signed formula is in `S`, its sort-`s` instance is in `S` for some
+    `t ∈ H s`.
+  * H5: every variable `(s, i)` free in some formula of `S` has its
+    variable term in `H s`.
+  * H6: instantiation terms drawn from `H s` are free for the bound
+    variable in every quantified formula of `S`.
+
+Direct many-sorted analogue of one-sorted `IsHintikkaSet`
+(chap5 Def 5.4.7), sort-indexed. Referenced by the completeness (→)
+direction of `msGoedelExtendedCompletenessG`. -/
+@[blueprint "chap10__theorem_10_4_1"]
+def MSIsHintikkaSet (L : MSLanguage) [DecidableEq L.SortType]
+    (H : (s : L.SortType) → Set (MSTerm L s))
+    (S : Set (MSSignedFormula L)) : Prop :=
+  -- H0: no atomic formula and its conjugate are both in S.
+  (∀ A : MSFormula L, A.isAtomic →
+    ¬ (MSSignedFormula.trueF A ∈ S ∧ MSSignedFormula.falseF A ∈ S)) ∧
+  -- H0 (falsum): `⊥` is never signed true in S (the §5.4 condition
+  -- `h0_falsum`; in the one-sorted normalized `FormulaN` there is no
+  -- `falsum` constructor, so this clause is automatic there, but
+  -- `MSFormula` has `⊥`, so it must be stated). `F ⊥ ∈ S` is allowed
+  -- (consistent with `⊥` evaluating to F).
+  (MSSignedFormula.trueF MSFormula.falsum ∉ S) ∧
+  -- H0 (no equality): no `eq_` formula appears signed in S. §10.4 is the
+  -- system WITHOUT equality (the §5.4 standing assumption `hNoEq`); the
+  -- one-sorted normalized `FormulaN` carries equality only via `eq_`,
+  -- excluded from Hintikka sets by `hNoEq`.
+  (∀ (hL : L.hasEquality = true) (s : L.SortType) (t1 t2 : MSTerm L s),
+    MSSignedFormula.trueF (MSFormula.eq_ hL s t1 t2) ∉ S ∧
+    MSSignedFormula.falseF (MSFormula.eq_ hL s t1 t2) ∉ S) ∧
+  -- H0 (no equivalence): no `≡` formula appears signed in S. The §5.4
+  -- normalized signed-formula decomposition (type-A/type-B) does not
+  -- cover `≡` (Gallier eliminates `≡` before the search/Hintikka stage),
+  -- so a faithful Hintikka set contains no `≡` formula. In the one-sorted
+  -- `FormulaN` there is no `equiv_` constructor (`h0_no_equiv` automatic);
+  -- `MSFormula` has `≡`, so it must be stated.
+  (∀ A B : MSFormula L,
+    MSSignedFormula.trueF (MSFormula.equiv_ A B) ∉ S ∧
+    MSSignedFormula.falseF (MSFormula.equiv_ A B) ∉ S) ∧
+  -- H1 (conjunctive / type-A): both components in S.
+  (∀ A B : MSFormula L,
+    (MSSignedFormula.trueF (MSFormula.conj A B) ∈ S →
+      MSSignedFormula.trueF A ∈ S ∧ MSSignedFormula.trueF B ∈ S) ∧
+    (MSSignedFormula.falseF (MSFormula.disj A B) ∈ S →
+      MSSignedFormula.falseF A ∈ S ∧ MSSignedFormula.falseF B ∈ S) ∧
+    (MSSignedFormula.falseF (MSFormula.impl A B) ∈ S →
+      MSSignedFormula.trueF A ∈ S ∧ MSSignedFormula.falseF B ∈ S)) ∧
+  (∀ A : MSFormula L,
+    (MSSignedFormula.trueF (MSFormula.neg A) ∈ S →
+      MSSignedFormula.falseF A ∈ S) ∧
+    (MSSignedFormula.falseF (MSFormula.neg A) ∈ S →
+      MSSignedFormula.trueF A ∈ S)) ∧
+  -- H2 (disjunctive / type-B): at least one component in S.
+  (∀ A B : MSFormula L,
+    (MSSignedFormula.falseF (MSFormula.conj A B) ∈ S →
+      MSSignedFormula.falseF A ∈ S ∨ MSSignedFormula.falseF B ∈ S) ∧
+    (MSSignedFormula.trueF (MSFormula.disj A B) ∈ S →
+      MSSignedFormula.trueF A ∈ S ∨ MSSignedFormula.trueF B ∈ S) ∧
+    (MSSignedFormula.trueF (MSFormula.impl A B) ∈ S →
+      MSSignedFormula.falseF A ∈ S ∨ MSSignedFormula.trueF B ∈ S)) ∧
+  -- H3 (universal / type-C): sort-s instance for EVERY t ∈ H s.
+  (∀ (s : L.SortType) (x : Nat) (A : MSFormula L),
+    (MSSignedFormula.trueF (MSFormula.all s x A) ∈ S →
+      ∀ t : MSTerm L s, t ∈ H s →
+        MSSignedFormula.trueF (msFormulaSubst A s x t) ∈ S) ∧
+    (MSSignedFormula.falseF (MSFormula.ex s x A) ∈ S →
+      ∀ t : MSTerm L s, t ∈ H s →
+        MSSignedFormula.falseF (msFormulaSubst A s x t) ∈ S)) ∧
+  -- H4 (existential / type-D): sort-s instance for SOME t ∈ H s.
+  (∀ (s : L.SortType) (x : Nat) (A : MSFormula L),
+    (MSSignedFormula.falseF (MSFormula.all s x A) ∈ S →
+      ∃ t : MSTerm L s, t ∈ H s ∧
+        MSSignedFormula.falseF (msFormulaSubst A s x t) ∈ S) ∧
+    (MSSignedFormula.trueF (MSFormula.ex s x A) ∈ S →
+      ∃ t : MSTerm L s, t ∈ H s ∧
+        MSSignedFormula.trueF (msFormulaSubst A s x t) ∈ S)) ∧
+  -- H5: free variables of formulae in S are carried by H (per sort).
+  (∀ (A : MSFormula L),
+    (MSSignedFormula.trueF A ∈ S ∨ MSSignedFormula.falseF A ∈ S) →
+      ∀ p : MSVar L, p ∈ msFormulaFV A → MSTerm.var p.1 p.2 ∈ H p.1) ∧
+  -- H6: terms in H are free for the bound variable in quantified
+  -- formulae of S (sort-matched).
+  (∀ (s : L.SortType) (x : Nat) (A : MSFormula L) (t : MSTerm L s),
+    t ∈ H s →
+    (MSSignedFormula.trueF (MSFormula.all s x A) ∈ S ∨
+     MSSignedFormula.falseF (MSFormula.all s x A) ∈ S ∨
+     MSSignedFormula.trueF (MSFormula.ex s x A) ∈ S ∨
+     MSSignedFormula.falseF (MSFormula.ex s x A) ∈ S) →
+    msIsFreeFor A s x t)
+
+/-- Definition 5.4.5 (many-sorted companion): an `S`-indexed family of
+per-sort term-carriers `H` is a (generated) term algebra iff each sort
+carrier `H s` is nonempty, is closed under the matching-sort function
+applications and constants, and is closed under sub-terms. Direct
+many-sorted analogue of one-sorted `IsGeneratedTermAlgebra`
+(chap5 Def 5.4.5), with the function/constant closure now sort-indexed:
+`f`'s value lands in `H (L.funRank f).2` when its arguments lie in the
+per-arity-sort carriers, and a constant of sort `s` lies in `H s`.
+
+This is the textbook standing hypothesis "`H` is a term algebra" of
+Lemma 5.4.5 (the Hintikka-set satisfiability lemma): the carrier of the
+Herbrand structure built below is the sort-indexed family `{t // t ∈ H s}`,
+which is a many-sorted `MSStructure` exactly because of these closure
+conditions (nonemptiness gives `carrierNonempty`, function/constant
+closure give `interpFunc`/`interpConst`, sub-term closure gives the
+`msTermEvalIdentity` evaluation identity). -/
 @[blueprint "chap10__lemma_10_4_1"]
-def MSInfSequent (L : MSLanguage) (_hL : L.withoutEquality) :=
-  {seq : MSInfSequentCore L // seq.IsSixConnective}
+structure MSIsGeneratedTermAlgebra (L : MSLanguage)
+    (H : (s : L.SortType) → Set (MSTerm L s)) : Prop where
+  /-- Each sort carrier `H s` is nonempty. -/
+  nonempty : ∀ s : L.SortType, ∃ t : MSTerm L s, t ∈ H s
+  /-- Closure under function symbols (sort-matched): if every argument
+      `ts i` lies in the carrier of its arity sort, then `f ts` lies in
+      the carrier of the output sort. -/
+  closedFunc : ∀ (f : L.funSymbols)
+    (ts : (i : Fin (L.funRank f).1.length) → MSTerm L ((L.funRank f).1.get i)),
+    (∀ i, ts i ∈ H ((L.funRank f).1.get i)) →
+    MSTerm.func f ts ∈ H (L.funRank f).2
+  /-- Every constant `c` of sort `s` lies in `H s`. -/
+  closedConst : ∀ (s : L.SortType) (c : L.constSymbols s),
+    MSTerm.const s c ∈ H s
+  /-- Sub-term closure: if `f ts` lies in the output carrier, then each
+      argument `ts i` lies in the carrier of its arity sort. -/
+  closedSubterm : ∀ (f : L.funSymbols)
+    (ts : (i : Fin (L.funRank f).1.length) → MSTerm L ((L.funRank f).1.get i)),
+    MSTerm.func f ts ∈ H (L.funRank f).2 →
+    ∀ i, ts i ∈ H ((L.funRank f).1.get i)
 
-/-- A finite subsequence selects distinct positions in their original order. -/
-def MSFormulaSequence.IsFiniteSubsequence {L : MSLanguage}
-    (a : MSFormulaSequence L) (xs : List (MSFormula L)) : Prop :=
-  ∃ f : Fin xs.length → a.Index,
-    (∀ i j, i < j → a.before (f i) (f j)) ∧
-    ∀ i, xs.get i = a.formula (f i)
+-- ATTACH-BLOCKER: size gate: retain original helper span in front
+/-- Lemma 10.4.1 (companion): if every free variable `(s', i)` of a
+sort-`s` term `t` has its variable term `var s' i ∈ H s'`, then `t ∈ H s`.
+Many-sorted analogue of one-sorted `termInH`. Proved by induction on `t`:
+variables are in `H` by assumption, constants by `closedConst`, function
+applications by `closedFunc` with the induction hypothesis. -/
+theorem msTermInH {L : MSLanguage}
+    {H : (s : L.SortType) → Set (MSTerm L s)}
+    (hTA : MSIsGeneratedTermAlgebra L H) :
+    {s : L.SortType} → (t : MSTerm L s) →
+    (∀ p : MSVar L, p ∈ msTermFV t → MSTerm.var p.1 p.2 ∈ H p.1) →
+    t ∈ H s := by
+  intro s t
+  induction t with
+  | var s' i =>
+    intro hvars
+    exact hvars (s', i) rfl
+  | const s' c =>
+    intro _
+    exact hTA.closedConst s' c
+  | func f ts ih =>
+    intro hvars
+    exact hTA.closedFunc f ts (fun i => ih i (fun p hp =>
+      hvars p ⟨i, hp⟩))
 
-/-- A finite subsequent selects an ordered subsequence on each side. -/
-def MSInfSequentCore.IsFiniteSubsequent {L : MSLanguage}
-    (seq : MSInfSequentCore L) (finite : MSSequentCore L) : Prop :=
-  seq.antecedent.IsFiniteSubsequence finite.antecedent ∧
-  seq.succedent.IsFiniteSubsequence finite.succedent
+-- ===================================================================
+-- Lemma 10.4.1 (companion): Herbrand structure on a term algebra H
+-- ===================================================================
 
-/-- Shared-assignment validity of an arbitrary indexed sequent. -/
-def msInfSequentValidCore {L : MSLanguage} (seq : MSInfSequentCore L) : Prop :=
-  ∀ (M : MSStructure L) (v : MSAssignment M),
-    (∀ i, msFormulaEval M (seq.antecedent.formula i) v = BoolVal.T) →
-    ∃ j, msFormulaEval M (seq.succedent.formula j) v = BoolVal.T
-
-/-- Lemma 10.4.1: validity of a possibly infinite sequent in G. -/
+/-- Lemma 10.4.1 (companion): the Herbrand structure `H_S` built from a
+many-sorted Hintikka set `S` over a term algebra `H`. The carrier of
+sort `s` is the subtype `{t : MSTerm L s // t ∈ H s}`; functions and
+constants are interpreted syntactically (landing back in `H` by the
+term-algebra closure conditions), and the predicate interpretation tests
+membership of the signed atom `T (P t…)` in `S`. Many-sorted analogue of
+one-sorted `hintikkaStructure`. -/
 @[blueprint "chap10__lemma_10_4_1"]
-def msInfSequentValid {L : MSLanguage} {hL : L.withoutEquality}
-    (seq : MSInfSequent L hL) : Prop := msInfSequentValidCore seq.val
+noncomputable def msHintikkaStructure {L : MSLanguage}
+    (H : (s : L.SortType) → Set (MSTerm L s))
+    (S : Set (MSSignedFormula L))
+    (hTA : MSIsGeneratedTermAlgebra L H) : MSStructure L where
+  carrier := fun s => { t : MSTerm L s // t ∈ H s }
+  carrierNonempty := fun s =>
+    let ⟨t, ht⟩ := hTA.nonempty s
+    ⟨⟨t, ht⟩⟩
+  interpFunc := fun f ts =>
+    ⟨MSTerm.func f (fun i => (ts i).val),
+     hTA.closedFunc f _ (fun i => (ts i).property)⟩
+  interpConst := fun s c => ⟨MSTerm.const s c, hTA.closedConst s c⟩
+  interpPred := fun P ts =>
+    open Classical in
+    if MSSignedFormula.trueF (MSFormula.pred P (fun i => (ts i).val)) ∈ S
+    then BoolVal.T else BoolVal.F
 
-/-- Lemma 10.4.1: a possibly infinite sequent is G-provable when some
-finite subsequent, with the original order retained, has a G-proof. -/
-@[blueprint "chap10__lemma_10_4_1"]
-def msInfSequentProvable {L : MSLanguage} [DecidableEq L.SortType]
-    (hL : L.withoutEquality) (seq : MSInfSequent L hL) : Prop :=
-  ∃ finite : MSSequentCore L,
-    seq.val.IsFiniteSubsequent finite ∧ msSequentProvable hL finite
+-- ATTACH-BLOCKER: dependency: retained front declaration references this helper
+/-- Lemma 10.4.1 (companion): the identity assignment for the Herbrand
+structure. The sort-`s` variable `x_i` is sent to itself `⟨var s i, _⟩`
+when `var s i ∈ H s`, otherwise to the chosen nonempty witness. Many-sorted
+analogue of one-sorted `identityAssignment`. -/
+noncomputable def msIdentityAssignment {L : MSLanguage}
+    (H : (s : L.SortType) → Set (MSTerm L s))
+    (S : Set (MSSignedFormula L))
+    (hTA : MSIsGeneratedTermAlgebra L H) :
+    MSAssignment (msHintikkaStructure H S hTA) :=
+  fun s i =>
+    open Classical in
+    if h : MSTerm.var s i ∈ H s then ⟨MSTerm.var s i, h⟩
+    else ⟨(hTA.nonempty s).choose, (hTA.nonempty s).choose_spec⟩
+
+-- ATTACH-BLOCKER: dependency: retained front declaration references this helper
+/-- Lemma 10.4.1 (companion): evaluating a sort-`s` term `t ∈ H s` in the
+Herbrand structure under the identity assignment yields `⟨t, ht⟩` — i.e.
+`t` itself. Many-sorted analogue of one-sorted `termEvalIdentity`. Proved
+by structural induction on `t`; the function case uses sub-term closure
+(`closedSubterm`) so the recursive calls apply. -/
+theorem msTermEvalIdentity {L : MSLanguage}
+    {H : (s : L.SortType) → Set (MSTerm L s)}
+    {S : Set (MSSignedFormula L)} {hTA : MSIsGeneratedTermAlgebra L H} :
+    {s : L.SortType} → (t : MSTerm L s) → (ht : t ∈ H s) →
+    msTermEval (msHintikkaStructure H S hTA)
+      (msIdentityAssignment H S hTA) t = ⟨t, ht⟩ := by
+  intro s t
+  induction t with
+  | var s' i =>
+    intro ht
+    simp only [msTermEval, varMeaning, msIdentityAssignment]
+    exact dif_pos ht
+  | const s' c =>
+    intro _
+    simp only [msTermEval, constM, msHintikkaStructure]
+  | func f ts ih =>
+    intro ht
+    simp only [msTermEval, funM, msHintikkaStructure]
+    apply Subtype.ext
+    simp only
+    congr 1
+    funext i
+    have hti : ts i ∈ H ((L.funRank f).1.get i) := hTA.closedSubterm f ts ht i
+    exact congrArg Subtype.val (ih i hti)
+
+-- ===================================================================
+-- Lemma 10.4.1 (companion): formula depth, for the satisfaction induction
+-- ===================================================================
+
+-- ATTACH-BLOCKER: dependency: retained front declaration references this helper
+/-- Lemma 10.4.1 (companion): the connective/quantifier depth of a
+many-sorted formula; atomic formulae (falsum, pred, eq_) have depth 0.
+Used for the well-founded induction in the Hintikka satisfiability
+proof (the quantifier cases need the claim for the same-depth instance
+`A[t/x]`). Many-sorted analogue of one-sorted `formulaDepth`. -/
+def msFormulaDepth {L : MSLanguage} : MSFormula L → Nat
+  | .falsum       => 0
+  | .pred _ _     => 0
+  | .eq_ _ _ _ _  => 0
+  | .neg A        => 1 + msFormulaDepth A
+  | .conj A B     => 1 + msFormulaDepth A + msFormulaDepth B
+  | .disj A B     => 1 + msFormulaDepth A + msFormulaDepth B
+  | .impl A B     => 1 + msFormulaDepth A + msFormulaDepth B
+  | .equiv_ A B   => 1 + msFormulaDepth A + msFormulaDepth B
+  | .all _ _ A    => 1 + msFormulaDepth A
+  | .ex _ _ A     => 1 + msFormulaDepth A
+
+-- ATTACH-BLOCKER: size gate: retain original helper span in front
+/-- Lemma 10.4.1 (companion): substitution preserves formula depth.
+Many-sorted analogue of one-sorted `formulaSubstN_depth`. -/
+theorem msFormulaSubst_depth {L : MSLanguage} [DecidableEq L.SortType]
+    (A : MSFormula L) (u : L.SortType) (x : Nat) (t : MSTerm L u) :
+    msFormulaDepth (msFormulaSubst A u x t) = msFormulaDepth A := by
+  induction A with
+  | falsum => rfl
+  | pred _ _ => rfl
+  | eq_ _ _ _ _ => rfl
+  | neg A ih => simp [msFormulaSubst, msFormulaDepth, ih]
+  | conj A B ihA ihB => simp [msFormulaSubst, msFormulaDepth, ihA, ihB]
+  | disj A B ihA ihB => simp [msFormulaSubst, msFormulaDepth, ihA, ihB]
+  | impl A B ihA ihB => simp [msFormulaSubst, msFormulaDepth, ihA, ihB]
+  | equiv_ A B ihA ihB => simp [msFormulaSubst, msFormulaDepth, ihA, ihB]
+  | all s i A ih =>
+    simp only [msFormulaSubst]; split
+    · rfl
+    · simp only [msFormulaDepth]; omega
+  | ex s i A ih =>
+    simp only [msFormulaSubst]; split
+    · rfl
+    · simp only [msFormulaDepth]; omega
+
+/-- Theorem 10.4.1 (companion): the many-sorted Hintikka-set
+satisfiability bridge used by the completeness (→) direction. If `S` is
+a many-sorted Hintikka set with respect to the `S`-indexed term-carrier
+family `H` — which is a term algebra (`MSIsGeneratedTermAlgebra`, the
+textbook standing hypothesis of Lemma 5.4.5) — then `S` is satisfiable
+in the Herbrand structure built on `H`: there is a structure `M` and
+assignment `v` making every `T A ∈ S` evaluate to `T` and every
+`F A ∈ S` evaluate to `F`. This is the heart of the many-sorted
+completeness argument (the §5.5 Hintikka satisfiability lemma transported
+to the many-sorted algebra). It references `MSIsHintikkaSet`, so the
+predicate is genuinely used by the completeness infrastructure.
+
+The proof builds the Herbrand structure `msHintikkaStructure H S hTA`
+with the identity assignment `msIdentityAssignment H S hTA`, then proves
+the key satisfaction claim by well-founded induction on `msFormulaDepth`
+(8 cases, atomic + connective + quantifier), using the H0–H6 Hintikka
+conditions and the proven substitution-evaluation lemma
+`msFormulaSubstEvalDirect`. Direct many-sorted analogue of one-sorted
+`hintikka_set_satisfiable`. -/
+@[blueprint "chap10__theorem_10_4_1"]
+theorem msHintikkaSetSatisfiable {L : MSLanguage} [DecidableEq L.SortType]
+    (H : (s : L.SortType) → Set (MSTerm L s))
+    (S : Set (MSSignedFormula L)) (hTA : MSIsGeneratedTermAlgebra L H)
+    (hHS : MSIsHintikkaSet L H S) :
+    ∃ (M : MSStructure L) (v : MSAssignment M),
+      (∀ A : MSFormula L, MSSignedFormula.trueF A ∈ S →
+        msFormulaEval M A v = BoolVal.T) ∧
+      (∀ A : MSFormula L, MSSignedFormula.falseF A ∈ S →
+        msFormulaEval M A v = BoolVal.F) 
 
 /-- Theorem 10.4.1: no sorted variable free in any end-sequent formula
 occurs bound in any end-sequent formula, on either side. -/
@@ -81,776 +368,6 @@ def MSInfSequent.crossNoFreeBound {L : MSLanguage} {hL : L.withoutEquality}
       (∃ j, x ∈ msFormulaFV (seq.val.succedent.formula j))) →
     (∀ i, x ∉ msFormulaBV (seq.val.antecedent.formula i)) ∧
       (∀ j, x ∉ msFormulaBV (seq.val.succedent.formula j))
-
-/-- Lemma 10.4.1 (companion): `msSequentValid seq ↔ ∀ M, ¬
-msSequentFalsifiableIn M seq`. Validity and "not falsifiable in any
-structure" coincide. Many-sorted, `BoolVal`-valued analogue of
-one-sorted `sequentValid_iff_not_falsifiable`. -/
-@[blueprint "chap10__lemma_10_4_1"]
-theorem msSequentValid_iff_not_falsifiable {L : MSLanguage}
-    (seq : MSSequentCore L) :
-    msSequentValid seq ↔ ∀ M : MSStructure L, ¬ msSequentFalsifiableIn M seq
-
--- ===================================================================
--- BoolVal connective helper lemmas (Ch3 truth functions, T/F form)
--- ===================================================================
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem hAnd_eq_T {a b : BoolVal} :
-    hAnd a b = BoolVal.T ↔ a = BoolVal.T ∧ b = BoolVal.T := by
-  cases a <;> cases b <;> simp [hAnd]
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem hOr_eq_F {a b : BoolVal} :
-    hOr a b = BoolVal.F ↔ a = BoolVal.F ∧ b = BoolVal.F := by
-  cases a <;> cases b <;> simp [hOr]
-
-
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem hImplies_eq_F {a b : BoolVal} :
-    hImplies a b = BoolVal.F ↔ a = BoolVal.T ∧ b = BoolVal.F := by
-  cases a <;> cases b <;> simp [hImplies]
-
-
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem hNeg_eq_T {a : BoolVal} : hNeg a = BoolVal.T ↔ a = BoolVal.F := by
-  cases a <;> simp [hNeg]
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem hNeg_eq_F {a : BoolVal} : hNeg a = BoolVal.F ↔ a = BoolVal.T := by
-  cases a <;> simp [hNeg]
-
--- ===================================================================
--- Quantifier evaluation helper lemmas (forallM / existsM truth conditions)
--- ===================================================================
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- The universally-quantified formula `∀_s x A` evaluates to `T` under
-`v` iff `A` evaluates to `T` under every update of `v` at `(s, x)`. -/
-theorem msEval_all_eq_T {L : MSLanguage} {M : MSStructure L}
-    (s : L.SortType) (x : Nat) (A : MSFormula L) (v : MSAssignment M) :
-    msFormulaEval M (MSFormula.all s x A) v = BoolVal.T ↔
-      ∀ a : M.carrier s, msFormulaEval M A (msAssignUpdate M v s x a) = BoolVal.T := by
-  simp only [msFormulaEval, forallM]
-  split
-  · rename_i h; exact ⟨fun _ => h, fun _ => rfl⟩
-  · rename_i h
-    constructor
-    · intro hc; exact absurd hc (by decide)
-    · intro hc; exact absurd hc h
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- The existentially-quantified formula `∃_s x A` evaluates to `T` under
-`v` iff `A` evaluates to `T` under some update of `v` at `(s, x)`. -/
-theorem msEval_ex_eq_T {L : MSLanguage} {M : MSStructure L}
-    (s : L.SortType) (x : Nat) (A : MSFormula L) (v : MSAssignment M) :
-    msFormulaEval M (MSFormula.ex s x A) v = BoolVal.T ↔
-      ∃ a : M.carrier s, msFormulaEval M A (msAssignUpdate M v s x a) = BoolVal.T := by
-  simp only [msFormulaEval, existsM]
-  split
-  · rename_i h; exact ⟨fun _ => h, fun _ => rfl⟩
-  · rename_i h
-    constructor
-    · intro hc; exact absurd hc (by decide)
-    · intro hc; exact absurd hc h
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- The universally-quantified formula `∀_s x A` evaluates to `F` under
-`v` iff `A` evaluates to `F` under some update of `v` at `(s, x)`. -/
-theorem msEval_all_eq_F {L : MSLanguage} {M : MSStructure L}
-    (s : L.SortType) (x : Nat) (A : MSFormula L) (v : MSAssignment M) :
-    msFormulaEval M (MSFormula.all s x A) v = BoolVal.F ↔
-      ∃ a : M.carrier s, msFormulaEval M A (msAssignUpdate M v s x a) = BoolVal.F := by
-  constructor
-  · intro hF
-    apply Classical.byContradiction
-    intro hne
-    have hall : ∀ a, msFormulaEval M A (msAssignUpdate M v s x a) = BoolVal.T :=
-      fun a => boolVal_ne_F_eq_T (fun haF => hne ⟨a, haF⟩)
-    have : msFormulaEval M (MSFormula.all s x A) v = BoolVal.T :=
-      (msEval_all_eq_T s x A v).mpr hall
-    rw [this] at hF; exact absurd hF (by decide)
-  · rintro ⟨a, ha⟩
-    apply boolVal_ne_T_eq_F
-    intro hT
-    exact absurd ((msEval_all_eq_T s x A v).mp hT a) (by rw [ha]; decide)
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- The existentially-quantified formula `∃_s x A` evaluates to `F` under
-`v` iff `A` evaluates to `F` under every update of `v` at `(s, x)`. -/
-theorem msEval_ex_eq_F {L : MSLanguage} {M : MSStructure L}
-    (s : L.SortType) (x : Nat) (A : MSFormula L) (v : MSAssignment M) :
-    msFormulaEval M (MSFormula.ex s x A) v = BoolVal.F ↔
-      ∀ a : M.carrier s, msFormulaEval M A (msAssignUpdate M v s x a) = BoolVal.F := by
-  constructor
-  · intro hF a
-    apply boolVal_ne_T_eq_F
-    intro hT
-    have : msFormulaEval M (MSFormula.ex s x A) v = BoolVal.T :=
-      (msEval_ex_eq_T s x A v).mpr ⟨a, hT⟩
-    rw [this] at hF; exact absurd hF (by decide)
-  · intro h
-    apply boolVal_ne_T_eq_F
-    intro hT
-    obtain ⟨a, ha⟩ := (msEval_ex_eq_T s x A v).mp hT
-    exact absurd ha (by rw [h a]; decide)
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- Eigenvariable agreement helper: if no free variable of `A` other than
-the bound `(s, x)` equals the eigenvariable `(s, y)`, then the assignment
-that first sets the eigenvariable `(s, y) := a` and then the bound
-variable `(s, x) := a` agrees, on every free variable of `A`, with the
-assignment that only sets `(s, x) := a`. Used in the `allRight`/`exLeft`
-falsification cases. -/
-theorem msAgreeUpdateFresh {L : MSLanguage} [DecidableEq L.SortType]
-    (M : MSStructure L) (v : MSAssignment M) (s : L.SortType) (y x : Nat)
-    (a : M.carrier s) (A : MSFormula L)
-    (yA : ∀ z : MSVar L, z ∈ msFormulaFV A → z ≠ (s, x) → z ≠ (s, y)) :
-    ∀ z : MSVar L, z ∈ msFormulaFV A →
-      msAssignUpdate M (msAssignUpdate M v s y a) s x a z.1 z.2 =
-        msAssignUpdate M v s x a z.1 z.2 := by
-  intro z hz
-  simp only [msAssignUpdate]
-  by_cases h1 : z.1 = s
-  · subst h1
-    by_cases h2 : z.2 = x
-    · subst h2; simp
-    · have hzx : z ≠ (z.1, x) := by
-        intro hzeq; exact h2 (congrArg Prod.snd hzeq)
-      have hzy : z ≠ (z.1, y) := yA z hz hzx
-      have h3 : z.2 ≠ y := fun heq => hzy (by
-        have : z = (z.1, z.2) := rfl
-        rw [this, heq])
-      simp [h2, h3]
-  · simp [h1]
-
--- ===================================================================
--- List membership helpers (polymorphic; mirror one-sorted Gentzen)
--- ===================================================================
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem1_cases {α : Type} {a : α} {Γ Δ : List α} {X : α}
-    (h : a ∈ Γ ++ [X] ++ Δ) : a ∈ Γ ∨ a = X ∨ a ∈ Δ := by
-  simp only [List.mem_append, List.mem_cons, List.mem_nil_iff, or_false] at h
-  rcases h with (h1 | h2) | h3
-  · exact Or.inl h1
-  · exact Or.inr (Or.inl h2)
-  · exact Or.inr (Or.inr h3)
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem1_left {α : Type} {a : α} {Γ Δ : List α} {X : α}
-    (h : a ∈ Γ) : a ∈ Γ ++ [X] ++ Δ :=
-  List.mem_append_left _ (List.mem_append_left _ h)
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem1_center {α : Type} {Γ Δ : List α} {X : α} :
-    X ∈ Γ ++ [X] ++ Δ :=
-  List.mem_append_left _ (List.mem_append_right _ (List.Mem.head _))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem1_right {α : Type} {a : α} {Γ Δ : List α} {X : α}
-    (h : a ∈ Δ) : a ∈ Γ ++ [X] ++ Δ :=
-  List.mem_append_right _ h
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem2_cases {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
-    (h : a ∈ Γ ++ [X, Y] ++ Δ) : a ∈ Γ ∨ a = X ∨ a = Y ∨ a ∈ Δ := by
-  simp only [List.mem_append, List.mem_cons, List.mem_nil_iff, or_false] at h
-  rcases h with (h1 | h2 | h3) | h4
-  · exact Or.inl h1
-  · exact Or.inr (Or.inl h2)
-  · exact Or.inr (Or.inr (Or.inl h3))
-  · exact Or.inr (Or.inr (Or.inr h4))
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem2_left {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
-    (h : a ∈ Γ) : a ∈ Γ ++ [X, Y] ++ Δ :=
-  List.mem_append_left _ (List.mem_append_left _ h)
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem2_first {α : Type} {Γ Δ : List α} {X Y : α} :
-    X ∈ Γ ++ [X, Y] ++ Δ :=
-  List.mem_append_left _ (List.mem_append_right _ (List.Mem.head _))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem2_second {α : Type} {Γ Δ : List α} {X Y : α} :
-    Y ∈ Γ ++ [X, Y] ++ Δ :=
-  List.mem_append_left _ (List.mem_append_right _ (List.Mem.tail _ (List.Mem.head _)))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMem2_right {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
-    (h : a ∈ Δ) : a ∈ Γ ++ [X, Y] ++ Δ :=
-  List.mem_append_right _ h
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcat_cases {α : Type} {a : α} {Γ Δ : List α}
-    (h : a ∈ Γ ++ Δ) : a ∈ Γ ∨ a ∈ Δ := List.mem_append.mp h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcat_left {α : Type} {a : α} {Γ Δ : List α}
-    (h : a ∈ Γ) : a ∈ Γ ++ Δ := List.mem_append_left _ h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcat_right {α : Type} {a : α} {Γ Δ : List α}
-    (h : a ∈ Δ) : a ∈ Γ ++ Δ := List.mem_append_right _ h
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcons_cases {α : Type} {a : α} {Γ : List α} {X : α}
-    (h : a ∈ [X] ++ Γ) : a = X ∨ a ∈ Γ := by
-  simp only [List.singleton_append, List.mem_cons] at h; exact h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcons_head {α : Type} {Γ : List α} {X : α} :
-    X ∈ [X] ++ Γ := List.mem_cons_self
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemcons_tail {α : Type} {a : α} {Γ : List α} {X : α}
-    (h : a ∈ Γ) : a ∈ [X] ++ Γ := List.mem_cons.mpr (Or.inr h)
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemsnoc_left {α : Type} {a : α} {Γ : List α} {X : α}
-    (h : a ∈ Γ) : a ∈ Γ ++ [X] := List.mem_append_left _ h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-theorem msMemsnoc_right {α : Type} {Γ : List α} {X : α} :
-    X ∈ Γ ++ [X] := List.mem_append_right _ (List.Mem.head _)
-
--- ===================================================================
--- Lemma 10.4.1: Rule falsification preservation (many-sorted)
--- ===================================================================
-
--- ATTACH-BLOCKER: size gate: retain original helper span in front
-/-- Lemma 10.4.1 (companion): For each one-premise rule of G, the
-conclusion sequent is falsifiable in `M` iff the premise is. Many-sorted,
-`BoolVal`-valued analogue of one-sorted `ruleFalsificationIff1`. Reasons
-about `BoolVal` connective values via the Ch3 truth-function helper
-lemmas; quantifier cases use `msFormulaSubstEvalDirect` and the §10.3
-coincidence lemma. -/
-theorem msRuleFalsificationIff1 {L : MSLanguage} [DecidableEq L.SortType]
-    (M : MSStructure L) {prem conc : MSSequentCore L}
-    (rule : MSGentzenStep1Frame prem conc) :
-    msSequentFalsifiableIn M conc ↔ msSequentFalsifiableIn M prem := by
-  cases rule with
-  | conjLeft Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, fun F hF => ?_, hsucc⟩
-      rcases msMem2_cases hF with h1 | h2 | h3 | h4
-      · exact hant F (msMem1_left h1)
-      · rw [h2]; exact (hAnd_eq_T.mp (hant _ msMem1_center)).1
-      · rw [h3]; exact (hAnd_eq_T.mp (hant _ msMem1_center)).2
-      · exact hant F (msMem1_right h4)
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, fun F hF => ?_, hsucc⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hant F (msMem2_left h1)
-      · exact hAnd_eq_T.mpr ⟨hant A msMem2_first, hant B msMem2_second⟩
-      · exact hant F (msMem2_right h3)
-  | disjRight Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAB := hsucc _ msMem1_center
-      obtain ⟨hA, hB⟩ := hOr_eq_F.mp hAB
-      refine ⟨v, hant, fun F hF => ?_⟩
-      rcases msMem2_cases hF with h1 | h2 | h3 | h4
-      · exact hsucc F (msMem1_left h1)
-      · rw [h2]; exact hA
-      · rw [h3]; exact hB
-      · exact hsucc F (msMem1_right h4)
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, hant, fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc F (msMem2_left h1)
-      · exact hOr_eq_F.mpr ⟨hsucc A msMem2_first, hsucc B msMem2_second⟩
-      · exact hsucc F (msMem2_right h3)
-  | implRight Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAB := hsucc _ msMem1_center
-      obtain ⟨hA, hB⟩ := hImplies_eq_F.mp hAB
-      refine ⟨v, fun F hF => ?_, fun F hF => ?_⟩
-      · rcases msMemcons_cases hF with rfl | hF'
-        · exact hA
-        · exact hant F hF'
-      · rcases msMemcons_cases hF with rfl | hF'
-        · exact hB
-        · rcases msMemcat_cases hF' with hΔ | hΛ
-          · exact hsucc F (msMem1_left hΔ)
-          · exact hsucc F (msMem1_right hΛ)
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, fun F hF => hant F (msMemcons_tail hF), fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc F (msMemcons_tail (msMemcat_left h1))
-      · exact hImplies_eq_F.mpr ⟨hant A msMemcons_head, hsucc B msMemcons_head⟩
-      · exact hsucc F (msMemcons_tail (msMemcat_right h3))
-  | negLeft Γ Δ Λ A =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hNA := hant _ msMem1_center
-      refine ⟨v, fun F hF => ?_, fun F hF => ?_⟩
-      · rcases msMemcat_cases hF with hΓ | hΔ
-        · exact hant F (msMem1_left hΓ)
-        · exact hant F (msMem1_right hΔ)
-      · rcases msMemcons_cases hF with rfl | hΛ
-        · exact hNeg_eq_T.mp hNA
-        · exact hsucc F hΛ
-    · intro ⟨v, hant, hsucc⟩
-      have hA := hsucc A msMemcons_head
-      refine ⟨v, fun F hF => ?_, fun F hF => hsucc F (msMemcons_tail hF)⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hant F (msMemcat_left h1)
-      · exact hNeg_eq_T.mpr hA
-      · exact hant F (msMemcat_right h3)
-  | negRight Γ Δ Λ A =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hNA := hsucc _ msMem1_center
-      have hA : msFormulaEval M A v = BoolVal.T := hNeg_eq_F.mp hNA
-      refine ⟨v, fun F hF => ?_, fun F hF => ?_⟩
-      · rcases msMemcons_cases hF with rfl | hF'
-        · exact hA
-        · exact hant F hF'
-      · rcases msMemcat_cases hF with hΔ | hΛ
-        · exact hsucc F (msMem1_left hΔ)
-        · exact hsucc F (msMem1_right hΛ)
-    · intro ⟨v, hant, hsucc⟩
-      have hA := hant A msMemcons_head
-      refine ⟨v, fun F hF => hant F (msMemcons_tail hF), fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc F (msMemcat_left h1)
-      · exact hNeg_eq_F.mpr hA
-      · exact hsucc F (msMemcat_right h3)
-  | allLeft s t Γ Δ Λ x A hfree =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAll := hant _ msMem1_center
-      refine ⟨v, fun F hF => ?_, hsucc⟩
-      rcases msMem2_cases hF with h1 | h2 | h3 | h4
-      · exact hant F (msMem1_left h1)
-      · -- side formula A[t/x] is T because ∀ x A is T.
-        rw [h2, msFormulaSubstEvalDirect A s x t hfree v]
-        exact (msEval_all_eq_T s x A v).mp hAll (msTermEval M v t)
-      · rw [h3]; exact hAll
-      · exact hant F (msMem1_right h4)
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, fun F hF => ?_, hsucc⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hant F (msMem2_left h1)
-      · exact hant _ msMem2_second
-      · exact hant F (msMem2_right h3)
-  | exRight s t Γ Δ Λ x A hfree =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hExA := hsucc _ msMem1_center
-      refine ⟨v, hant, fun F hF => ?_⟩
-      rcases msMem2_cases hF with h1 | h2 | h3 | h4
-      · exact hsucc F (msMem1_left h1)
-      · -- side formula A[t/x] is F because ∃ x A is F.
-        rw [h2, msFormulaSubstEvalDirect A s x t hfree v]
-        exact (msEval_ex_eq_F s x A v).mp hExA (msTermEval M v t)
-      · rw [h3]; exact hExA
-      · exact hsucc F (msMem1_right h4)
-    · intro ⟨v, hant, hsucc⟩
-      refine ⟨v, hant, fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc F (msMem2_left h1)
-      · exact hsucc _ msMem2_second
-      · exact hsucc F (msMem2_right h3)
-  | allRight s y Γ Δ Λ x A hfresh hfreeFor =>
-    -- Eigenvariable (s, y) is fresh in the lower sequent.
-    have yA : ∀ z : MSVar L, z ∈ msFormulaFV A → z ≠ (s, x) → z ≠ (s, y) := by
-      intro z hz hzx hzy
-      apply hfresh (MSFormula.all s x A) (msMemcat_right msMem1_center)
-      show (s, y) ∈ msFormulaFV A \ Set.singleton (s, x)
-      refine ⟨hzy ▸ hz, ?_⟩
-      intro hsing
-      exact hzx (hzy.trans (hsing : (s, y) = (s, x)))
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      -- ∀_s x A is F: some a with A(v[x := a]) = F.
-      obtain ⟨a, ha⟩ := (msEval_all_eq_F s x A v).mp (hsucc _ msMem1_center)
-      -- Update the eigenvariable to a fresh witness.
-      let v' : MSAssignment M := msAssignUpdate M v s y a
-      -- v' agrees with v away from (s, y).
-      have coin_fresh : ∀ (F : MSFormula L), (s, y) ∉ msFormulaFV F →
-          ∀ z : MSVar L, z ∈ msFormulaFV F → v z.1 z.2 = v' z.1 z.2 := by
-        intro F hyF z hz
-        simp only [v', msAssignUpdate]
-        by_cases h1 : z.1 = s
-        · subst h1
-          by_cases h2 : z.2 = y
-          · exact absurd (show ((z.1, y) : MSVar L) ∈ msFormulaFV F by rw [← h2]; exact hz) hyF
-          · simp [h2]
-        · simp [h1]
-      have hant' : ∀ F ∈ Γ, msFormulaEval M F v' = BoolVal.T := fun F hF =>
-        (Semantics.Substitution.msCoincidenceLemma M F v v'
-          (coin_fresh F (hfresh F (msMemcat_left hF)))) ▸ hant F hF
-      have hsucc' : ∀ F ∈ Δ ++ Λ, msFormulaEval M F v' = BoolVal.F := by
-        intro F hF
-        have hyF : (s, y) ∉ msFormulaFV F := by
-          rcases List.mem_append.mp hF with hD | hL
-          · exact hfresh F (msMemcat_right (msMem1_left hD))
-          · exact hfresh F (msMemcat_right (msMem1_right hL))
-        rw [← Semantics.Substitution.msCoincidenceLemma M F v v' (coin_fresh F hyF)]
-        rcases List.mem_append.mp hF with hD | hL
-        · exact hsucc F (msMem1_left hD)
-        · exact hsucc F (msMem1_right hL)
-      -- A[y/x] evaluated at v' is F.
-      have hAyx : msFormulaEval M (msFormulaSubst A s x (MSTerm.var s y)) v' =
-          BoolVal.F := by
-        rw [msFormulaSubstEvalDirect A s x (MSTerm.var s y) hfreeFor v']
-        -- v'[x := v' s y] agrees with v[x := a] on FV(A).
-        have hval : msTermEval M v' (MSTerm.var s y) = a := by
-          simp only [msTermEval, varMeaning, v', msAssignUpdate]; simp
-        rw [hval]
-        rw [Semantics.Substitution.msCoincidenceLemma M A
-          (msAssignUpdate M v' s x a) (msAssignUpdate M v s x a)
-          (msAgreeUpdateFresh M v s y x a A yA)]
-        exact ha
-      refine ⟨v', hant', fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc' F (List.mem_append_left _ h1)
-      · exact hAyx
-      · exact hsucc' F (List.mem_append_right _ h3)
-    · intro ⟨v, hant, hsucc⟩
-      have hAyx := hsucc _ msMem1_center
-      -- A[y/x] = F gives A(v[x := v s y]) = F, hence ∀ x A = F.
-      have hNotA : msFormulaEval M A (msAssignUpdate M v s x (v s y)) = BoolVal.F := by
-        have := msFormulaSubstEvalDirect A s x (MSTerm.var s y) hfreeFor v
-        rw [this] at hAyx
-        have hval : msTermEval M v (MSTerm.var s y) = v s y := by
-          simp only [msTermEval, varMeaning]
-        rw [hval] at hAyx
-        exact hAyx
-      refine ⟨v, hant, fun F hF => ?_⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hsucc F (msMem1_left h1)
-      · exact (msEval_all_eq_F s x A v).mpr ⟨v s y, hNotA⟩
-      · exact hsucc F (msMem1_right h3)
-  | exLeft s y Γ Δ Λ x A hfresh hfreeFor =>
-    have yA : ∀ z : MSVar L, z ∈ msFormulaFV A → z ≠ (s, x) → z ≠ (s, y) := by
-      intro z hz hzx hzy
-      apply hfresh (MSFormula.ex s x A) (msMemcat_left msMem1_center)
-      show (s, y) ∈ msFormulaFV A \ Set.singleton (s, x)
-      refine ⟨hzy ▸ hz, ?_⟩
-      intro hsing
-      exact hzx (hzy.trans (hsing : (s, y) = (s, x)))
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      -- ∃_s x A is T: some a with A(v[x := a]) = T.
-      obtain ⟨a, ha⟩ := (msEval_ex_eq_T s x A v).mp (hant _ msMem1_center)
-      let v' : MSAssignment M := msAssignUpdate M v s y a
-      have coin_fresh : ∀ (F : MSFormula L), (s, y) ∉ msFormulaFV F →
-          ∀ z : MSVar L, z ∈ msFormulaFV F → v z.1 z.2 = v' z.1 z.2 := by
-        intro F hyF z hz
-        simp only [v', msAssignUpdate]
-        by_cases h1 : z.1 = s
-        · subst h1
-          by_cases h2 : z.2 = y
-          · exact absurd (show ((z.1, y) : MSVar L) ∈ msFormulaFV F by rw [← h2]; exact hz) hyF
-          · simp [h2]
-        · simp [h1]
-      have hant' : ∀ F ∈ Γ ++ Δ, msFormulaEval M F v' = BoolVal.T := by
-        intro F hF
-        have hyF : (s, y) ∉ msFormulaFV F := by
-          rcases List.mem_append.mp hF with hΓ | hΔ
-          · exact hfresh F (msMemcat_left (msMem1_left hΓ))
-          · exact hfresh F (msMemcat_left (msMem1_right hΔ))
-        rw [← Semantics.Substitution.msCoincidenceLemma M F v v' (coin_fresh F hyF)]
-        rcases List.mem_append.mp hF with hΓ | hΔ
-        · exact hant F (msMem1_left hΓ)
-        · exact hant F (msMem1_right hΔ)
-      have hsucc' : ∀ F ∈ Λ, msFormulaEval M F v' = BoolVal.F := by
-        intro F hF
-        have hyF : (s, y) ∉ msFormulaFV F := hfresh F (msMemcat_right hF)
-        rw [← Semantics.Substitution.msCoincidenceLemma M F v v' (coin_fresh F hyF)]
-        exact hsucc F hF
-      have hAyx : msFormulaEval M (msFormulaSubst A s x (MSTerm.var s y)) v' =
-          BoolVal.T := by
-        rw [msFormulaSubstEvalDirect A s x (MSTerm.var s y) hfreeFor v']
-        have hval : msTermEval M v' (MSTerm.var s y) = a := by
-          simp only [msTermEval, varMeaning, v', msAssignUpdate]; simp
-        rw [hval]
-        rw [Semantics.Substitution.msCoincidenceLemma M A
-          (msAssignUpdate M v' s x a) (msAssignUpdate M v s x a)
-          (msAgreeUpdateFresh M v s y x a A yA)]
-        exact ha
-      refine ⟨v', fun F hF => ?_, hsucc'⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hant' F (List.mem_append_left _ h1)
-      · exact hAyx
-      · exact hant' F (List.mem_append_right _ h3)
-    · intro ⟨v, hant, hsucc⟩
-      have hAyx := hant _ msMem1_center
-      have hExA : msFormulaEval M (MSFormula.ex s x A) v = BoolVal.T := by
-        apply (msEval_ex_eq_T s x A v).mpr
-        refine ⟨v s y, ?_⟩
-        have := msFormulaSubstEvalDirect A s x (MSTerm.var s y) hfreeFor v
-        rw [this] at hAyx
-        have hval : msTermEval M v (MSTerm.var s y) = v s y := by
-          simp only [msTermEval, varMeaning]
-        rw [hval] at hAyx
-        exact hAyx
-      refine ⟨v, fun F hF => ?_, hsucc⟩
-      rcases msMem1_cases hF with h1 | rfl | h3
-      · exact hant F (msMem1_left h1)
-      · exact hExA
-      · exact hant F (msMem1_right h3)
-
-
-
-theorem hOr_eq_T {a b : BoolVal} :
-    hOr a b = BoolVal.T ↔ a = BoolVal.T ∨ b = BoolVal.T := by
-  cases a <;> cases b <;> simp [hOr]
-
-
-
-theorem hImplies_eq_T {a b : BoolVal} :
-    hImplies a b = BoolVal.T ↔ a = BoolVal.F ∨ b = BoolVal.T := by
-  cases a <;> cases b <;> simp [hImplies]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/-- Lemma 10.4.1 (companion, two-premise): For each two-premise rule of G,
-the conclusion sequent is falsifiable in `M` iff at least one premise is
-falsifiable. Many-sorted, `BoolVal`-valued analogue of one-sorted
-`ruleFalsificationIff2`. -/
-theorem msRuleFalsificationIff2 {L : MSLanguage}
-    (M : MSStructure L) {prem1 prem2 conc : MSSequentCore L}
-    (rule : MSGentzenStep2Frame prem1 prem2 conc) :
-    msSequentFalsifiableIn M conc ↔
-      (msSequentFalsifiableIn M prem1 ∨ msSequentFalsifiableIn M prem2) := by
-  cases rule with
-  | conjRight Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAB := hsucc _ msMem1_center
-      simp only [msFormulaEval, Semantics.andM] at hAB
-      by_cases hA : msFormulaEval M A v = BoolVal.T
-      · right
-        have hB : msFormulaEval M B v = BoolVal.F := by
-          rw [hA] at hAB
-          cases hb : msFormulaEval M B v with
-          | T => rw [hb] at hAB; exact absurd hAB (by decide)
-          | F => rfl
-        refine ⟨v, hant, fun F hF => ?_⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hsucc F (msMem1_left h1)
-        · exact hB
-        · exact hsucc F (msMem1_right h3)
-      · left
-        refine ⟨v, hant, fun F hF => ?_⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hsucc F (msMem1_left h1)
-        · exact boolVal_ne_T_eq_F hA
-        · exact hsucc F (msMem1_right h3)
-    · intro h; rcases h with ⟨v, hant, hsucc⟩ | ⟨v, hant, hsucc⟩
-      · have hA := hsucc _ msMem1_center
-        refine ⟨v, hant, fun F hF => ?_⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hsucc F (msMem1_left h1)
-        · simp only [msFormulaEval, Semantics.andM]; rw [hA]; rfl
-        · exact hsucc F (msMem1_right h3)
-      · have hB := hsucc _ msMem1_center
-        refine ⟨v, hant, fun F hF => ?_⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hsucc F (msMem1_left h1)
-        · simp only [msFormulaEval, Semantics.andM]; rw [hB]
-          cases msFormulaEval M A v <;> rfl
-        · exact hsucc F (msMem1_right h3)
-  | disjLeft Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAB := hant _ msMem1_center
-      rcases hOr_eq_T.mp hAB with hA | hB
-      · left
-        refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMem1_left h1)
-        · exact hA
-        · exact hant F (msMem1_right h3)
-      · right
-        refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMem1_left h1)
-        · exact hB
-        · exact hant F (msMem1_right h3)
-    · intro h; rcases h with ⟨v, hant, hsucc⟩ | ⟨v, hant, hsucc⟩
-      · refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMem1_left h1)
-        · exact hOr_eq_T.mpr (Or.inl (hant A msMem1_center))
-        · exact hant F (msMem1_right h3)
-      · refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMem1_left h1)
-        · exact hOr_eq_T.mpr (Or.inr (hant B msMem1_center))
-        · exact hant F (msMem1_right h3)
-  | implLeft Γ Δ Λ A B =>
-    constructor
-    · intro ⟨v, hant, hsucc⟩
-      have hAB := hant _ msMem1_center
-      by_cases hA : msFormulaEval M A v = BoolVal.T
-      · -- A=T and A⊃B=T force B=T: prem2 falsifiable.
-        have hB : msFormulaEval M B v = BoolVal.T :=
-          (hImplies_eq_T.mp hAB).resolve_left (fun hAF =>
-            absurd (hAF ▸ hA) (by decide))
-        right
-        refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMemcons_cases hF with rfl | hF'
-        · exact hB
-        · rcases msMemcat_cases hF' with hΓ | hΔ
-          · exact hant F (msMem1_left hΓ)
-          · exact hant F (msMem1_right hΔ)
-      · -- A=F: prem1 falsifiable (A is a new succedent, F).
-        left
-        refine ⟨v, fun F hF => ?_, fun F hF => ?_⟩
-        · rcases msMemcat_cases hF with hΓ | hΔ
-          · exact hant F (msMem1_left hΓ)
-          · exact hant F (msMem1_right hΔ)
-        · rcases msMemcons_cases hF with rfl | hΛ
-          · exact boolVal_ne_T_eq_F hA
-          · exact hsucc F hΛ
-    · intro h; rcases h with ⟨v, hant, hsucc⟩ | ⟨v, hant, hsucc⟩
-      · -- prem1 falsifiable: A (in succedent) is F, so A⊃B=T.
-        have hA := hsucc A msMemcons_head
-        refine ⟨v, fun F hF => ?_, fun F hF => hsucc F (msMemcons_tail hF)⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMemcat_left h1)
-        · exact hImplies_eq_T.mpr (Or.inl hA)
-        · exact hant F (msMemcat_right h3)
-      · -- prem2 falsifiable: B (in antecedent) is T, so A⊃B=T.
-        have hB := hant B msMemcons_head
-        refine ⟨v, fun F hF => ?_, hsucc⟩
-        rcases msMem1_cases hF with h1 | rfl | h3
-        · exact hant F (msMemcons_tail (msMemcat_left h1))
-        · exact hImplies_eq_T.mpr (Or.inr hB)
-        · exact hant F (msMemcons_tail (msMemcat_right h3))
-
-/-- General-carrier one-premise soundness, also used by G=. -/
-theorem msRuleValidityIff1Core {L : MSLanguage} [DecidableEq L.SortType]
-    {prem conc : MSSequentCore L} (rule : MSGentzenStep1Core prem conc) :
-    msSequentValid conc ↔ msSequentValid prem := by
-  rw [msSequentValid_iff_not_falsifiable, msSequentValid_iff_not_falsifiable]
-  exact forall_congr' (fun M => not_congr (msRuleFalsificationIff1 M rule.frame))
-
-/-- General-carrier two-premise soundness, also used by G=. -/
-theorem msRuleValidityIff2Core {L : MSLanguage}
-    {prem1 prem2 conc : MSSequentCore L} (rule : MSGentzenStep2Core prem1 prem2 conc) :
-    msSequentValid conc ↔ (msSequentValid prem1 ∧ msSequentValid prem2) := by
-  rw [msSequentValid_iff_not_falsifiable, msSequentValid_iff_not_falsifiable,
-      msSequentValid_iff_not_falsifiable]
-  constructor
-  · intro h
-    refine ⟨fun M hF => h M ?_, fun M hF => h M ?_⟩
-    · exact (msRuleFalsificationIff2 M rule.frame).mpr (Or.inl hF)
-    · exact (msRuleFalsificationIff2 M rule.frame).mpr (Or.inr hF)
-  · intro ⟨h1, h2⟩ M hF
-    rcases (msRuleFalsificationIff2 M rule.frame).mp hF with hF1 | hF2
-    · exact h1 M hF1
-    · exact h2 M hF2
-
-/-- Finite soundness on the general carrier shared by G and G=. -/
-theorem msProofTreeValidCore {L : MSLanguage} [DecidableEq L.SortType]
-    {seq : MSSequentCore L} (t : MSGProofTreeCore seq) : msSequentValid seq := by
-  induction t with
-  | axiom_ s _hDomain hax =>
-    intro M v hant
-    obtain ⟨A, hA_ant, hA_suc⟩ := hax
-    exact ⟨A, hA_suc, hant A hA_ant⟩
-  | onePremise rule _ ih =>
-    exact (msRuleValidityIff1Core rule).mpr ih
-  | twoPremise rule _ _ ih1 ih2 =>
-    exact (msRuleValidityIff2Core rule).mpr ⟨ih1, ih2⟩
-
-/-- Lemma 10.4.1 (companion): For each one-premise rule of G, the
-conclusion sequent is valid iff the premise is valid. Proved (in a later
-stage) by transposing the per-rule falsifiability-iff lemmas through
-`msSequentValid_iff_not_falsifiable`, exactly mirroring one-sorted
-`ruleValidityIff1` — but reasoning about `BoolVal` equalities via the
-§10.3 lifted connective lemmas rather than Prop logic. -/
-@[blueprint "chap10__lemma_10_4_1"]
-theorem msRuleValidityIff1 {L : MSLanguage} [DecidableEq L.SortType]
-    (hL : L.withoutEquality)
-    {prem conc : MSSequentCore L} (rule : MSGentzenStep1 hL prem conc) :
-    msSequentValid conc ↔ msSequentValid prem
-
-/-- Lemma 10.4.1 (companion): For each two-premise rule of G, the
-conclusion sequent is valid iff both premises are valid. Many-sorted,
-`BoolVal`-valued analogue of one-sorted `ruleValidityIff2`. -/
-@[blueprint "chap10__lemma_10_4_1"]
-theorem msRuleValidityIff2 {L : MSLanguage}
-    (hL : L.withoutEquality)
-    {prem1 prem2 conc : MSSequentCore L} (rule : MSGentzenStep2 hL prem1 prem2 conc) :
-    msSequentValid conc ↔ (msSequentValid prem1 ∧ msSequentValid prem2)
-
-/-- Lemma 10.4.1 (companion): Every (indexed) proof tree in G has a valid
-conclusion sequent. Proved by induction on the tree: the `axiom_` case
-uses the shared common formula (true in the antecedent by hypothesis,
-hence a true witness in the succedent), and the `onePremise` /
-`twoPremise` cases apply `msRuleValidityIff1.mpr` / `msRuleValidityIff2.mpr`
-to the inductive hypotheses. Many-sorted analogue of one-sorted
-`proofTreeValid`. -/
-@[blueprint "chap10__lemma_10_4_1"]
-theorem msProofTreeValid {L : MSLanguage} [DecidableEq L.SortType]
-    (hL : L.withoutEquality)
-    {seq : MSSequentCore L} (t : MSGProofTree hL seq) : msSequentValid seq
-
-/-- Lemma 10.4.1: every possibly infinite sequent provable in the
-many-sorted equality-free system G is valid under a shared assignment. -/
-@[blueprint "chap10__lemma_10_4_1" (main := true)]
-theorem msSoundnessG {L : MSLanguage} [DecidableEq L.SortType]
-    (hL : L.withoutEquality) (seq : MSInfSequent L hL)
-    (h : msInfSequentProvable hL seq) : msInfSequentValid seq
-
-/-- Theorem 10.4.1 (completeness direction): a valid, possibly infinite
-sequent in the equality-free six-connective domain has a finite G-provable
-subsequent. Free/bound separation is imposed on the whole end sequent. -/
-@[attach_debt, blueprint "chap10__theorem_10_4_1"]
-theorem msSearchCompletenessValid {L : MSLanguage} [DecidableEq L.SortType]
-    (hL : L.withoutEquality) (seq : MSInfSequent L hL)
-    (hCross : seq.crossNoFreeBound) (hValid : msInfSequentValid seq) :
-    msInfSequentProvable hL seq
 
 /-- Theorem 10.4.1: Gödel's extended completeness theorem for many-sorted
 G. A possibly infinite equality-free six-connective end sequent with no

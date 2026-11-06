@@ -16,15 +16,6 @@ open LCS.FirstOrder.ManySorted.CongruenceClosure.Decision
 
 open LCS.Propositional.Semantics
 
-proof_of msEqBoolAsIdentity := by
-  exact msFormulaEval_eq_T_iff M rfl (MSBoolSort L) a b v
-
-
-proof_of semanticEqualityRelationPred_isCongruence := by
-  -- REPAIR(T10-17): proof pending — Transport semantic equality to the restricted sort-fiber graph congruence.
-  sorry
-
-
 proof_of encodeModel_interpFunc_inl_eq := rfl
 
 
@@ -32,11 +23,6 @@ proof_of inlArgRecast_heq := by
   unfold inlArgRecast
   apply HEq.trans (eqRec_heq _ _)
   congr 1
-
-
-proof_of msTermEval_term_cast := by
-  cases h; rfl
-
 
 proof_of lift_meaning_heq := by
   subst h
@@ -88,33 +74,6 @@ proof_of liftTerm_eq_iff := by
   constructor
   · intro h; exact h
   · intro h; rw [h]
-
-
-proof_of msTopConst_eval := by
-  simp [msTopConst, msTermEval, constM, encodeModel, MSBoolSort]
-  rfl
-
-
-proof_of encodeModel_interpFunc_inr_eq := rfl
-
-
-proof_of inrArgRecast_heq := by
-  unfold inrArgRecast
-  apply HEq.trans (eqRec_heq _ _)
-  congr 1
-
-
-proof_of inrArgRecast_eval := by
-  apply eq_of_heq
-  have hi : j.val < (((L.predArity P).map some)).length := by
-    have := j.isLt
-    simpa [boolExtendedLanguage, boolExtendedFunRank, List.length_map] using this
-  refine HEq.trans (inrArgRecast_heq L M P args j hi) ?_
-  rw [hargs ⟨j.val, hi⟩]
-  refine lift_meaning_heq L M v _ ?_ (msTermEval_encodeModel_liftTerm L M v _)
-  simp only [boolExtendedLanguage, boolExtendedFunRank, List.get_eq_getElem]
-  exact List.getElem_map some
-
 
 proof_of msEncodeAtom_eval := by
   -- REPAIR(T10-15): proof pending — Extend atom evaluation transfer to nullary Boolean constants.

@@ -49,20 +49,6 @@ theorem msHintikkaSetEqQuotientSatisfiable {L : MSLanguage}
       (∀ A, MSSignedFormula.trueF A ∈ S → msFormulaEval M A v = BoolVal.T) ∧
       (∀ A, MSSignedFormula.falseF A ∈ S → msFormulaEval M A v = BoolVal.F)
 
-/-- Theorem 10.5.1 (companion): extended completeness obtained by adapting
-§5.6 to sorted equality-Hintikka sets. The intended completeness derivation
-uses `msHintikkaSetEqQuotientSatisfiable` on a saturated counterbranch;
-soundness uses `msSoundnessGEq`. Its endpoint is
-`msGoedelExtendedCompletenessGEq`: arbitrary ordered six-connective sequents,
-end-sequent free/bound separation, and a finite subsequent proved by the
-actual G= rules. The quotient construction and counterbranch adaptation
-remain proof obligations. -/
-@[attach_debt, blueprint "chap10__theorem_10_5_1"]
-theorem msEqualityHintikkaExtendedCompleteness {L : MSLanguage}
-    [DecidableEq L.SortType] (hL : L.hasEquality = true)
-    (seq : MSInfSequentEq L hL) (hCross : seq.crossNoFreeBound) :
-    msInfSequentValidEq seq ↔ msSequentProvableEq hL seq
-
 /-- Lemma 10.5.2 (companion): every formula of an arbitrary theory is true
 in one fixed structure under one shared, unrestricted sorted assignment. -/
 @[blueprint "chap10__lemma_10_5_2"]

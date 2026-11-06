@@ -125,40 +125,12 @@ theorem foLogEquivT_disj {L : Language} {A A' B B' : FormulaT L}
     (hA : foLogEquivT A A') (hB : foLogEquivT B B') :
     foLogEquivT (FormulaT.disj A B) (FormulaT.disj A' B') 
 
-/-- Lemma 5.3.7 (companion): Congruence for implication: if A simeq A' and
-B simeq B' then (A supset B) simeq (A' supset B'). -/
-@[blueprint "chap5__lemma_5_3_8"]
-theorem foLogEquivT_impl {L : Language} {A A' B B' : FormulaT L}
-    (hA : foLogEquivT A A') (hB : foLogEquivT B B') :
-    foLogEquivT (FormulaT.impl A B) (FormulaT.impl A' B') 
-
-/-- Lemma 5.3.7 (companion): Congruence for biconditional: if A simeq A' and
-B simeq B' then (A equiv B) simeq (A' equiv B'). -/
-@[blueprint "chap5__lemma_5_3_8"]
-theorem foLogEquivT_equiv {L : Language} {A A' B B' : FormulaT L}
-    (hA : foLogEquivT A A') (hB : foLogEquivT B B') :
-    foLogEquivT (FormulaT.equiv A B) (FormulaT.equiv A' B') 
-
 /-- Lemma 5.3.7 (companion): Congruence for negation: if A simeq A' then
 neg A simeq neg A'. -/
 @[blueprint "chap5__lemma_5_3_8"]
 theorem foLogEquivT_neg {L : Language} {A A' : FormulaT L}
     (h : foLogEquivT A A') :
     foLogEquivT (FormulaT.neg A) (FormulaT.neg A') 
-
-/-- Lemma 5.3.7 (companion): Congruence for universal quantification: if A simeq A'
-then forall x A simeq forall x A'. -/
-@[blueprint "chap5__lemma_5_3_8"]
-theorem foLogEquivT_all {L : Language} (x : Nat) {A A' : FormulaT L}
-    (h : foLogEquivT A A') :
-    foLogEquivT (FormulaT.all x A) (FormulaT.all x A') 
-
-/-- Lemma 5.3.7 (companion): Congruence for existential quantification: if A simeq
-A' then exists x A simeq exists x A'. -/
-@[blueprint "chap5__lemma_5_3_8"]
-theorem foLogEquivT_ex {L : Language} (x : Nat) {A A' : FormulaT L}
-    (h : foLogEquivT A A') :
-    foLogEquivT (FormulaT.ex x A) (FormulaT.ex x A') 
 
 -- ===================================================================
 -- Definition 5.3.12: Logical equivalence relation foLogEquivN
@@ -230,15 +202,6 @@ theorem validF_neg_all_as_ex_neg {L : Language} (x : Nat)
       (Formula.neg (Formula.all x A))
       (Formula.ex x (Formula.neg A))) 
 
-/-- Definition 5.3.11 (consequence): The formula ¬∀x A ≡ ∃x¬A is
-universally valid but does not belong to PROP_L. -/
-@[blueprint "chap5__definition_5_3_11"]
-theorem quantifierDuality_valid_not_inPROPL {L : Language} (A : Formula L) (x : Nat) :
-    universallyValid (Formula.equiv_ (Formula.neg (Formula.all x A))
-      (Formula.ex x (Formula.neg A))) ∧
-    ¬ Subformulae.inPROPL (Formula.equiv_ (Formula.neg (Formula.all x A))
-      (Formula.ex x (Formula.neg A))) 
-
 /-- Lemma 5.3.6(9): ¬∃x A ≡ ∀x ¬A is universally valid. -/
 @[blueprint "chap5__lemma_5_3_6" (main := true)]
 theorem validF_neg_ex_as_all_neg {L : Language} (x : Nat)
@@ -271,115 +234,6 @@ inductive FormulaConnective where
   | bot | neg | conj | disj | impl | equiv | all | ex
   deriving DecidableEq
 
-/-- All connective occurrences in a formula; repeated occurrences are retained. -/
-@[blueprint "chap5__lemma_5_3_6"]
-def formulaConnectives {L : Language} : Formula L → List FormulaConnective
-  | .falsum => [.bot]
-  | .pred0 _ _ | .predN _ _ _ | .eq_ _ _ _ => []
-  | .neg A => .neg :: formulaConnectives A
-  | .conj A B => .conj :: (formulaConnectives A ++ formulaConnectives B)
-  | .disj A B => .disj :: (formulaConnectives A ++ formulaConnectives B)
-  | .impl A B => .impl :: (formulaConnectives A ++ formulaConnectives B)
-  | .equiv_ A B => .equiv :: (formulaConnectives A ++ formulaConnectives B)
-  | .all _ A => .all :: formulaConnectives A
-  | .ex _ A => .ex :: formulaConnectives A
-
-/-- Propositional connective occurrences, with ⊥ counted as a connective. -/
-@[blueprint "chap5__lemma_5_3_6"]
-def propConnectives {α : Type} : Subformulae.PropFormulaOver α → List FormulaConnective
-  | .fls => [.bot]
-  | .var _ => []
-  | .neg A => .neg :: propConnectives A
-  | .conj A B => .conj :: (propConnectives A ++ propConnectives B)
-  | .disj A B => .disj :: (propConnectives A ++ propConnectives B)
-  | .impl A B => .impl :: (propConnectives A ++ propConnectives B)
-  | .equiv_ A B => .equiv :: (propConnectives A ++ propConnectives B)
-
-/-- Functional completeness in the sense of §3.3.3: every truth function
-of positive finite arity is represented using K. Truth values use the same
-classical Prop semantics as `evalProp`; the representing formula uses only
-the prescribed finite family of input letters. -/
-@[blueprint "chap5__lemma_5_3_6"]
-def functionallyComplete (K : FormulaConnective → Prop) : Prop :=
-  ∀ n : Nat, 0 < n → ∀ f : (Fin n → Prop) → Prop,
-    ∃ B : Subformulae.PropFormulaOver (Fin n),
-      (∀ c ∈ propConnectives B, K c) ∧
-      ∀ v, Subformulae.evalProp v B ↔ f v
-
-/-- A formula uses only propositional connectives in K; quantifiers remain allowed. -/
-@[blueprint "chap5__lemma_5_3_6"]
-def usesConnectives {L : Language} (K : FormulaConnective → Prop) (A : Formula L) : Prop :=
-  ∀ c ∈ formulaConnectives A, K c ∨ c = .all ∨ c = .ex
-
-
-
-
-
-
-
-
-
-/-- Lemma 5.3.6 (consequence): Every formula has an equivalent over any
-functionally complete propositional basis K. To represent a constant formula,
-K must contain ⊥ or the language must supply a predicate or equality atom.
-Quantifiers are unrestricted. -/
-@[blueprint "chap5__lemma_5_3_6"]
-theorem formula_connectiveReduction {L : Language} {K : FormulaConnective → Prop}
-    (hK : functionallyComplete K)
-    (hbase : K .bot ∨ ∃ atom : Formula L, formulaConnectives atom = [])
-    (A : Formula L) :
-    ∃ B : Formula L, usesConnectives K B ∧ universallyValid (.equiv_ A B) 
-
-
-
-
-
-
-
-/-- Lemma 5.3.6 (consequence): Every formula is equivalent to an ∃-free formula. -/
-@[blueprint "chap5__lemma_5_3_6"]
-theorem formula_existsFree_equivalent {L : Language} (A : Formula L) :
-    ∃ B : Formula L, FormulaConnective.ex ∉ formulaConnectives B ∧
-      universallyValid (.equiv_ A B) 
-
-/-- Lemma 5.3.6 (consequence): Every formula is equivalent to a ∀-free formula. -/
-@[blueprint "chap5__lemma_5_3_6"]
-theorem formula_forallFree_equivalent {L : Language} (A : Formula L) :
-    ∃ B : Formula L, FormulaConnective.all ∉ formulaConnectives B ∧
-      universallyValid (.equiv_ A B) 
-
-
-
--- retained: used by LCS.Herbrand.PrenexForm.Part2
-/-- For normalized formulae, (A supset B) equiv (neg A vee B) is universally
-valid. Implication can be expressed as disjunction with negation. -/
-theorem valid_impl_as_disj {L : Language} (A B : FormulaN L) :
-    universallyValidN (FormulaN.equiv
-      (FormulaN.impl A B)
-      (FormulaN.disj (FormulaN.neg A) B)) :=
--- BEGIN PROOF
-by
-  intro M s
-  simp only [formulaEvalN]
-  exact ⟨fun h => (em _).elim (fun ha => Or.inr (h ha)) Or.inl,
-         fun h ha => h.elim (fun hna => absurd ha hna) id⟩
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- ===================================================================
 -- Lemma 5.3.7 (Companions): Equivalence relation and congruence
 -- ===================================================================
@@ -393,18 +247,6 @@ theorem foLogEquivN_refl {L : Language} (A : FormulaN L) :
 by
   intro M s
   simp [formulaEvalN]
-
--- retained: used by LCS.Herbrand.PrenexForm.Part2
-/-- Lemma 5.3.7 (companion): foLogEquivN is symmetric: if A simeq B then
-B simeq A. -/
-theorem foLogEquivN_symm {L : Language} {A B : FormulaN L}
-    (h : foLogEquivN A B) : foLogEquivN B A :=
--- BEGIN PROOF
-by
-  intro M s
-  simp only [foLogEquivN, universallyValidN, validInN, formulaEvalN] at *
-  obtain ⟨hab, hba⟩ := h M s
-  exact ⟨hba, hab⟩
 
 -- retained: used by LCS.Herbrand.PrenexForm.Part1, LCS.Herbrand.PrenexForm.Part2
 /-- Lemma 5.3.7 (companion): foLogEquivN is transitive: if A simeq B and B simeq C
@@ -633,54 +475,6 @@ theorem foLogEquivN_conj_comm {L : Language} (A B : FormulaN L) :
 by
   intro M s; simp only [formulaEvalN]; exact ⟨And.comm.mp, And.comm.mpr⟩
 
-
-
-
-
--- retained: used by LCS.Herbrand.PrenexForm.Part2
-/-- De Morgan's rule for disjunction for normalized formulae:
-neg(A vee B) simeq (neg A wedge neg B). -/
-theorem foLogEquivN_deMorgan_disj {L : Language}
-    (A B : FormulaN L) :
-    foLogEquivN (FormulaN.neg (FormulaN.disj A B))
-      (FormulaN.conj (FormulaN.neg A) (FormulaN.neg B)) :=
--- BEGIN PROOF
-by
-  intro M s; simp only [formulaEvalN]; exact ⟨not_or.mp, not_or.mpr⟩
-
--- retained: used by LCS.Herbrand.PrenexForm.Part2
-/-- De Morgan's rule for conjunction for normalized formulae:
-neg(A wedge B) simeq (neg A vee neg B). -/
-theorem foLogEquivN_deMorgan_conj {L : Language}
-    (A B : FormulaN L) :
-    foLogEquivN (FormulaN.neg (FormulaN.conj A B))
-      (FormulaN.disj (FormulaN.neg A) (FormulaN.neg B)) :=
--- BEGIN PROOF
-by
-  intro M s
-  simp only [formulaEvalN]
-  exact ⟨fun h => (em _).elim (fun ha => Or.inr (fun hb => h ⟨ha, hb⟩)) Or.inl,
-         fun h ⟨ha, hb⟩ => h.elim (· ha) (· hb)⟩
-
-
-
-
-
--- retained: used by LCS.Herbrand.PrenexForm.Part2, LCS.Herbrand.SHGTheorem.Main.GroundMatrix
-/-- Double negation rule for normalized formulae:
-neg neg A simeq A. -/
-theorem foLogEquivN_double_neg {L : Language} (A : FormulaN L) :
-    foLogEquivN (FormulaN.neg (FormulaN.neg A)) A :=
--- BEGIN PROOF
-by
-  intro M s; simp [formulaEvalN]
-
-
-
-
-
-
-
 -- ===================================================================
 -- §5.3.9: The Lindenbaum quotient and its operations
 -- ===================================================================
@@ -856,13 +650,5 @@ structure IsBooleanAlgebra {α : Type} (add mul : α → α → α)
   mulOne : ∀ a, mul a one = a
   addNeg : ∀ a, add a (neg a) = one
   mulNeg : ∀ a, mul a (neg a) = zero
-
-/-- Lemma 5.3.8 (companion): The Lindenbaum quotient with its induced
-operations, zero from the fixed rank-zero letter P, and one from ⊤
-is a Boolean algebra in the source sense. -/
-@[blueprint "chap5__lemma_5_3_8"]
-theorem BL.isBooleanAlgebra {L : Language}
-    (P : L.predSymbols) (hP : L.predArity P = 0) :
-    IsBooleanAlgebra (BL.add (L := L)) BL.mul BL.neg (BL.zero P hP) BL.one 
 
 end LCS.FirstOrder.Semantics.Equivalence

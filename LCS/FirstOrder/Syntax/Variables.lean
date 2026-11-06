@@ -88,13 +88,6 @@ def formulaBV {L : Language} : Formula L → Set Nat
   | .all i A => formulaBV A ∪ Set.singleton i
   | .ex i A => formulaBV A ∪ Set.singleton i
 
-/-- Definition 5.2.5 (companion): Free and bound variable sets can overlap
-when the language has equality or a predicate of positive arity. -/
-@[blueprint "chap5__definition_5_2_5"]
-theorem fv_bv_overlap_possible {L : Language}
-    (h : L.hasEquality = true ∨ ∃ P, 0 < L.predArity P) :
-    ∃ (A : Formula L) (x : Nat), x ∈ formulaFV A ∧ x ∈ formulaBV A 
-
 -- ===================================================================
 -- Example 5.2.3: Formula A with overlapping FV and BV
 -- ===================================================================

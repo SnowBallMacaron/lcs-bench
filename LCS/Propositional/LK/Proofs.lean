@@ -268,30 +268,6 @@ proof_of lk_gprime_equivalence := by
       exact ⟨gprimeProof_to_cutFreeLKProof t,
              gprimeProof_to_cutFreeLKProof_isCutFree t⟩
 
-
-proof_of hauptsatz := by
-  constructor
-  · intro h
-    exact (lk_gprime_equivalence s).2 ((lk_gprime_equivalence s).1 h)
-  · rintro ⟨t, _⟩
-    exact ⟨t⟩
-
-
-proof_of inf_lk_gprime_equivalence := by
-  constructor <;> constructor
-  · rintro ⟨Γ, Δ, hΓ, hΔ, h⟩
-    exact ⟨Γ, Δ, hΓ, hΔ, (lk_gprime_equivalence _).1 h⟩
-  · rintro ⟨Γ, Δ, hΓ, hΔ, h⟩
-    exact ⟨Γ, Δ, hΓ, hΔ, (hauptsatz _).mpr ((lk_gprime_equivalence _).2 h)⟩
-  · rintro ⟨Γ, Δ, hΓ, hΔ, h⟩
-    exact ⟨Γ, Δ, hΓ, hΔ, (lk_gprime_equivalence _).2 h⟩
-  · rintro ⟨Γ, Δ, hΓ, hΔ, h⟩
-    exact ⟨Γ, Δ, hΓ, hΔ, (lk_gprime_equivalence _).1 ((hauptsatz _).mpr h)⟩
-
-
-proof_of inf_hauptsatz := (inf_lk_gprime_equivalence seq).1.trans (inf_lk_gprime_equivalence seq).2
-
-
 proof_of valid_to_lkProvable := ⟨(validSequent_to_cutFreeLKProof s hv).val⟩
 
 

@@ -18,7 +18,6 @@ proof_of funcNode_closureRel := by
   -- REPAIR(T10-22): proof pending — transport function ports through the occurring-sort rank list.
   sorry
 
-
 proof_of funOpC_case1 := by
   -- BEGIN PROOF
     -- All arguments are `some`, and `f y_1…y_k ∈ TERM(C)`, so the first
@@ -28,7 +27,6 @@ proof_of funOpC_case1 := by
     rw [dif_pos hall]
     simp only [Option.get_some]
     rw [dif_pos hmem]
-
 
 proof_of funOpC_case2 := by
   -- BEGIN PROOF
@@ -58,7 +56,6 @@ proof_of funOpC_case2 := by
         (hsymm (h2.choose_spec.1 i)) (hcong i)
     exact funcNode_closureRel C f (h2.choose) zs h2.choose_spec.2 hmem hcong'
 
-
 proof_of funOpC_case3 := by
   -- BEGIN PROOF
     unfold funOpC
@@ -66,7 +63,6 @@ proof_of funOpC_case3 := by
     rw [dif_pos hall]
     simp only [Option.get_some]
     rw [dif_neg _hnot1, dif_neg hnot2]
-
 
 proof_of closure_isAlgebraCongruence := by
   -- BEGIN PROOF
@@ -153,7 +149,6 @@ proof_of closure_isAlgebraCongruence := by
       have hrz : ¬ rep zs := fun h => hr (hrep_iff.mpr h)
       exact Or.inl ⟨(hval ys).2 hr, (hval zs).2 hrz⟩
 
-
 proof_of closureSetoid_r_iff := by
   -- BEGIN PROOF
     constructor
@@ -166,10 +161,8 @@ proof_of closureSetoid_r_iff := by
     · intro h
       exact ⟨carrierNode C s t, carrierNode C s u, rfl, rfl, h⟩
 
-
 proof_of chooseRep_spec := Classical.choose_spec (Quotient.exists_rep q)
   -- BEGIN PROOF
-
 
 proof_of termMeaning_eq_class := by
   -- BEGIN PROOF
@@ -276,7 +269,6 @@ proof_of termMeaning_eq_class := by
         apply Quotient.sound
         exact (closureSetoid_r_iff C (L.funRank f).2 w _).mpr hrel
 
-
 proof_of conjunctionOfLiterals_eval_T := by
   -- BEGIN PROOF
     intro D
@@ -332,16 +324,13 @@ proof_of conjunctionOfLiterals_eval_T := by
       intro hcl hlit
       exact hlit (MSFormula.ex s i A) rfl hcl
 
-
 proof_of posEq_mem := ⟨⟨hL, s, t, u, Or.inl hcon, Or.inl (msTermSubterms_self _)⟩,
   -- BEGIN PROOF
      ⟨hL, s, t, u, Or.inl hcon, Or.inr (msTermSubterms_self _)⟩⟩
 
-
 proof_of negEq_mem := ⟨⟨hL, s, r, vt, Or.inr hcon, Or.inl (msTermSubterms_self _)⟩,
   -- BEGIN PROOF
      ⟨hL, s, r, vt, Or.inr hcon, Or.inr (msTermSubterms_self _)⟩⟩
-
 
 proof_of noCollision_sat_direction := by
   -- BEGIN PROOF
@@ -393,7 +382,6 @@ proof_of noCollision_sat_direction := by
       rw [if_neg hne]
       rfl
 
-
 proof_of msUnsatisfiable_iff_collision := by
   -- BEGIN PROOF
     constructor
@@ -406,161 +394,6 @@ proof_of msUnsatisfiable_iff_collision := by
     · -- Backward: a collision ⇒ unsatisfiable (the soundness direction).
       intro hcol
       exact collision_unsat_direction C hcol
-
-
-proof_of node_eq_of_val_eq := Subtype.ext h
-  -- BEGIN PROOF
-
-
-proof_of exampleNode_mem := by
-  -- REPAIR(T10-71): proof pending — verify membership of the six displayed subterms.
-  sorry
-
-proof_of exampleGraphNodes_exact := by
-  -- REPAIR(T10-71): proof pending — prove the six-node enumeration is exhaustive and injective.
-  sorry
-
-proof_of exampleTermFibers_exact := by
-  -- REPAIR(T10-71): proof pending — identify both term-set fibers.
-  sorry
-
-proof_of exampleGraphSymbols_exact := by
-  -- REPAIR(T10-71): proof pending — prove the five-symbol enumeration is exhaustive and injective.
-  sorry
-
-proof_of exampleE_exact := by
-  -- REPAIR(T10-71): proof pending — extract the sole positive equation from the conjunction.
-  sorry
-
-proof_of exampleClosureClasses := by
-  -- REPAIR(T10-72): proof pending — prove closure equals the displayed four-block partition.
-  sorry
-
-proof_of exampleGraphRanks := by
-  cases e <;> rfl
-
-proof_of exampleGraphLabels := by
-  cases n <;> rfl
-
-proof_of exampleGraphPorts := by
-  cases n <;> rfl
-
-proof_of examplePartition_exact := by
-  rcases k with ⟨k, hk⟩
-  have h : k = 0 ∨ k = 1 ∨ k = 2 ∨ k = 3 := by omega
-  rcases h with rfl | rfl | rfl | rfl <;> cases n <;>
-    simp only [examplePartition, exampleClass] <;> decide +revert
-
-proof_of exampleClosurePairs := by
-  -- BEGIN PROOF
-    -- Make the four nodes concrete by substituting their underlying values,
-    -- so that `Lambda`, `delta`, `successorOfNode` all reduce.
-    obtain ⟨pfabv, pfabm⟩ := pfab
-    obtain ⟨pcv, pcm⟩ := pc
-    obtain ⟨pgfabav, pgfabam⟩ := pgfaba
-    obtain ⟨pgcav, pgcam⟩ := pgca
-    simp only at hpfab hpc hpgfaba hpgca
-    subst hpfab; subst hpc; subst hpgfaba; subst hpgca
-    -- The positive equation `f(a,b) =̇_s c` is a conjunct of C, so the seed
-    -- relation `E` already relates `pfab` and `pc`.
-    have hEfab : exampleE ⟨⟨ExampleSort.s, exampleTerm_fab⟩, pfabm⟩
-        ⟨⟨ExampleSort.s, exampleTerm_c⟩, pcm⟩ := by
-      refine ⟨rfl, ExampleSort.s, exampleTerm_fab, exampleTerm_c, ?_, rfl, rfl⟩
-      -- msConjunctContains C (eq_ rfl s fab c): it is the left conjunct.
-      exact Or.inr (Or.inl rfl)
-    have hfab : msCongruenceClosure (graphOfConjunction exampleConjunction)
-        exampleE (positiveEquationRelation_sortSupported exampleConjunction) _ _ :=
-      msCongruenceClosure_contains _ exampleE (positiveEquationRelation_sortSupported exampleConjunction) _ _ hEfab
-    refine ⟨hfab, ?_⟩
-    -- For `g(f(a,b),a) ~ g(c,a)` use backward closure (2b): same label `g`,
-    -- and successors `f(a,b) ~ c` (from `hfab`) and `a ~ a` (reflexivity).
-    have hrefl := (positiveClosure_equivalence exampleConjunction).refl
-    have hbc2b := (msCongruenceClosure_isCongruence
-      (graphOfConjunction exampleConjunction) exampleE
-      (positiveEquationRelation_sortSupported exampleConjunction)).2.2.2
-    -- The labels of both g-nodes are `ConjSymbol.func g` (definitional now).
-    have hlab : (graphOfConjunction exampleConjunction).Lambda
-          ⟨⟨ExampleSort.s, exampleTerm_gfaba⟩, pgfabam⟩
-        = (graphOfConjunction exampleConjunction).Lambda
-          ⟨⟨ExampleSort.s, exampleTerm_gca⟩, pgcam⟩ := rfl
-    refine hbc2b _ _ hlab ?_
-    intro i
-    -- Case on the value of `i` (g has arity length 2).
-    rcases i with ⟨iv, hiv⟩
-    have hlen : iv < 2 := hiv
-    rcases iv with _ | _ | iv
-    · -- successor 0 of both nodes: f(a,b) and c, related by `hfab`.
-      -- The successor nodes reduce definitionally; relate via `hfab`.
-      have hp : ((graphOfConjunction exampleConjunction).delta
-          ⟨⟨ExampleSort.s, exampleTerm_gfaba⟩, pgfabam⟩ ⟨0, hiv⟩)
-          = ⟨⟨ExampleSort.s, exampleTerm_fab⟩, pfabm⟩ := node_eq_of_val_eq rfl
-      have hq : ((graphOfConjunction exampleConjunction).delta
-          ⟨⟨ExampleSort.s, exampleTerm_gca⟩, pgcam⟩ (hlab ▸ ⟨0, hiv⟩))
-          = ⟨⟨ExampleSort.s, exampleTerm_c⟩, pcm⟩ := node_eq_of_val_eq rfl
-      rw [hp, hq]; exact hfab
-    · -- successor 1 of both nodes: `a`, related by reflexivity.
-      have hpq : ((graphOfConjunction exampleConjunction).delta
-          ⟨⟨ExampleSort.s, exampleTerm_gfaba⟩, pgfabam⟩ ⟨1, hiv⟩)
-          = ((graphOfConjunction exampleConjunction).delta
-          ⟨⟨ExampleSort.s, exampleTerm_gca⟩, pgcam⟩ (hlab ▸ ⟨1, hiv⟩)) :=
-        node_eq_of_val_eq rfl
-      rw [hpq]; exact hrefl _
-    · -- iv ≥ 2 is impossible.
-      omega
-
-
-proof_of exampleCandidateTable :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
-
-proof_of exampleConjunction_contains_neg := Or.inr (Or.inr rfl)
-  -- BEGIN PROOF
-
-
-proof_of exampleTerm_gfaba_mem := ⟨rfl, ExampleSort.s, exampleTerm_gfaba, exampleTerm_gca,
-  -- BEGIN PROOF
-      Or.inr exampleConjunction_contains_neg, Or.inl (msTermSubterms_self _)⟩
-
-
-proof_of exampleTerm_gca_mem := ⟨rfl, ExampleSort.s, exampleTerm_gfaba, exampleTerm_gca,
-  -- BEGIN PROOF
-      Or.inr exampleConjunction_contains_neg, Or.inr (msTermSubterms_self _)⟩
-
-
-proof_of exampleTerm_fab_mem := ⟨rfl, ExampleSort.s, exampleTerm_fab, exampleTerm_c,
-  -- BEGIN PROOF
-      Or.inl (Or.inr (Or.inl rfl)), Or.inl (msTermSubterms_self _)⟩
-
-
-proof_of exampleTerm_c_mem := ⟨rfl, ExampleSort.s, exampleTerm_fab, exampleTerm_c,
-  -- BEGIN PROOF
-      Or.inl (Or.inr (Or.inl rfl)), Or.inr (msTermSubterms_self _)⟩
-
-
-proof_of exampleCollision := by
-  -- BEGIN PROOF
-    -- The four relevant nodes of `G(C)`.
-    refine ⟨rfl, exampleTerm_gfaba, exampleTerm_gca,
-      ⟨⟨ExampleSort.s, exampleTerm_gfaba⟩, exampleTerm_gfaba_mem⟩,
-      ⟨⟨ExampleSort.s, exampleTerm_gca⟩, exampleTerm_gca_mem⟩,
-      exampleConjunction_contains_neg, rfl, rfl, ?_⟩
-    -- The closure relates the two g-nodes (`exampleClosurePairs`, part 2),
-    -- using the f-node and c-node as the related successors of index 0.
-    exact (exampleClosurePairs
-      ⟨⟨ExampleSort.s, exampleTerm_fab⟩, exampleTerm_fab_mem⟩
-      ⟨⟨ExampleSort.s, exampleTerm_c⟩, exampleTerm_c_mem⟩
-      ⟨⟨ExampleSort.s, exampleTerm_gfaba⟩, exampleTerm_gfaba_mem⟩
-      ⟨⟨ExampleSort.s, exampleTerm_gca⟩, exampleTerm_gca_mem⟩
-      rfl rfl rfl rfl).2
-
-
-proof_of exampleDecision := by
-  -- BEGIN PROOF
-    -- The collision on the negated equation `¬(g(f(a,b),a) =̇ g(c,a))` yields
-    -- unsatisfiability via the soundness direction of Lemma 10.6.2.
-    obtain ⟨hL, r, v, p, q, hneg, hp, hq, hcol⟩ := exampleCollision
-    exact collision_unsat_direction exampleConjunction
-      ⟨hL, ExampleSort.s, r, v, p, q, hneg, hp, hq, hcol⟩
-
 
 end LCS.FirstOrder.ManySorted.CongruenceClosure.Decision
 

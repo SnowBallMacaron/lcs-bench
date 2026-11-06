@@ -1,0 +1,1 @@
+import LCS.FirstOrder.Semantics.Subformulae.RectifiedFormulae

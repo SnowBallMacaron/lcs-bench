@@ -48,24 +48,6 @@ inductive LKOpenDeductionTree {L : Language} (boundary : List (Sequent L)) :
       (left : LKOpenDeductionTree boundary p)
       (right : LKOpenDeductionTree boundary q) : LKOpenDeductionTree boundary c
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The ordered open leaves of an open deduction. -/
-def LKOpenDeductionTree.openLeaves {L : Language} {boundary : List (Sequent L)} :
-    {s : Sequent L} → LKOpenDeductionTree boundary s → List (Sequent L)
-  | _, .openLeaf s _ => [s]
-  | _, .axiom_ _ _ => []
-  | _, .onePremise _ sub => sub.openLeaves
-  | _, .twoPremise _ left right => left.openLeaves ++ right.openLeaves
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- The ordered certified identity leaves of an open deduction. -/
-def LKOpenDeductionTree.axiomLeaves {L : Language} {boundary : List (Sequent L)} :
-    {s : Sequent L} → LKOpenDeductionTree boundary s → List (Sequent L)
-  | _, .openLeaf _ _ => []
-  | _, .axiom_ s _ => [s]
-  | _, .onePremise _ sub => sub.axiomLeaves
-  | _, .twoPremise _ left right => left.axiomLeaves ++ right.axiomLeaves
-
 /-- Example 7.1.1 (companion): The equality-free language of the PDF fragment.
 The unary function symbols false/true denote f/g, the unary predicate symbols
 false/true denote P/Q, and the sole constant denotes a. -/
@@ -111,11 +93,6 @@ def openExampleQfga_7_1_1 : FormulaN openExampleLang_7_1_1 :=
 @[blueprint "chap7__example_7_1_1"]
 def openRightBoundary_7_1_1 : Sequent openExampleLang_7_1_1 :=
   ⟨[openExampleQfga_7_1_1], [openExampleQfga_7_1_1]⟩
-
-/-- Example 7.1.1 (companion): The conclusion of the all-left right branch. -/
-@[blueprint "chap7__example_7_1_1"]
-def openIntermediate_7_1_1 : Sequent openExampleLang_7_1_1 :=
-  ⟨[.all 0 openExampleQfx_7_1_1], [openExampleQfga_7_1_1]⟩
 
 /-- Example 7.1.1 (companion): The printed end sequent
 P(a) ∨ ∀x Q(f(x)) → Q(f(g(a))). -/
@@ -441,25 +418,6 @@ def LKOpenDeductionTree.IsPure {L : Language} {boundary : List (Sequent L)}
       ¬ (y ∈ formulaFVN F ∧ y ∈ formulaBVN F)) ∧
     (∀ b q e, (b, q, e) ∈ t.nodes [] → ∀ F ∈ q.antecedent ++ q.succedent,
       y ∈ formulaAllVariables F → ∃ suffix, b = a ++ [0] ++ suffix)
-
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
-/-- Preorder of actual rules: 0 open, 1 axiom, 2 all-right, 3 right weakening,
-4 right exchange, 5 right contraction, 7 and-right, 6/8 other unary/binary. -/
-def LKOpenDeductionTree.ruleTrace {L : Language} {boundary : List (Sequent L)} :
-    {s : Sequent L} → LKOpenDeductionTree boundary s → List Nat
-  | _, .openLeaf .. => [0]
-  | _, .axiom_ .. => [1]
-  | _, .onePremise r t =>
-    (match r with
-      | .allRight .. => 2
-      | .weakenRight .. => 3
-      | .exchangeRight .. => 4
-      | .contractRight .. => 5
-      | _ => 6) :: t.ruleTrace
-  | _, .twoPremise r a b =>
-    (match r with | .andRight .. => 7 | _ => 8) :: (a.ruleTrace ++ b.ruleTrace)
-
-
 
 /-- Example 7.3.2 (companion theorem): Fresh z has no free or bound occurrence
 in the original matrix or retained context. Both displayed fragments then

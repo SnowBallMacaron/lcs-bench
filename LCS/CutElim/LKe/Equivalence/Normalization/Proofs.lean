@@ -1,35 +1,20 @@
 import LCS.CutElim.LKe.Equivalence.Normalization
 
 section
-
 namespace LCS.CutElim.LKe.Equivalence
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.Semantics.Subformulae
-
 open LCS.FirstOrder.Gentzen
-
 open LCS.FirstOrder.Gentzen.Hintikka
-
 open LCS.FirstOrder.Equality
-
 open LCS.FirstOrder.Completeness
-
 open LCS.FirstOrder.Equality.Completeness
-
 open LCS.CutElim.LK
-
 open LCS.CutElim.LKe
-
 open LCS.CutElim.CompletenessBridge
 
 helper theorem geqNormalize_atomic
@@ -100,77 +85,5 @@ proof_of geqNormalize_conjImpl := by
       intro h
       exact (hleaf h).elim
 
-
-helper /-- Lemma 6.3.3: Every G=-proof tree T can be converted to a proof
-tree T' of the same sequent such that, at every non-leaf node containing
-a conjunction in the succedent or an implication in the antecedent,
-the root rule selects one such occurrence using conjunction-right or
-implication-left. Furthermore, if T satisfies the conditions of
-Lemma 6.3.1, then T' has the same depth as T. -/
-noncomputable def full_permutation {L : Language} {hL : L.hasEquality = true}
-    {s : Sequent L}
-    (T : GEqProofTree hL s) : GEqProofTree hL s :=
-  Classical.choose (geqNormalize_conjImpl T)
-
-helper /-- Bounds for `full_permutation`: the produced tree satisfies the
-combined conjunction/implication progress invariant and, when T's
-leaves are all atomic-or-quantified as in Lemma 6.3.1, has the same
-depth as the input. -/
-theorem full_permutation_spec {L : Language} {hL : L.hasEquality = true}
-    {s : Sequent L}
-    (T : GEqProofTree hL s) :
-    geqIsConjImplNormalized (full_permutation T) ∧
-    ((∀ s' ∈ geqLeafSequents T, seqAllAtomicOrQuantified s') →
-      geqDepth (full_permutation T) = geqDepth T) := by
-  exact Classical.choose_spec (geqNormalize_conjImpl T)
-
-helper /-- Theorem 6.3.1 (required def): Extract the conclusion sequent from
-an LKeProofTree. With indexed trees, the conclusion is the type index. -/
-def lkeConclusion {L : Language} {s : Sequent L}
-    (_ : LKeProofTree s) : Sequent L := s
-
-
-
-
-
 end LCS.CutElim.LKe.Equivalence
-
-end
-
-section
-
-namespace LCS.CutElim.LKe.Equivalence
-
-open LCS.FirstOrder.Basic
-
-open LCS.FirstOrder.SyntaxN
-
-open LCS.FirstOrder.SyntaxN.Variables
-
-open LCS.FirstOrder.SyntaxN.Substitution
-
-open LCS.FirstOrder.SemanticsN
-
-open LCS.FirstOrder.Semantics.Subformulae
-
-open LCS.FirstOrder.Gentzen
-
-open LCS.FirstOrder.Gentzen.Hintikka
-
-open LCS.FirstOrder.Equality
-
-open LCS.FirstOrder.Completeness
-
-open LCS.FirstOrder.Equality.Completeness
-
-open LCS.CutElim.LK
-
-open LCS.CutElim.LKe
-
-open LCS.CutElim.CompletenessBridge
-
-
-
-end LCS.CutElim.LKe.Equivalence
-
 end

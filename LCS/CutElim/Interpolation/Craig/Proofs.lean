@@ -1,32 +1,43 @@
 import LCS.CutElim.Interpolation.Craig
 
 section
-
 namespace LCS.CutElim.Interpolation
-
 open Classical
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.Gentzen
-
 open LCS.FirstOrder.Gentzen.SignedFormulae
-
 open LCS.CutElim.LK
-
 open LCS.CutElim.LKe
-
 open LCS.CutElim.LKe.Equivalence
-
 open LCS.FirstOrder.Gentzen.Hintikka
+
+proof_of interpolation_example_spec := by
+  constructor
+  · exact ⟨.onePremise
+      (.andLeftR _ interpExInterpolant [] [interpExInterpolant])
+      (.axiom_ _ ⟨interpExInterpolant, rfl, rfl⟩)⟩
+  · let q : FormulaN interpExLanguage :=
+      .predN InterpExPred.Q (fun _ => .const InterpExConst.b)
+    refine ⟨.onePremise (.orRightR _ q [interpExInterpolant] []) ?_⟩
+    exact .onePremise
+      (.allLeft (.const InterpExConst.b) 0
+        (.predN InterpExPred.Q (fun _ => .var 0)) [] [q] trivial)
+      (.axiom_ _ ⟨q, rfl, rfl⟩)
+  · intro pred hPred
+    change pred = InterpExPred.Q at hPred
+    subst pred
+    exact ⟨Or.inr rfl, Or.inr rfl⟩
+  · intro c hc
+    obtain ⟨i, hi⟩ := hc
+    exact False.elim hi
+  · intro x hx
+    change (∃ _ : Fin 1, x = 0) ∧ ¬ x = 0 at hx
+    obtain ⟨⟨i, hi⟩, hne⟩ := hx
+    exact False.elim (hne hi)
 
 proof_of craig_interpolant_common_pred_exists := by
   let s : Sequent L := { antecedent := [A], succedent := [B] }
@@ -125,7 +136,6 @@ proof_of craig_interpolant_common_pred_exists := by
     · simpa only [p, listFormulaFV, List.nil_append,
         List.mem_singleton, exists_eq_left,
         CraigFreshBot.freshLiftFormula_fv] using hCommon.2
-
 
 proof_of craig_interpolation_no_common_pred := by
   have hANoEq : formulaNoEq A :=
@@ -234,7 +244,5 @@ proof_of craig_interpolation_no_common_pred := by
       List.append_nil, List.nil_append,
       CraigFreshBot.freshLowerFormula_lift] using hLower
 
-
 end LCS.CutElim.Interpolation
-
 end

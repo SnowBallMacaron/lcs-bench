@@ -47,32 +47,6 @@ proof_of ex437D_wellFormed := by
     all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
       GCNF.Clause.remove, Literal.conjugate, or_comm, or_assoc, and_or_left] <;> omega
 
-
-proof_of ex437D1_wellFormed := by
-  refine ⟨by change 4 < 8; decide, ?_, ?_⟩
-  · intro i n hi r hr
-    have hiBound : i < 8 := (List.getElem?_eq_some_iff.mp hi).1
-    have hCases : i = 0 ∨ i = 1 ∨ i = 2 ∨ i = 3 ∨ i = 4 ∨ i = 5 ∨ i = 6 ∨ i = 7 := by omega
-    rcases hCases with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex437D1, ex437D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r; simp
-  · intro i hiMem n hi r hr
-    have hIds : (ex437D1 P Q).vertexIds = [4, 0, 1] := rfl
-    rw [hIds] at hiMem
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hiMem
-    rcases hiMem with rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex437D1, ex437D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r
-    all_goals refine ⟨_, _, rfl, rfl, ?_, ?_, ?_⟩
-    all_goals try { simp [Clause.ofList, Literal.conjugate,
-      GCNF.Clause.remove, hPQ, Ne.symm hPQ] }
-    all_goals apply finiteSetEq; intro L
-    all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
-      GCNF.Clause.remove, Literal.conjugate, or_comm] <;> omega
-
-
 proof_of ex437D2_wellFormed := by
   refine ⟨by change 4 < 8; decide, ?_, ?_⟩
   · intro i n hi r hr
@@ -147,32 +121,6 @@ proof_of ex437D4_wellFormed := by
     all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
       GCNF.Clause.remove, Literal.conjugate, or_comm] <;> omega
 
-
-proof_of ex437D5_wellFormed := by
-  refine ⟨by change 5 < 8; decide, ?_, ?_⟩
-  · intro i n hi r hr
-    have hiBound : i < 8 := (List.getElem?_eq_some_iff.mp hi).1
-    have hCases : i = 0 ∨ i = 1 ∨ i = 2 ∨ i = 3 ∨ i = 4 ∨ i = 5 ∨ i = 6 ∨ i = 7 := by omega
-    rcases hCases with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex437D5, ex437D4, ex437D3, ex437D2, ex437D1, ex437D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r; simp
-  · intro i hiMem n hi r hr
-    have hIds : (ex437D5 P Q).vertexIds = [5, 0, 2] := rfl
-    rw [hIds] at hiMem
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hiMem
-    rcases hiMem with rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex437D5, ex437D4, ex437D3, ex437D2, ex437D1, ex437D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r
-    all_goals refine ⟨_, _, rfl, rfl, ?_, ?_, ?_⟩
-    all_goals try { simp [Clause.ofList, Literal.conjugate,
-      GCNF.Clause.remove, hPQ, Ne.symm hPQ] }
-    all_goals apply finiteSetEq; intro L
-    all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
-      GCNF.Clause.remove, Literal.conjugate, or_comm] <;> omega
-
-
 proof_of ex437D6_wellFormed := by
   refine ⟨by change 5 < 8; decide, ?_, ?_⟩
   · intro i n hi r hr
@@ -221,32 +169,6 @@ proof_of ex438D_wellFormed := by
     all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
       GCNF.Clause.remove, Literal.conjugate, or_comm] <;> omega
 
-
-proof_of ex438D1_wellFormed := by
-  refine ⟨by change 6 < 9; decide, ?_, ?_⟩
-  · intro i n hi r hr
-    have hiBound : i < 9 := (List.getElem?_eq_some_iff.mp hi).1
-    have hCases : i = 0 ∨ i = 1 ∨ i = 2 ∨ i = 3 ∨ i = 4 ∨ i = 5 ∨ i = 6 ∨ i = 7 ∨ i = 8 := by omega
-    rcases hCases with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex438D1, ex438D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r; simp
-  · intro i hiMem n hi r hr
-    have hIds : (ex438D1 P Q R).vertexIds = [6, 5, 0, 1, 2] := rfl
-    rw [hIds] at hiMem
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hiMem
-    rcases hiMem with rfl | rfl | rfl | rfl | rfl <;>
-      simp [FiniteGraph.node, ex438D1, ex438D, FiniteGraph.mapLabels, FiniteGraph.atRoot, FiniteGraph.prune] at hi <;>
-      subst n <;> simp at hr
-    all_goals subst r
-    all_goals refine ⟨_, _, rfl, rfl, ?_, ?_, ?_⟩
-    all_goals try { simp [Clause.ofList, Literal.conjugate,
-      GCNF.Clause.remove, hPQ, Ne.symm hPQ, hQR, Ne.symm hQR] }
-    all_goals apply finiteSetEq; intro L
-    all_goals cases L <;> simp_all [Clause.ofList, Clause.union,
-      GCNF.Clause.remove, Literal.conjugate, or_comm] <;> omega
-
-
 proof_of ex438D2_wellFormed := by
   refine ⟨by change 6 < 9; decide, ?_, ?_⟩
   · intro i n hi r hr
@@ -290,31 +212,6 @@ helper theorem proofDisplay_cast {S T : ClauseSequent} (h : S = T)
     (t : GCNFProofTree S) : proofDisplay (h ▸ t) = proofDisplay t := by
   cases h
   rfl
-
-proof_of ex437ProofDag_five_vertices := ⟨rfl, (ex437Trees_counts P Q).2.2.2.2.1, (ex437Graphs_counts P Q).1⟩
-
-
-proof_of ex437ProofDag_unfolds := by
-  change some (ProofDisplay.fork (ex437T4 P Q).conclusion (proofDisplay (unitAxiom Q))
-    (.fork (ex437T3 P Q).conclusion
-      (.fork (ex437T2 P Q).conclusion (proofDisplay (unitAxiom P))
-        (proofDisplay (unitAxiom Q))) (proofDisplay (unitAxiom P)))) = _
-  simp only [ex437T4, ex437T3, ex437T2, proofDisplay_cast, proofDisplay,
-    unitAxiom, GCNFProofTree.conclusion, Option.some.injEq,
-    ProofDisplay.fork.injEq, ProofDisplay.leaf.injEq, and_true, true_and]
-  repeat first
-    | erw [proofDisplay_cast]
-    | simp only [proofDisplay, ProofDisplay.fork.injEq, ProofDisplay.leaf.injEq,
-        proofDisplay_cast, and_true, true_and]
-  refine ⟨?_, ?_, ?_, ?_⟩
-  all_goals apply LCS.Finset.ext; intro C
-  all_goals
-    have hSwap (A B : Literal) : Clause.ofList [A, B] = Clause.ofList [B, A] := by
-      apply LCS.Finset.ext; intro L; simp [Clause.ofList, or_comm]
-    simp [ClauseSequent.ofList, ClauseSequent.mapSet, GCNF.clauseWithLiteral_ofList,
-      ClauseSequent.single, Clause.ofList_singleton_eq_single,
-      hSwap, or_assoc, or_comm, or_left_comm, eq_comm]
-
 
 proof_of ex437D_refutes := by
   refine ⟨ex437D_wellFormed P Q hPQ, ?_, rfl⟩
@@ -565,15 +462,6 @@ helper theorem ex438D2_unfold (P Q R : Nat) (hPQ : P ≠ Q) (hQR : Q ≠ R) :
     FiniteGraph.atRoot, FiniteGraph.mapLabels, ex438Tree2,
     removeList, hPQ, Ne.symm hPQ, hQR, Ne.symm hQR]
 
-helper theorem ex437Tree2_toGCNF (Q : Nat) (hWF : (ex437Tree2 Q).IsWellFormed)
-    (he : (ex437Tree2 Q).label = Clause.empty)
-    (ho : (ex437Tree2 Q).inputs.isOrdinary) :
-    proofDisplay ((ex437Tree2 Q).toGCNF hWF he ho).val = proofDisplay (ex437T1 Q) := by
-  refine (toGCNF_display_eq_conversionDisplay _ _ _ _).trans ?_
-  simp [ex437Tree2, conversionDisplay, proofDisplay,
-    ex437T1, unitAxiom, ResolutionTree.inputs, ClauseSequent.single,
-    singleList, unionList, ClauseSequent.ofList]
-
 helper theorem ex437EraseQ (P Q : Nat) (hPQ : P ≠ Q) :
     (ResolutionTree.resolve (.axiom_ (Clause.ofList [Literal.pos P, Literal.pos Q]))
       (.axiom_ (Clause.ofList [Literal.neg P, Literal.pos Q])) (Literal.pos P)).eraseLiteral (Literal.pos Q) = ex437Tree2 P := by
@@ -607,14 +495,6 @@ helper theorem ex437Tree4_display (P Q : Nat) (hPQ : P ≠ Q) :
   all_goals simp [ResolutionTree.inputs, ClauseSequent.ofList,
     ClauseSequent.single, ClauseSequent.mapSet, GCNF.clauseWithLiteral_ofList, ← Clause.ofList_singleton_eq_single,
     or_assoc, or_comm, or_left_comm, eq_comm]
-
-helper theorem ex437Tree4_toGCNF (P Q : Nat) (hPQ : P ≠ Q)
-    (hWF : (ex437Tree4 P Q).IsWellFormed)
-    (he : (ex437Tree4 P Q).label = Clause.empty)
-    (ho : (ex437Tree4 P Q).inputs.isOrdinary) :
-    proofDisplay ((ex437Tree4 P Q).toGCNF hWF he ho).val = proofDisplay (ex437T2 P Q) := by
-  exact (toGCNF_display_eq_conversionDisplay _ _ _ _).trans
-    (ex437Tree4_display P Q hPQ)
 
 helper theorem memRemove (L K : Literal) (C : GCNF.Clause) :
     L ∈ GCNF.Clause.remove C K ↔ L ∈ C ∧ L ≠ K := by
@@ -874,47 +754,6 @@ proof_of ex438D_toGCNF := by
   refine (graph_toGCNF_display _ _ _ _).trans ?_
   rw [ex438D_unfold P Q R hPQ hQR,
     ex438Tree_conversionDisplay P Q R hPQ hPR hQR, proofDisplay_withRoot_self]
-
-
-proof_of ex437ProofDag_unfolds_conversion := by
-  rw [ex437D_toGCNF P Q hPQ, ex437ProofDag_unfolds]
-
-
-helper theorem leafCount_proofDisplay {S : ClauseSequent} (t : GCNFProofTree S) :
-    (proofDisplay t).leafCount = t.leafCount := by
-  induction t with
-  | axiom_ => rfl
-  | rule _ _ _ _ _ _ _ _ _ _ _ _ _ _ ihL ihR =>
-    simp only [proofDisplay, ProofDisplay.leafCount, GCNFProofTree.leafCount, ihL, ihR]
-
-helper theorem nodeCount_proofDisplay {S : ClauseSequent} (t : GCNFProofTree S) :
-    (proofDisplay t).nodeCount = t.nodeCount := by
-  induction t with
-  | axiom_ => rfl
-  | rule _ _ _ _ _ _ _ _ _ _ _ _ _ _ ihL ihR =>
-    simp only [proofDisplay, ProofDisplay.nodeCount, GCNFProofTree.nodeCount, ihL, ihR]
-
-proof_of ex437Conversion_counts := by
-  dsimp only
-  have hl := congrArg ProofDisplay.leafCount (ex437D_toGCNF P Q hPQ)
-  have hn := congrArg ProofDisplay.nodeCount (ex437D_toGCNF P Q hPQ)
-  simp only [leafCount_proofDisplay] at hl
-  simp only [nodeCount_proofDisplay] at hn
-  rw [hl, hn]
-  exact ⟨(ex437Trees_counts P Q).2.2.2.1,
-    (ex437Trees_counts P Q).2.2.2.2.1, (ex437Trees_counts P Q).2.2.2.2.2⟩
-
-
-proof_of ex438Conversion_fewer_leaves := by
-  dsimp only
-  have hl := congrArg ProofDisplay.leafCount (ex438D_toGCNF P Q R hPQ hPR hQR)
-  have hn := congrArg ProofDisplay.nodeCount (ex438D_toGCNF P Q R hPQ hPR hQR)
-  simp only [leafCount_proofDisplay] at hl
-  simp only [nodeCount_proofDisplay] at hn
-  rw [hl, hn]
-  exact ⟨(ex438Trees_fewer_leaves P Q R).2.1,
-    (ex438Trees_fewer_leaves P Q R).2.2.1, (ex438Trees_fewer_leaves P Q R).2.2.2⟩
-
 
 end ReverseExamples
 

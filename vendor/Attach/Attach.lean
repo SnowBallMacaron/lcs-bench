@@ -12,23 +12,6 @@ register_option attach.strict : Bool := {
 
 namespace Attach
 
-/-- Topic fronts retain the original unit's reserved helper namespace. -/
-initialize helperNamespaces : SimplePersistentEnvExtension (Name × Name) (NameMap Name) ←
-  registerSimplePersistentEnvExtension {
-    addEntryFn := fun entries (unit, helperNs) => entries.insert unit helperNs
-    addImportedFn := fun arrays => arrays.foldl (fun entries rows =>
-      rows.foldl (fun entries (unit, helperNs) => entries.insert unit helperNs) entries) {}
-  }
-
-private def helperNamespace (env : Environment) (unit : Name) : Name :=
-  ((helperNamespaces.getState env).find? unit).getD (unit ++ `Proofs)
-
-elab "attach_helper_namespace " ns:ident : command => do
-  let unit := (← getEnv).mainModule
-  unless ns.getId.getString! == "Proofs" && ns.getId.getPrefix.isPrefixOf unit do
-    throwError "helper namespace must be an ancestor unit's reserved Proofs namespace"
-  modifyEnv fun env => helperNamespaces.addEntry env (unit, ns.getId)
-
 structure Record where
   name : Name
   path : String
@@ -255,7 +238,7 @@ private def runProofLinters : CommandElabM Unit := do
 -- Isolate the block's message log, so only this block's errors are downgraded.
 -- Restoring its tactic state before sorry avoids keeping a partially failed term.
 private def execute (b : Block) (unit : Name) : TacticM Unit := do
-  let helperRoot := helperNamespace (← getEnv) unit
+  let helperRoot := unit ++ `Proofs
   let original ← Core.getMessageLog
   Core.setMessageLog {}
   let state ← saveState
@@ -402,7 +385,7 @@ private def load (path : String) : CoreM Unit := do
     retainLocations path
 
 private def runHelpers (count : Nat) (unit : Name) : CommandElabM Unit := do
-  let helperRoot := helperNamespace (← getEnv) unit
+  let helperRoot := unit ++ `Proofs
   let s := cache.getState (← getEnv)
   for i in [s.done:count] do
     let h := s.helpers[i]!
@@ -518,7 +501,7 @@ elab "attach_run " path:str : tactic => withMainContext do
   let s := cache.getState (← getEnv)
   if let some snapshot := s.shadow then
     Shadow.check snapshot (← getEnv) s.proofConstants
-      (helperNamespace (← getEnv) (← getEnv).mainModule) (← liftCoreM strict)
+      ((← getEnv).mainModule ++ `Proofs) (← liftCoreM strict)
   for (name, block) in s.blocks.toList do
     if !s.used.contains name && !s.loaded.isEmpty then
       withTheReader Command.Context (fun c => { c with fileName := block.path, fileMap := block.fileMap }) do

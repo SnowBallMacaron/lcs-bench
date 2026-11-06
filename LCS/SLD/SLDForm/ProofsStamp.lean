@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.SLD.SLDForm : UInt64 := 2561473300058868170
+def AttachStamp.LCS.SLD.SLDForm : UInt64 := 18198406676719203637

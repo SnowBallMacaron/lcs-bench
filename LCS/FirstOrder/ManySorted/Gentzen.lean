@@ -4,7 +4,9 @@ import LCS.FirstOrder.ManySorted
 import LCS.FirstOrder.ManySorted.Semantics
 import LCS.FirstOrder.ManySorted.Semantics.Substitution
 import LCS.Propositional.Semantics
-import LCS.FirstOrder.ManySorted.Gentzen.Calculus
+import LCS.FirstOrder.ManySorted.Gentzen.SystemG
+import LCS.FirstOrder.ManySorted.Gentzen.DeductionTrees
+import LCS.FirstOrder.ManySorted.Gentzen.Soundness
 import LCS.FirstOrder.ManySorted.Gentzen.Completeness
 
 /-! # FirstOrder.ManySorted.Gentzen
@@ -24,23 +26,14 @@ import LCS.FirstOrder.ManySorted.Gentzen.Completeness
     system, whose `formulaEvalN` is Prop-valued.
 
     Source: Logic for Computer Science, Gallier 2015.
+
+    Content modules, in book order:
+    - `Gentzen.SystemG` — Section 10.4.1, Definition 10.4.1 (the Gentzen system G for many-sorted languages without equality: sequents, axioms, rules)
+    - `Gentzen.DeductionTrees` — Section 10.4.2 (deduction trees and proof trees, provability of finite and infinite sequents)
+    - `Gentzen.Soundness` — Section 10.4.3, Lemma 10.4.1 (soundness of G, many-sorted case)
+    - `Gentzen.Completeness` — Section 10.4.4, Theorem 10.4.1 (many-sorted Hintikka sets and Gödel's extended completeness theorem for G)
 -/
 
 namespace LCS.FirstOrder.ManySorted.Gentzen
-
-open LCS.FirstOrder.ManySorted
-open LCS.FirstOrder.ManySorted.Semantics
-open LCS.Propositional.Semantics
-
--- ===================================================================
--- Definition 10.4.1: Many-sorted sequent
--- ===================================================================
-
-
-
--- ===================================================================
--- Lemma 10.4.1: Soundness of G (many-sorted)
--- ===================================================================
-
 
 end LCS.FirstOrder.ManySorted.Gentzen

@@ -139,46 +139,4 @@ theorem msUnificationClosure_mayNotExist :
       (¬ ∃ U, msIsUnificationClosure G X U ∧ (∀ a b, R a b → U a b)) ∧
       ¬ ∃ U, msIsLeastUnificationClosure G X R U
 
-/-- The finite vertex set of a graph, obtained extensionally from its
-total-finiteness witness. Duplicate entries in that witness are removed. -/
-@[blueprint "chap10__lemma_10_6_5"]
-noncomputable def msGraphNodes (G : MSLabeledGraph) : Finset G.Node := by
-  classical
-  exact Finset.ofList (Classical.choose G.nodeFinite)
-
-/-- The finite set of indexed edges `(v, i)` in the domain of `δ`.
-Distinct indices are distinct edges even when their endpoints coincide. -/
-@[blueprint "chap10__lemma_10_6_5"]
-noncomputable def msGraphEdges (G : MSLabeledGraph) : Finset G.Edge := by
-  classical
-  exact Finset.ofList ((Classical.choose G.nodeFinite).flatMap fun v =>
-    (List.finRange (G.Sigma.rank (G.Lambda v)).1.length).map fun i =>
-      (⟨v, i⟩ : G.Edge))
-
-/-- The number `n` of vertices. -/
-@[blueprint "chap10__lemma_10_6_5"]
-noncomputable def msGraphNodeCount (G : MSLabeledGraph) : Nat :=
-  (msGraphNodes G).card
-
-/-- The number `m` of indexed edges `(v, i)`. Counting the domain of `δ`
-is the adopted reading for the independent size assertion in §10.6.6. -/
-@[blueprint "chap10__lemma_10_6_5"]
-noncomputable def msGraphEdgeCount (G : MSLabeledGraph) : Nat :=
-  (msGraphEdges G).card
-
-/-- Every vertex has incoming or outgoing incidence with an indexed edge.
-A loop supplies both kinds of incidence. -/
-@[blueprint "chap10__lemma_10_6_5"]
-def msGraphNoIsolatedNodes (G : MSLabeledGraph) : Prop :=
-  ∀ v, (∃ e : G.Edge, G.delta e.1 e.2 = v) ∨
-    (∃ e : G.Edge, e.1 = v)
-
-/-- With `m` read as the number of indexed edges `(v, i)`, every finite
-graph without isolated vertices has `n ≤ 2m`. This is the uniform,
-independent size assertion underlying the source's `n = O(m)` remark. -/
-@[attach_debt, blueprint "chap10__lemma_10_6_5"]
-theorem msGraphNodeCount_le_twice_edgeCount (G : MSLabeledGraph)
-    (hG : msGraphNoIsolatedNodes G) :
-    msGraphNodeCount G ≤ 2 * msGraphEdgeCount G
-
 end LCS.FirstOrder.ManySorted.ClosureApplications

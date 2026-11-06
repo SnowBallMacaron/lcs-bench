@@ -9,14 +9,19 @@ import LCS.Herbrand.SharpenedHauptsatz.Theorem
 import LCS.Herbrand.PrenexForm
 import LCS.CutElim.Hauptsatz.Completeness
 import LCS.CutElim.Hauptsatz.CutElimination
+import LCS.Herbrand.NNFHauptsatz.Theorem.RuleClasses
 import LCS.Herbrand.NNFHauptsatz.Theorem.VariableSupport
-import LCS.Herbrand.NNFHauptsatz.Theorem.Paths
-import LCS.Herbrand.NNFHauptsatz.Theorem.Purity
-import LCS.Herbrand.NNFHauptsatz.Theorem.RuleOccurrences
-import LCS.Herbrand.NNFHauptsatz.Theorem.ExchangeBodies
+import LCS.Herbrand.NNFHauptsatz.Theorem.RootToNodePaths
+import LCS.Herbrand.NNFHauptsatz.Theorem.AtomicAxioms
 import LCS.Herbrand.NNFHauptsatz.Theorem.Midsequents
 import Attach
 import LCS.Herbrand.NNFHauptsatz.Theorem.Example.ProofsStamp
+
+/-! # Herbrand.NNFHauptsatz.Theorem.Example
+
+Example 7.4.4: a G2nnf proof not in normal form, its conversion to normal form, and
+its midsequent.
+-/
 
 section
 open LCS.FirstOrder.Basic
@@ -92,18 +97,6 @@ private theorem nnfHauptEx_forallYRyRectified :
     formulaBVN, termFV]
 
 -- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptEx_QxOrForallYRyRectified :
-    isRectified nnfHauptEx_QxOrForallYRy := by
-  simp [nnfHauptEx_QxOrForallYRy, nnfHauptEx_forallYRy,
-    nnfHauptEx_Ry, nnfHauptExLang, nnfHauptExVec1_apply,
-    nnfHauptEx_iUnion_fin_one, isRectified, boundVarsFresh,
-    distinctQuantifierBindings, formulaFVN, formulaBVN, termFV]
-  change ∀ x : Nat,
-    ((∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 0) j)) ∨
-      (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) → x ≠ 1
-  simp [nnfHauptExVec1_apply, termFV]
-
--- ATTACH-BLOCKER: private declaration
 private theorem nnfHauptEx_QaOrForallYRyRectified :
     isRectified (.disj nnfHauptEx_Qa nnfHauptEx_forallYRy) := by
   simp [nnfHauptEx_forallYRy, nnfHauptEx_Ry,
@@ -153,13 +146,6 @@ theorem nnfHauptEx_afterFirstInstRectified :
     ((∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.const NNFHauptExConst.a) j)) ∨
       (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) → x ≠ 1
   simp [nnfHauptExVec1_apply, termFV]
-
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptExDeltaBaseRectified :
-    AllRectified (LCS.Finset.empty, nnfHauptExDeltaBase) :=
-  AllRectified.insert_right nnfHauptEx_PaRectified
-    (AllRectified.insert_right nnfHauptEx_QaRectified
-      AllRectified.empty)
 
 -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem nnfHauptExDeltaRectified :
@@ -919,7 +905,6 @@ def nnfHauptExNormalConstruction :
   let cFaForX := cFa.castRoot hFaToX rfl
   exact nnfHauptExPrependQuantifier ruleX trivial rfl hSCX trivial cFaForX
 
-
 -- ===================================================================
 -- Example 7.4.4 (companion def): nnfHauptsatzExNormalTree
 -- ===================================================================
@@ -939,334 +924,11 @@ def nnfHauptsatzExNormalTree :
           (LCS.Finset.insert nnfHauptEx_RfaAndRfb LCS.Finset.empty))) :=
   nnfHauptExNormalConstruction.tree
 
-
-
 end
-end LCS.Herbrand.NNFHauptsatz.Theorem
-end
-
-section
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.Herbrand.NNFHauptsatz
-open LCS.Herbrand.NNFHauptsatz.Soundness
-open LCS.Herbrand.SharpenedHauptsatz
-open LCS.Herbrand.SharpenedHauptsatz.Permutability
-open LCS.Herbrand.SharpenedHauptsatz.Theorem
-open LCS.Herbrand.PrenexForm
-open LCS.CutElim.Hauptsatz
-open LCS.CutElim.Hauptsatz.Completeness
-open LCS.CutElim.LK
-namespace LCS.Herbrand.NNFHauptsatz.Theorem
-open LCS.Herbrand.NNFHauptsatz.G2nnfProofTree
-open LCS.Herbrand.NNFHauptsatz.G2nnfRule
-
-/-- Lemma 7.4.2 (companion propositional part): Every quantifier rule R_1 of G2nnf can be permuted with a propositional rule R_2 in a pure-variable, cut-free proof. This covers Cases 1-4 from the textbook (conjunction-left with forall-left/exists-left, conjunction-right with forall-right/exists-right) as well as the G1nnf-inherited cases from Lemma 7.3.3. Each case constructs the permuted proof tree T' explicitly, with subcases based on whether the formula A belongs to the context Gamma or to the top sequent of the propositional rule. -/
-theorem g2nnf_permutability_with_propositional
-    {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
-    {Γ Δ : LCS.Finset (FormulaN L)}
-    (T : G2nnfProofTree hL Γ Δ)
-    (R₁ R₂ : G2nnfRule L hL)
-    (hPure : IsPureVariableProofG2nnf T)
-    (hCF : T.isCutFree)
-    (hQuant : R₁.isQuantifierRule)
-    (hProp : R₂.isPropositionalRule) :
-    CanPermuteWithG2nnf R₁ R₂ T := by
--- BEGIN PROOF
-  -- REPAIR(T7-47): proof pending; construct Q for each eligible occurrence
-  sorry
-
--- ===================================================================
--- Lemma 7.4.2 (weakening part): g2nnf_permutability_with_weakening
--- ===================================================================
-
-/-- Lemma 7.4.2 (companion weakening part): Every quantifier rule R_1 of G2nnf can be permuted with a weakening rule R_2 in a pure-variable, cut-free proof. The proof constructs the permuted tree T' by applying the weakening rule first, then the quantifier rule, with adjustments to the context sets. -/
-theorem g2nnf_permutability_with_weakening
-    {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
-    {Γ Δ : LCS.Finset (FormulaN L)}
-    (T : G2nnfProofTree hL Γ Δ)
-    (R₁ R₂ : G2nnfRule L hL)
-    (hPure : IsPureVariableProofG2nnf T)
-    (hCF : T.isCutFree)
-    (hQuant : R₁.isQuantifierRule)
-    (hWeak : R₂.isWeakening) :
-    CanPermuteWithG2nnf R₁ R₂ T := by
--- BEGIN PROOF
-  -- REPAIR(T7-47): proof pending; construct Q for each eligible occurrence
-  sorry
-
--- ===================================================================
--- Lemma 7.4.2: g2nnf_permutability
--- ===================================================================
-
-/-- Lemma 7.4.2: In every pure-variable, cut-free G2nnf proof, each
-quantifier inference can be locally permuted with a propositional inference
-or weakening. Every eligible occurrence pair has its own boundary-preserving
-Q, including focused side-formula cases and weakening-only intermediate
-paths. The only extra inferences in Q are weakenings; lower-schema copies
-are permitted. -/
-@[attach_debt, blueprint "chap7__lemma_7_4_2" (main := true)]
-theorem g2nnf_permutability
-    {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
-    {Γ Δ : LCS.Finset (FormulaN L)}
-    (T : G2nnfProofTree hL Γ Δ)
-    (R₁ R₂ : G2nnfRule L hL)
-    (hPure : IsPureVariableProofG2nnf T)
-    (hCF : T.isCutFree)
-    (hQuant : R₁.isQuantifierRule)
-    (hR₂ : R₂.isPropositionalRule ∨ R₂.isWeakening) :
-    CanPermuteWithG2nnf R₁ R₂ T 
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): allSequentFormulaeAreNNF
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion def): Predicate asserting that every formula in both the antecedent and succedent of an `LCS.Finset`-based sequent is in NNF (FormulaN.isNNF holds for each formula). This is the hypothesis that all formulae in Gamma -> Delta are in negation normal form. -/
-@[blueprint "chap7__theorem_7_4_1"]
-def allSequentFormulaeAreNNF {L : Language}
-    (seq : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L)) : Prop :=
-  (∀ A, Membership.mem seq.1 A → FormulaN.isNNF A) ∧
-  (∀ A, Membership.mem seq.2 A → FormulaN.isNNF A)
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): G1nnfProvableSet
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion def): Over a language without equality,
-a set-based sequent is G1nnf-provable when it has an indexed proof tree,
-`Nonempty (G1nnfProofTree hL Γ Δ)`. -/
-@[blueprint "chap7__theorem_7_4_1"]
-def G1nnfProvableSet {L : Language} [DecidableEq (FormulaN L)]
-    (hL : L.withoutEquality)
-    (seq : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L)) : Prop :=
-  Nonempty (G1nnfProofTree hL seq.1 seq.2)
-
-/-- “Note that the system G1nnf is a subsystem of G2nnf.” (§7.4.1,
-after Definition 7.4.3.) Under the section's conventions (rectified NNF formulae,
-with no variable both free and bound in the sequent), every G1nnf-provable
-set sequent is G2nnf-provable. -/
-@[attach_debt, blueprint "chap7__definition_7_4_3"]
-theorem g1nnf_subsystem_g2nnf {L : Language} [DecidableEq (FormulaN L)]
-    (hL : L.withoutEquality)
-    (seq : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L))
-    (hAllNNF : allSequentFormulaeAreNNF seq)
-    (hRect : AllRectified seq)
-    (hCross : finsetCrossNoFreeBound seq.1 seq.2) :
-    G1nnfProvableSet hL seq → Nonempty (G2nnfProofTree hL seq.1 seq.2)
-
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): StringEncoding
--- ===================================================================
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Theorem 7.4.1 (companion def): For each root-to-leaf branch in the G2nnf proof tree, assigns the letter 'a' to each quantifier rule and 'b' to each propositional rule or weakening rule. Produces a list of strings (one per branch) encoding the inference sequence along each branch. This is the string encoding technique used in the proof of Theorem 7.4.1 to track the arrangement of quantifier vs propositional/weakening rules. -/
-def StringEncoding {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)] :
-    {Γ Δ : LCS.Finset (FormulaN L)} →
-    G2nnfProofTree hL Γ Δ → List (List Char)
-  | _, _, .leaf _ _ h _ _ => h.elim
-  | _, _, .extraAxiom _ _ h _ _ => h.elim
-  | _, _, .axiom_ _ _ _ _ => [[]]
-  | _, _, .onePremise rule _ _ _ sub =>
-    let ch : Char :=
-      if G2nnfRuleCore.isQuantifierRuleBool rule then 'a' else 'b'
-    (StringEncoding (hL := hL) sub).map (fun branch => ch :: branch)
-  | _, _, .twoPremise rule _ _ _ sub1 sub2 =>
-    let ch : Char :=
-      if G2nnfRuleCore.isQuantifierRuleBool rule then 'a' else 'b'
-    (StringEncoding (hL := hL) sub1).map (fun branch => ch :: branch) ++
-    (StringEncoding (hL := hL) sub2).map (fun branch => ch :: branch)
-
-
-
-
-
-
-
--- ===================================================================
--- Theorem 7.4.1 (helper): containsBA
--- ===================================================================
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Theorem 7.4.1 (companion def): Predicate asserting that a single branch (string) contains the substring "ba". A branch contains "ba" if there exist consecutive characters 'b' followed by 'a'. -/
-def containsBA : List Char → Prop
-  | [] => False
-  | [_] => False
-  | c1 :: c2 :: rest =>
-    (c1 = 'b' ∧ c2 = 'a') ∨ containsBA (c2 :: rest)
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): allBranchesNormalForm
--- ===================================================================
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Theorem 7.4.1 (companion def): Predicate asserting that all branches in a string encoding are in normal form: the string consists of zero or more 'a' characters followed by zero or more 'b' characters (all quantifier rules below all propositional/weakening rules). A branch is in normal form if it does not contain the substring "ba" (a propositional/weakening rule above a quantifier rule). -/
-def allBranchesNormalForm (branches : List (List Char)) :
-    Prop :=
-  ∀ branch ∈ branches, ¬ containsBA branch
-
--- ===================================================================
--- Theorem 7.4.1 (helper): IsBAExchangeOf
--- ===================================================================
-
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
-/-- Theorem 7.4.1 (companion def): Predicate asserting that string s' is obtained from string s by replacing one occurrence of the substring "ba" with one of "ab", "abb", or "abbb". -/
-def IsBAExchangeOf (s' s : List Char) : Prop :=
-  ∃ (prefix_ suffix_ : List Char),
-    s = prefix_ ++ ['b', 'a'] ++ suffix_ ∧
-    (s' = prefix_ ++ ['a', 'b'] ++ suffix_ ∨
-     s' = prefix_ ++ ['a', 'b', 'b'] ++ suffix_ ∨
-     s' = prefix_ ++ ['a', 'b', 'b', 'b'] ++ suffix_)
-
--- ===================================================================
--- Theorem 7.4.1 (companion theorem): baExchangePattern
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion theorem): By Lemma 7.4.2, when a 'ba' substring appears in the string encoding (one propositional/weakening rule above one quantifier rule), a single permutation step replaces it with either 'ab', 'abb', or 'abbb' (quantifier rule below propositional/weakening, with possibly extra propositional/weakening rules from the permutation). This is the local exchange step that drives the normalization process. The resulting tree T' preserves the conclusion, the pure-variable property, and the cut-free property, and its string encoding reflects the ba-to-ab/abb/abbb replacement on at least one branch. Under the indexed `G2nnfProofTree hL Γ Δ` API, the conclusion sequent `(Γ, Δ)` is baked into the type; no `T'.conclusion = T.conclusion` or `T'.WellFormed` conjunct is needed. -/
-theorem baExchangePattern {L : Language} {hL : L.withoutEquality}
-    [DecidableEq (FormulaN L)]
-    {Γ Δ : LCS.Finset (FormulaN L)}
-    (T : G2nnfProofTree hL Γ Δ)
-    (hPure : IsPureVariableProofG2nnf T)
-    (hCF : T.isCutFree)
-    (hBA : ∃ branch ∈ StringEncoding (hL := hL) T,
-      containsBA branch) :
-    ∃ T' : G2nnfProofTree hL Γ Δ,
-      IsPureVariableProofG2nnf T' ∧
-      T'.isCutFree ∧
-      (∃ (oldBranch : List Char)
-         (newBranch : List Char),
-        oldBranch ∈ StringEncoding (hL := hL) T ∧
-        containsBA oldBranch ∧
-        newBranch ∈ StringEncoding (hL := hL) T' ∧
-        IsBAExchangeOf newBranch oldBranch) := by
--- BEGIN PROOF
-  -- REPAIR(T7-20): proof pending; existing case/conversion proof debt
-  sorry
-
--- ===================================================================
--- Theorem 7.4.1 (companion theorem): bMaReduction
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion theorem): Iterating the ba-to-ab exchange, a string b^m a (m propositional/weakening rules above one quantifier rule) is replaced by a b^k where m <= k <= 3*m. This bounds the number of new propositional/weakening rules introduced by one round of permutations. -/
-theorem bMaReduction (m : Nat) :
-    ∀ (s : List Char),
-      s = List.replicate m 'b' ++ ['a'] →
-      ∃ (k : Nat),
-        m ≤ k ∧ k ≤ 3 * m ∧
-        ∃ (s' : List Char),
-          s' = ['a'] ++ List.replicate k 'b' := by
--- BEGIN PROOF
-  -- REPAIR(T7-20): proof pending; existing string-lemma debt
-  sorry
-
--- ===================================================================
--- Theorem 7.4.1 (companion theorem): bMaNReduction
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion theorem): Generalizing bMaReduction: b^m a^n (m propositional/weakening rules above n quantifier rules) is replaced by a^n b^mk for some k, placing all quantifier rules below all propositional/weakening rules. This shows that the normalization process terminates. -/
-theorem bMaNReduction (m n : Nat) :
-    ∀ (s : List Char),
-      s = List.replicate m 'b' ++ List.replicate n 'a' →
-      ∃ (k : Nat),
-        1 ≤ k ∧ k ≤ 3 ^ n ∧
-        ∃ (s' : List Char),
-          s' = List.replicate n 'a' ++
-               List.replicate (m * k) 'b' := by
--- BEGIN PROOF
-  -- REPAIR(T7-20): proof pending; existing string-lemma debt
-  sorry
-
--- ===================================================================
--- Theorem 7.4.1 (companion theorem): permutationTermination
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion theorem): The permutation process terminates: starting from any pure-variable cut-free G2nnf proof T, repeated application of Lemma 7.4.2 produces a proof T' where all branches have normal form a^n b^k (all quantifier rules below all propositional/weakening rules). This is established by the string encoding technique: each ba-to-ab exchange reduces the number of ba-substrings in the encoding, and the bound b^m*a^n -> a^n*b^mk ensures termination. Under the indexed `G2nnfProofTree hL Γ Δ` API, the conclusion sequent is baked into the type; no `T'.conclusion = T.conclusion` or `T'.WellFormed` conjunct is needed. -/
-theorem permutationTermination {L : Language} {hL : L.withoutEquality}
-    [DecidableEq (FormulaN L)]
-    {Γ Δ : LCS.Finset (FormulaN L)}
-    (T : G2nnfProofTree hL Γ Δ)
-    (hPure : IsPureVariableProofG2nnf T)
-    (hCF : T.isCutFree) :
-    ∃ T' : G2nnfProofTree hL Γ Δ,
-      IsPureVariableProofG2nnf T' ∧
-      T'.isCutFree ∧
-      allBranchesNormalForm (StringEncoding (hL := hL) T') := by
--- BEGIN PROOF
-  classical
-  by_cases hNormal : allBranchesNormalForm (StringEncoding (hL := hL) T)
-  · exact ⟨T, hPure, hCF, hNormal⟩
-  · -- REPAIR(T7-20): proof pending; normalize the non-normal branch encoding
-    sorry
-
--- ===================================================================
--- Theorem 7.4.1 (companion theorem): cutFreeG1nnfFromProvability
--- ===================================================================
-
-/-- Theorem 7.4.1 (companion theorem): Over a language without equality,
-a G1nnf-provable rectified sequent satisfying the §6.1 sequent-level
-free/bound-variable convention has a cut-free G2nnf proof. The conclusion
-is obtained by G1nnf cut elimination and the embedding into G2nnf.
-The root remains indexed by the original sequent. -/
-theorem cutFreeG1nnfFromProvability {L : Language}
-    [DecidableEq (FormulaN L)]
-    (hL : L.withoutEquality)
-    (seq : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L))
-    (hRect : AllRectified seq)
-    (hCross : finsetCrossNoFreeBound seq.1 seq.2)
-    (hProv : G1nnfProvableSet hL seq) :
-    ∃ T : G2nnfProofTree hL seq.1 seq.2, T.isCutFree := by
-  -- REPAIR(T6-21c): truth open under E-CUTFB; proof pending
-  -- REPAIR(T7-20): proof pending; existing case/conversion proof debt
-  sorry
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): premiseOfHighestQuantifier
--- ===================================================================
-
-
-
--- ===================================================================
--- Theorem 7.4.1 (companion def): removeWeakeningQuantifiedFormulae
--- ===================================================================
-
-
-
--- ===================================================================
--- Theorem 7.4.1: sharpenedHauptsatz_G2nnf
--- ===================================================================
-
-/-- Theorem 7.4.1: Over a language without equality, a G1nnf-provable
-rectified NNF sequent satisfying the §6.1 sequent-level free/bound-variable
-convention has a cut-free, pure-variable G2nnf proof with a midsequent.
-Every formula of the midsequent is quantifier-free; above it the rules are
-propositional or weakening, and below it they are quantifier-for-subformulae
-rules. Rectification remains a standing assumption of §7.4 and is enforced
-at every proof node by the G2nnf side conditions. -/
-@[attach_debt, blueprint "chap7__theorem_7_4_1" (main := true)]
-theorem sharpenedHauptsatz_G2nnf {L : Language}
-    [DecidableEq (FormulaN L)]
-    (hL : L.withoutEquality)
-    (seq : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L))
-    (hAllNNF : allSequentFormulaeAreNNF seq)
-    (hRect : AllRectified seq)
-    (hCross : finsetCrossNoFreeBound seq.1 seq.2)
-    (hProv : G1nnfProvableSet hL seq) :
-    ∃ (T : G2nnfProofTree hL seq.1 seq.2)
-      (mid : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L)),
-      T.isCutFree ∧
-      IsPureVariableProofG2nnf T ∧
-      IsMidsequentG2nnf T mid 
 
 -- ===================================================================
 -- Example 7.4.4 (companion theorem): nnfHauptsatzExMidsequentIsQuantifierFree
 -- ===================================================================
-
-
 
 -- ===================================================================
 -- Example 7.4.4 (companion theorem): nnfHauptsatzExIsMidsequent
@@ -1288,7 +950,5 @@ theorem nnfHauptsatzExIsMidsequent :
           (LCS.Finset.insert nnfHauptEx_Qa
             (LCS.Finset.insert nnfHauptEx_RfaAndRfb
               LCS.Finset.empty)) )
-
 end LCS.Herbrand.NNFHauptsatz.Theorem
 end
-

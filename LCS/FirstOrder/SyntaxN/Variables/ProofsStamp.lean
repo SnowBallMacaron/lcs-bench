@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.FirstOrder.SyntaxN.Variables : UInt64 := 9853057192886565529
+def AttachStamp.LCS.FirstOrder.SyntaxN.Variables : UInt64 := 12024279506547494003

@@ -92,28 +92,6 @@ helper theorem toStr_ne_nil (A : PropFormula) : A.toStr ≠ [] := by
   cases A <;> simp [PropFormula.toStr, FormationFn.c_neg, FormationFn.c_conj,
     FormationFn.c_disj, FormationFn.c_impl, FormationFn.c_equiv]
 
-helper theorem allConnNot_leftPC_zero (p : PropString) (h : ∀ c, c ∈ p → c = PropAlphabet.connNot) :
-    PropString.leftParenCount p = 0 := by
-  induction p with
-  | nil => simp [PropString.leftParenCount, List.foldl]
-  | cons hd tl ih =>
-    have hhd := h hd (by simp); subst hhd
-    rw [show (PropAlphabet.connNot :: tl : PropString) = [PropAlphabet.connNot] ++ tl from rfl]
-    rw [leftParenCount_append]
-    have : PropString.leftParenCount [PropAlphabet.connNot] = 0 := by decide
-    have := ih (fun c hc => h c (by simp [hc])); omega
-
-helper theorem allConnNot_rightPC_zero (p : PropString) (h : ∀ c, c ∈ p → c = PropAlphabet.connNot) :
-    PropString.rightParenCount p = 0 := by
-  induction p with
-  | nil => simp [PropString.rightParenCount, List.foldl]
-  | cons hd tl ih =>
-    have hhd := h hd (by simp); subst hhd
-    rw [show (PropAlphabet.connNot :: tl : PropString) = [PropAlphabet.connNot] ++ tl from rfl]
-    rw [rightParenCount_append]
-    have : PropString.rightParenCount [PropAlphabet.connNot] = 0 := by decide
-    have := ih (fun c hc => h c (by simp [hc])); omega
-
 helper theorem prefix_balance_conj (A B : PropFormula)
     (ihA : ∀ q : PropString, q <+: A.toStr → q.leftParenCount ≥ q.rightParenCount)
     (ihB : ∀ q : PropString, q <+: B.toStr → q.leftParenCount ≥ q.rightParenCount)

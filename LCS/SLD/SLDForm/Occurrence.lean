@@ -1,8 +1,11 @@
 import LCS.Item
 import LCS.Util
 import LCS.SLD.SLDForm
-import LCS.SLD.SLDForm.Occurrence.Part1
-import LCS.SLD.SLDForm.Occurrence.Part2
+import LCS.SLD.SLDForm.Occurrence.OccurrenceGCNF
+import LCS.SLD.SLDForm.Occurrence.CommutingDiamond
+import LCS.SLD.SLDForm.Occurrence.RootPermutation
+import LCS.SLD.SLDForm.Occurrence.RootPartition
+import LCS.SLD.SLDForm.Occurrence.Compression
 
 /-! # SLD.SLDForm.Occurrence
 
@@ -19,76 +22,3 @@ back to the existing finite-set proof tree.
 This module deliberately has no inverse from arbitrary `GCNFProofTree`s:
 finite-set compression erases occurrence provenance.
 -/
-
-namespace LCS.SLD.SLDForm.Occurrence
-
-open LCS.Resolution.GCNF
-
-/-! ## Occurrence-indexed proofs -/
-
-
-namespace OccurrenceGCNFProof
-
-
-end OccurrenceGCNFProof
-
-/-! ## Exact root occurrences -/
-
-
-namespace RootOccurrence
-
-
-end RootOccurrence
-
-/-! ## Exact root-rule certificates -/
-
-namespace OccurrenceGCNFProof
-
-
-end OccurrenceGCNFProof
-
-/-! ## Two distinct root positions -/
-
-
-namespace TwoOccurrenceContext
-
-
-end TwoOccurrenceContext
-
-/-! ## Atomic two-rule commuting diamond -/
-
-
-namespace UnaryRuleSquare
-
-
-end UnaryRuleSquare
-
-/-! ## Structural plans for moving one selected rule to the root -/
-
-namespace OccurrenceGCNFProof
-
-
-namespace InferencePermutationCertificate
-
-end InferencePermutationCertificate
-
-
-end OccurrenceGCNFProof
-
-/-! ## Derivations rooted at extensional clause sequents -/
-
-
-namespace OccurrenceGCNFDerivation
-
-
-end OccurrenceGCNFDerivation
-
-/-! ## Canonical finite-set erasure -/
-
-
-namespace OccurrenceGCNFDerivation
-
-
-end OccurrenceGCNFDerivation
-
-end LCS.SLD.SLDForm.Occurrence

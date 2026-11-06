@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.SLD.FirstOrder.HashLanguage : UInt64 := 15742961758624642094
+def AttachStamp.LCS.SLD.FirstOrder.HashLanguage : UInt64 := 14144646760983754902

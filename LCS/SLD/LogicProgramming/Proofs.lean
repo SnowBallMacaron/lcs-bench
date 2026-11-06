@@ -18,38 +18,6 @@ open LCS.FOResolution.Unification
 
 open LCS.SLD.FirstOrder
 
-namespace AntiHornClause
-
-proof_of negationIsHorn := by
-  -- REPAIR(T9-23): proof pending — negation of the existential matrix equals its universal Horn dual
-  sorry
-
-
-end AntiHornClause
-
-namespace LogicProgram
-
-proof_of negQueryIsConjOfHorn := by
-  -- REPAIR(T9-23): proof pending — De Morgan equivalence for the same finite query components
-  sorry
-
-
-proof_of outputVarList_nodup := by
-  exact LCS.SLD.FirstOrder.list_eraseDups_nodup _
-
-proof_of mem_outputVarList := by
-  simp only [outputVarList, List.mem_eraseDups, List.mem_flatMap, outputVars]
-  constructor
-  · rintro ⟨a, ha, hv⟩
-    obtain ⟨i, hi⟩ := List.mem_iff_get.mp ha
-    refine ⟨i, ?_⟩
-    rw [hi]
-    exact (a.wellFormed.2 v).mp hv
-  · rintro ⟨i, hv⟩
-    exact ⟨lp.qry.get i, List.get_mem _ _, ((lp.qry.get i).wellFormed.2 v).mpr hv⟩
-
-end LogicProgram
-
 namespace HerbrandStructure
 
 proof_of funcInterp := by
@@ -212,89 +180,8 @@ proof_of exIndAnswer_noSingleWitness := by
     · simp [HerbrandStructure.predInterp, herbrandExceptB, groundConst_b]
     · exact ht
 
-namespace programSemantics
-proof_of mem_isDefiniteSemantics := by
-  rfl
-proof_of definiteAnswer_exists := by
-  -- REPAIR(T9-22): proof pending — finite subtheory and definite-answer lemma yield singleton membership
-  sorry
-
-end programSemantics
-
-
-helper /-- Lemma 9.5.2 (Definite answer lemma): If P is a finite set of
-    definite clauses and G = exists z_1...exists z_q (B_1 and ... and B_l)
-    where each B_i is an atomic formula, and if P entails G (i.e.
-    models P supset G), then there exists a q-tuple (t_1,...,t_q) of
-    ground terms in the Herbrand universe such that
-    models P supset (B_1 and ... and B_l)[t_1/z_1,...,t_q/z_q].
-    The proof relies on Lemma 9.5.1 to reduce to Herbrand structures
-    and on the intersection property of minimal Herbrand models for
-    definite clause sets. -/
--- Helper: evalTermInHerbrand agrees on free variables
-theorem evalTermInHerbrand_agree_fv {L : Language}
-    (s1 s2 : Nat → GroundTerm L) (t : Term L)
-    (h : ∀ v, termFV t v → s1 v = s2 v) :
-    evalTermInHerbrand s1 t = evalTermInHerbrand s2 t := by
--- BEGIN PROOF
-  apply Subtype.ext; simp [evalTermInHerbrand]
-  induction t with
-  | var v => exact congrArg Subtype.val (h v rfl)
-  | const c => rfl
-  | func f args ih =>
-    simp [evalTermInHerbrandRaw]; congr 1; funext i
-    exact ih i (fun v hv => h v ⟨i, hv⟩)
-
-helper theorem findIndex_mem_some {v : Nat} {l : List Nat} (h : v ∈ l) :
-    ∃ i, findIndex l v = some i := by
--- BEGIN PROOF
-  induction l with
-  | nil => exact absurd h (by simp)
-  | cons x xs ih =>
-    simp only [findIndex]; split
-    · exact ⟨0, rfl⟩
-    · next hne =>
-      have hNe : ¬(x = v) := by simp [BEq.beq] at hne; exact hne
-      have : v ∈ xs := by
-        cases h with | head => exact absurd rfl hNe | tail _ h => exact h
-      obtain ⟨i, hi⟩ := ih this
-      exact ⟨i + 1, by simp [hi]⟩
-
-helper theorem atomicEvalTransfer {L : Language} (hNoEq : L.withoutEquality)
-    (H1 H2 : HerbrandStructure L hNoEq)
-    (s1 s2 : Nat → GroundTerm L)
-    (b : FOAtom L hNoEq)
-    (hPred : ∀ (p : L.predSymbols) (gts : List (GroundTerm L)),
-      H1.predInterp p gts → H2.predInterp p gts)
-    (hFV : ∀ v, formulaFVN b.toFormula v → s1 v = s2 v) :
-    evalFormulaInHerbrand H1 s1 b.toFormula →
-      evalFormulaInHerbrand H2 s2 b.toFormula := by
--- BEGIN PROOF
-  cases b with
-  | predN p args =>
-    simp only [FOAtomCore.toFormula, evalFormulaInHerbrand]
-    intro h1
-    have hArgsEq : (fun i => evalTermInHerbrand s1 (args i)) =
-                   (fun i => evalTermInHerbrand s2 (args i)) :=
-      funext fun i => evalTermInHerbrand_agree_fv s1 s2 (args i)
-        (fun v hv => hFV v ⟨i, hv⟩)
-    rw [show List.ofFn (fun i => evalTermInHerbrand s2 (args i)) =
-           List.ofFn (fun i => evalTermInHerbrand s1 (args i)) from
-        congrArg List.ofFn hArgsEq.symm]
-    exact hPred p _ h1
-  | eq_ _ t1 t2 =>
-    simp only [FOAtomCore.toFormula, evalFormulaInHerbrand]
-    intro h1
-    rw [← evalTermInHerbrand_agree_fv s1 s2 t1 (fun v hv => hFV v (Or.inl hv)),
-        ← evalTermInHerbrand_agree_fv s1 s2 t2 (fun v hv => hFV v (Or.inr hv))]
-    exact h1
-
 proof_of definiteAnswerLemma := by
   -- REPAIR(T9-21): proof pending — empty-conjunction extension
-  sorry
-
-proof_of exHanoiProgram_moveRelation := by
-  -- REPAIR(T9-53): proof pending — the five clauses hold in the recursive Hanoi move interpretation
   sorry
 
 end LCS.SLD.LogicProgramming

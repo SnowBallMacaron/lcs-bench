@@ -94,9 +94,6 @@ theorem ex438Graphs_counts (P Q R : Nat) :
 theorem ex437D_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D P Q).WellFormed 
 
 @[blueprint "chap4__example_4_3_7"]
-theorem ex437D1_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D1 P Q).WellFormed 
-
-@[blueprint "chap4__example_4_3_7"]
 theorem ex437D2_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D2 P Q).WellFormed 
 
 @[blueprint "chap4__example_4_3_7"]
@@ -106,16 +103,10 @@ theorem ex437D3_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D3 P Q).WellForme
 theorem ex437D4_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D4 P Q).WellFormed 
 
 @[blueprint "chap4__example_4_3_7"]
-theorem ex437D5_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D5 P Q).WellFormed 
-
-@[blueprint "chap4__example_4_3_7"]
 theorem ex437D6_wellFormed (P Q : Nat) (hPQ : P ≠ Q) : (ex437D6 P Q).WellFormed 
 
 @[blueprint "chap4__example_4_3_8"]
 theorem ex438D_wellFormed (P Q R : Nat) (hPQ : P ≠ Q) (hQR : Q ≠ R) : (ex438D P Q R).WellFormed 
-
-@[blueprint "chap4__example_4_3_8"]
-theorem ex438D1_wellFormed (P Q R : Nat) (hPQ : P ≠ Q) (hQR : Q ≠ R) : (ex438D1 P Q R).WellFormed 
 
 @[blueprint "chap4__example_4_3_8"]
 theorem ex438D2_wellFormed (P Q R : Nat) (hPQ : P ≠ Q) (hQR : Q ≠ R) : (ex438D2 P Q R).WellFormed 
@@ -308,43 +299,6 @@ def proofDisplay : {S : ClauseSequent} → GCNFProofTree S → ProofDisplay
       .fork (LCS.Finset.union Gamma (As.mapSet (fun A => clauseWithLiteral A B)))
         (proofDisplay left) (proofDisplay right)
 
-
-
-/-- A sequent-labeled DAG with explicit vertex identities. -/
-@[blueprint "chap4__example_4_3_7"]
-structure ProofDag where
-  table : List (ClauseSequent × Option (Nat × Nat))
-  root : Nat
-
-@[blueprint "chap4__example_4_3_7"]
-def ProofDag.unfoldAt (g : ProofDag) : Nat → Nat → Option ProofDisplay
-  | 0, _ => none
-  | depth + 1, i => do
-      let (S, children) ← g.table[i]?
-      match children with
-      | none => some (.leaf S)
-      | some (left, right) =>
-          return .fork S (← g.unfoldAt depth left) (← g.unfoldAt depth right)
-
-/-- The repeated Q-axiom is row 1; the repeated P-axiom is row 0. -/
-@[blueprint "chap4__example_4_3_7"]
-def ex437ProofDag (P Q : Nat) : ProofDag :=
-  ⟨[(ClauseSequent.ofList [Clause.ofList [Literal.pos P], Clause.ofList [Literal.neg P]], none),
-    (ClauseSequent.ofList [Clause.ofList [Literal.pos Q], Clause.ofList [Literal.neg Q]], none),
-    ((ex437T2 P Q).conclusion, some (0, 1)),
-    ((ex437T3 P Q).conclusion, some (2, 0)),
-    ((ex437T4 P Q).conclusion, some (1, 3))], 4⟩
-
-@[blueprint "chap4__example_4_3_7"]
-theorem ex437ProofDag_five_vertices (P Q : Nat) :
-    (ex437ProofDag P Q).table.length = 5 ∧
-    (ex437T4 P Q).nodeCount = 7 ∧ (ex437D P Q).nodeCount = 8 
-
-/-- Unfolding the five actual vertices gives the seven-node proof tree. -/
-@[blueprint "chap4__example_4_3_7"]
-theorem ex437ProofDag_unfolds (P Q : Nat) :
-    (ex437ProofDag P Q).unfoldAt 5 4 = some (proofDisplay (ex437T4 P Q)) 
-
 /-- The original D refutes exactly the antecedent of T₄. -/
 @[blueprint "chap4__example_4_3_7"]
 theorem ex437D_refutes (P Q : Nat) (hPQ : P ≠ Q) :
@@ -525,13 +479,6 @@ theorem ex438D_toGCNF (P Q R : Nat) (hPQ : P ≠ Q) (hPR : P ≠ R) (hQR : Q ≠
     proofDisplay ((ex438D P Q R).toGCNF (ex438T2 P Q R).conclusion
       (ex438D_refutes P Q R hPQ hQR) (ex438T2 P Q R).ordinary) = proofDisplay (ex438T2 P Q R) 
 
-/-- The five-vertex display DAG unfolds to the converter's actual output. -/
-@[blueprint "chap4__example_4_3_7"]
-theorem ex437ProofDag_unfolds_conversion (P Q : Nat) (hPQ : P ≠ Q) :
-    (ex437ProofDag P Q).unfoldAt 5 4 = some
-      (proofDisplay ((ex437D P Q).toGCNF (ex437T4 P Q).conclusion
-        (ex437D_refutes P Q hPQ) (ex437T4 P Q).ordinary)) 
-
 -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Count axiom occurrences in a fully labeled proof display. -/
 def ProofDisplay.leafCount : ProofDisplay → Nat
@@ -542,25 +489,6 @@ def ProofDisplay.leafCount : ProofDisplay → Nat
 def ProofDisplay.nodeCount : ProofDisplay → Nat
   | .leaf _ => 1
   | .fork _ left right => 1 + left.nodeCount + right.nodeCount
-
-
-
-
-
-/-- Four axiom occurrences and seven vertices belong to the actual output tree. -/
-@[blueprint "chap4__example_4_3_7"]
-theorem ex437Conversion_counts (P Q : Nat) (hPQ : P ≠ Q) :
-    let T := (ex437D P Q).toGCNF (ex437T4 P Q).conclusion
-      (ex437D_refutes P Q hPQ) (ex437T4 P Q).ordinary
-    T.leafCount = 4 ∧ T.nodeCount = 7 ∧ T.leafCount = (ex437D P Q).stepCount 
-
-/-- The actual output has two axioms, strictly fewer than D's four steps. -/
-@[blueprint "chap4__example_4_3_8"]
-theorem ex438Conversion_fewer_leaves (P Q R : Nat)
-    (hPQ : P ≠ Q) (hPR : P ≠ R) (hQR : Q ≠ R) :
-    let T := (ex438D P Q R).toGCNF (ex438T2 P Q R).conclusion
-      (ex438D_refutes P Q R hPQ hQR) (ex438T2 P Q R).ordinary
-    T.leafCount = 2 ∧ T.nodeCount = 3 ∧ T.leafCount < (ex438D P Q R).stepCount 
 
 end ReverseExamples
 end LCS.Resolution.Method

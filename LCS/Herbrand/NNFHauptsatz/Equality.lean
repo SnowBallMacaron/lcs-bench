@@ -3,8 +3,12 @@ import LCS.Util
 import LCS.Herbrand.NNFHauptsatz
 import LCS.Herbrand.NNFHauptsatz.Theorem
 import LCS.CutElim.Hauptsatz.Equality
-import LCS.Herbrand.NNFHauptsatz.Equality.Part1
-import LCS.Herbrand.NNFHauptsatz.Equality.Part2
+import LCS.Herbrand.NNFHauptsatz.Equality.RuleClasses
+import LCS.Herbrand.NNFHauptsatz.Equality.RootToNodePaths
+import LCS.Herbrand.NNFHauptsatz.Equality.PureVariable
+import LCS.Herbrand.NNFHauptsatz.Equality.Permutability
+import LCS.Herbrand.NNFHauptsatz.Equality.SharpenedHauptsatz
+import LCS.Herbrand.NNFHauptsatz.Equality.Soundness
 
 /-! # Herbrand.NNFHauptsatz.Equality
     Formalization of Chapter 7, Section 7.4.4: The system G2nnf=
@@ -34,51 +38,5 @@ import LCS.Herbrand.NNFHauptsatz.Equality.Part2
     Source: Logic for Computer Science, Gallier 2015
 -/
 
-open LCS.FirstOrder.Basic
-open LCS.FirstOrder.SyntaxN
-open LCS.FirstOrder.SyntaxN.Variables
-open LCS.FirstOrder.SyntaxN.Substitution
-open LCS.FirstOrder.SemanticsN
-open LCS.FirstOrder.Semantics.Subformulae
-open LCS.Herbrand.NNFHauptsatz
-open LCS.Herbrand.NNFHauptsatz.Theorem
-open LCS.Herbrand.SharpenedHauptsatz
-open LCS.CutElim.Hauptsatz
-open LCS.CutElim.Hauptsatz.Equality
-
--- ===================================================================
--- Definition 7.4.4 (companion def): G2nnfEqRule.isQuantifierRule
--- ===================================================================
-
-namespace LCS.Herbrand.NNFHauptsatz.G2nnfEqRule
-
-
-end LCS.Herbrand.NNFHauptsatz.G2nnfEqRule
-
--- ===================================================================
--- Theorem 7.4.2 (helper): G2nnfEqProofTree.isSubtree
--- ===================================================================
-
-namespace LCS.Herbrand.NNFHauptsatz.G2nnfEqProofTree
-
-
-end LCS.Herbrand.NNFHauptsatz.G2nnfEqProofTree
-
 namespace LCS.Herbrand.NNFHauptsatz.Equality
-
-open LCS.Herbrand.NNFHauptsatz.G2nnfEqRule
-open LCS.Herbrand.NNFHauptsatz.G2nnfEqProofTree
-
--- ===================================================================
--- Lemma 7.4.3 (companion def): g2nnfEqProofTreeContainsFormula
--- ===================================================================
-
-
-
-namespace G2nnfEqSelectedPremiseOccurrence
-
-
-end G2nnfEqSelectedPremiseOccurrence
-
-
 end LCS.Herbrand.NNFHauptsatz.Equality

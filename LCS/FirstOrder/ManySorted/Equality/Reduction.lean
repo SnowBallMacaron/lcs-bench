@@ -3,7 +3,7 @@ import LCS.Util
 import LCS.FirstOrder.Basic
 import LCS.FirstOrder.SyntaxN
 import LCS.FirstOrder.Gentzen
-import LCS.FirstOrder.Equality.Part1
+import LCS.FirstOrder.Equality.SystemGEq
 import LCS.FirstOrder.ManySorted
 import LCS.FirstOrder.ManySorted.Semantics
 import LCS.FirstOrder.ManySorted.Gentzen
@@ -297,17 +297,6 @@ def msTheoryTranslate (L : MSLanguage) (ν : L.SortType × Nat → Nat)
     Set (FormulaN (msToOneSortedLang L)) :=
   fun B => ∃ A, T A ∧ B = msFormulaTranslate L ν A
 
-/-- Lemma 10.5.2 (companion): a finite selection from all three MS
-axiom families. Proof support is chosen existentially from full MS in
-the consequence interface; this list constructor enumerates a selection. -/
-@[blueprint "chap10__lemma_10_5_2"]
-def msAxiomsList (L : MSLanguage) (ν : L.SortType × Nat → Nat)
-    (sorts : List L.SortType) (funs : List L.funSymbols)
-    (consts : List (OneSortedConst L)) :
-    List (FormulaN (msToOneSortedLang L)) :=
-  sorts.map (msDomainNonemptyAxiom L ν) ++ funs.map (msFuncClosureAxiom L ν) ++
-    consts.map (msConstTypingAxiom L)
-
 /-- Lemma 10.5.2 (companion): one shared typing guard for each sorted
 variable free in T or A. The same ν names variables throughout the theory
 and goal, preserving their common-assignment interpretation. -/
@@ -358,136 +347,6 @@ def oneSortedTheoryProvableEq {L : Language} (hL : L.hasEquality = true)
     (T : Set (FormulaN L)) (A : FormulaN L) : Prop :=
   ∃ Γ : List (FormulaN L), (∀ B ∈ Γ, T B) ∧
     LCS.FirstOrder.Equality.sequentProvableEq hL (Sequent.mk Γ [A])
-
-/-- Lemma 10.5.2 (companion): the list `T.map (msFormulaTranslate L)` used
-in the reduction sequent enumerates exactly the named set translation
-`msTheoryTranslate L T'` of the set `T'` underlying the list `T`. This is
-the membership bridge linking the textbook's named object T' (the
-Set-valued `msTheoryTranslate`) to the finite `List` presentation used by
-the `Sequent` infrastructure: a one-sorted formula `B` occurs in the
-translated antecedent list iff it is the translation of some many-sorted
-formula `A` occurring in `T`. Records the finite-list approximation of the
-(possibly infinite) set T' — the same caveat already used for the §10.4
-and §5.5 completeness sequents. -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem msTheoryTranslate_mem {L : MSLanguage} (ν : L.SortType × Nat → Nat)
-    (T : List (MSFormula L)) (B : FormulaN (msToOneSortedLang L)) :
-    B ∈ T.map (msFormulaTranslate L ν) ↔
-    msTheoryTranslate L ν (fun A => A ∈ T) B 
-
--- ===================================================================
--- Lemma 10.5.2 (ν-renaming key lemmas): substitution commutation
--- ===================================================================
-
-/-- Lemma 10.5.2 (companion, ν-renaming OBSTRUCTION 1 RESOLVED):
-SUBSTITUTION COMMUTATION at the term level. With an INJECTIVE renaming `ν`,
-translating a many-sorted substitution `r[t/x]_u` equals the one-sorted
-substitution of the translated `t` for the renamed index `ν (u, x)` in the
-translated `r`:
-`translate (r[t/x]_u) = (translate r)[translate t / ν (u, x)]`.
-
-This is the lemma that was FALSE under the old sort-collapsing translation
-(`(s, i) ↦ i`): a same-index, other-sort variable `(s', x)` with `s' ≠ u`
-would translate to `Term.var x` and be wrongly hit by the one-sorted
-substitution for index `x`. Under injective `ν`, the variable `(s', x)`
-translates to `Term.var (ν (s', x))`, and `ν (s', x) = ν (u, x)` iff
-`(s', x) = (u, x)` (by injectivity) iff `s' = u` — exactly when the
-many-sorted `msTermSubst u x t` also acts. So the two sides agree. Proved
-by induction on `r`; the only interesting case is the variable, where
-injectivity of `ν` is used. -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem msTermTranslate_subst_comm {L : MSLanguage} [DecidableEq L.SortType]
-    (ν : L.SortType × Nat → Nat) (hν : Function.Injective ν)
-    (u : L.SortType) (x : Nat) (t : MSTerm L u) :
-    {s : L.SortType} → (r : MSTerm L s) →
-    msTermTranslate L ν (msTermSubst u x t r) =
-      termSubst (msTermTranslate L ν r) (msTermTranslate L ν t) (ν (u, x)) 
-
-/-- Lemma 10.5.2 (companion, ν-renaming): free variables of a translated
-TERM are exactly the ν-images of the many-sorted free variables:
-`n ∈ termFV (translate r) ↔ ∃ p ∈ msTermFV r, ν p = n`. Proved by
-induction on `r`. -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem termFV_msTermTranslate {L : MSLanguage}
-    (ν : L.SortType × Nat → Nat) :
-    {s : L.SortType} → (r : MSTerm L s) → (n : Nat) →
-    (n ∈ termFV (msTermTranslate L ν r) ↔ ∃ p : MSVar L, p ∈ msTermFV r ∧ ν p = n) 
-
-/-- Lemma 10.5.2 (companion, ν-renaming OBSTRUCTION 2 RESOLVED):
-EIGENVARIABLE FRESHNESS TRANSFER. Every free variable of the translated
-formula `translate A` is either the ν-image of a free variable of `A` or
-the canonical falsum-guard index `ν (someSort, 0)` (introduced by the
-falsum case `⊥ ↦ D_{someSort}(x_{ν(someSort,0)}) ∧ ¬…`):
-`formulaFVN (translate A) ⊆ ν '' (msFormulaFV A) ∪ {ν (someSort, 0)}`.
-
-Combined with injectivity of `ν`, this gives the freshness transfer the
-`allRight`/`exLeft` cases of the reduction need: if the eigenvariable
-`(s, y)` is fresh in `A` (`(s, y) ∉ msFormulaFV A`) AND distinct from the
-falsum sentinel `(someSort, 0)`, then `ν (s, y) ∉ formulaFVN (translate A)`.
-
-This was the SECOND obstruction under the old translation: there
-`formulaFVN ∘ translate` collected the bare indices of EVERY-sort free
-variables, so a sort-`s` eigenvariable could clash with an other-sort
-free variable of the same index. Under injective `ν`, indices of distinct
-sorts are kept apart. The membership characterization is the same image
-shape as the term-level `termFV_msTermTranslate`. Proved by induction on
-`A`; the quantifier cases use that the bound renamed index `ν (s, x)` is
-removed on the one-sorted side exactly when the bound sorted variable
-`(s, x)` is removed on the many-sorted side (again injectivity of `ν`). -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem formulaFVN_msFormulaTranslate_subset {L : MSLanguage}
-    (ν : L.SortType × Nat → Nat)
-    (A : MSFormula L) (n : Nat) :
-    n ∈ formulaFVN (msFormulaTranslate L ν A) →
-      (∃ p : MSVar L, p ∈ msFormulaFV A ∧ ν p = n) ∨ n = ν (L.someSort, 0) 
-
-/-- Lemma 10.5.2 (companion, ν-renaming): the eigenvariable-freshness
-transfer in usable form. If the sorted variable `(s, y)` is fresh in `A`
-and is not the falsum sentinel `(someSort, 0)`, then its ν-image is fresh
-in the translated formula `translate A`. Direct consequence of
-`formulaFVN_msFormulaTranslate_subset` and injectivity of `ν`. -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem msTranslate_eigenvar_fresh {L : MSLanguage}
-    (ν : L.SortType × Nat → Nat) (hν : Function.Injective ν)
-    (A : MSFormula L) (s : L.SortType) (y : Nat)
-    (hfresh : (s, y) ∉ msFormulaFV A) (hsent : (s, y) ≠ (L.someSort, 0)) :
-    ν (s, y) ∉ formulaFVN (msFormulaTranslate L ν A) 
-
--- ===================================================================
--- Lemma 10.5.2 (ν-renaming key lemma): formula substitution commutation
--- ===================================================================
-
-/-- Lemma 10.5.2 (companion, ν-renaming OBSTRUCTION 1, formula level):
-SUBSTITUTION COMMUTATION at the FORMULA level. Translating the many-sorted
-substitution `A[t/x]_u` equals the one-sorted substitution of `translate t`
-for the renamed index `ν (u, x)` in `translate A`:
-`translate (A[t/x]_u) = (translate A)[translate t / ν (u, x)]`.
-
-This is the formula-level analogue of `msTermTranslate_subst_comm`. The
-quantifier cases hold OUTRIGHT: the translated binder `ν (s', i)` is removed
-by the one-sorted `formulaSubstN` exactly when the sorted binder `(s', i)`
-blocks the many-sorted `msFormulaSubst` — both gated by the SAME equality
-`(s', i) = (u, x)`, decided through injectivity of `ν`; and the inserted
-domain guard `D_{s'}(x_{ν(s',i)})` mentions only `ν (s', i) ≠ ν (u, x)`, so
-substitution of `ν (u, x)` leaves it untouched.
-
-FAITHFUL SIDE HYPOTHESIS `hsent : (u, x) ≠ (L.someSort, 0)`. The falsum
-sentinel `(L.someSort, 0)` is the single one-sorted index the falsum
-translation `⊥ ↦ D_{someSort}(x_{ν(someSort,0)}) ∧ ¬…` introduces (since
-`FormulaN` has no `⊥` constructor, the §5.3.8 abbreviation `A ∧ ¬A` is
-inlined). We RESERVE the sorted variable `(someSort, 0)` as not a
-substitution target, so substituting `ν (u, x)` never disturbs the falsum
-guard. This is a benign convention: in the reduction the substituted
-variables are genuine quantified/eigen variables, which can always be chosen
-distinct from the reserved sentinel. Proved by induction on `A`; atomic
-cases use `msTermTranslate_subst_comm`. -/
-@[blueprint "chap10__lemma_10_5_2"]
-theorem msFormulaTranslate_subst_comm {L : MSLanguage} [DecidableEq L.SortType]
-    (ν : L.SortType × Nat → Nat) (hν : Function.Injective ν)
-    (u : L.SortType) (x : Nat) (t : MSTerm L u)
-    (hsent : (u, x) ≠ (L.someSort, 0)) (A : MSFormula L) :
-    msFormulaTranslate L ν (msFormulaSubst A u x t) =
-      formulaSubstN (msFormulaTranslate L ν A) (msTermTranslate L ν t) (ν (u, x)) 
 
 -- ===================================================================
 -- Lemma 10.5.2: the reduction biconditional

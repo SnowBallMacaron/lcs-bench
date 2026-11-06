@@ -1,25 +1,15 @@
 import LCS.FirstOrder.Gentzen.Hintikka.Examples
 
 section
-
 namespace LCS.FirstOrder.Gentzen.Hintikka
-
 open LCS.FirstOrder.Basic
-
 open LCS.FirstOrder.SyntaxN
-
 open LCS.FirstOrder.SyntaxN.Variables
-
 open LCS.FirstOrder.SyntaxN.Substitution
-
 open LCS.FirstOrder.SemanticsN
-
 open LCS.FirstOrder.SemanticsN.Substitution
-
 open LCS.FirstOrder.Gentzen
-
 open LCS.FirstOrder.Gentzen.SignedFormulae
-
 open LCS.FirstOrder.SyntaxN.Variables
 
 proof_of exSearchCounterModel_falsifies := by
@@ -50,7 +40,6 @@ proof_of exSearchCounterModel_falsifies := by
       specialize hAll exCounterDomain.y2
       simp [formulaEvalN, termEval, assignUpdate, exSearchCounterModel] at hAll
 
-
 proof_of exSearchCounterModelTwo_falsifies := by
   refine ⟨fun _ => exCounterDomainTwo.y1, ?_, ?_⟩
   · intro A hA; cases hA
@@ -71,7 +60,5 @@ proof_of exSearchCounterModelTwo_falsifies := by
     specialize hAll exCounterDomainTwo.y2
     simp [formulaEvalN, termEval, assignUpdate, exSearchCounterModelTwo] at hAll
 
-
 end LCS.FirstOrder.Gentzen.Hintikka
-
 end

@@ -1,0 +1,1 @@
+import LCS.FirstOrder.ManySorted.CongruenceClosure.Decision.Satisfiability

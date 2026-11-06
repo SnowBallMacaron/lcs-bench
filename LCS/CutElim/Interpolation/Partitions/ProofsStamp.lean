@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.CutElim.Interpolation.Partitions : UInt64 := 9919736877182856179
+def AttachStamp.LCS.CutElim.Interpolation.Partitions : UInt64 := 4794006371259217068
