@@ -37,7 +37,6 @@ open Classical
 -- Lemma 5.5.1 (normalized): satisfiable_implies_consistentN
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.5.1: In a language with at least one normalized formula,
 a satisfiable set Gamma is consistent: some formula cannot be proved
 from any finite list of members of Gamma. -/

@@ -66,7 +66,7 @@ def proofExistential : FormulaN language :=
 def proofAtom : FormulaN language :=
   .eq_ rfl (.var 9) (.var 8)
 
-private theorem source_rectified :
+theorem source_rectified :
     LCS.FirstOrder.Semantics.Subformulae.isRectified source := by
   simp [source, outerUniversalBody, innerUniversalBody,
     allocatedExistential, allocatedBody,
@@ -93,13 +93,13 @@ target existential rule. -/
 def leafFormula : FormulaN language :=
   formulaSubstN proofAtom (.var 7) 1
 
-private theorem innerAmbient_eq :
+theorem innerAmbient_eq :
     innerAmbient = afterOuterSubstitution := by
   simp [innerAmbient, source, outerUniversalBody, innerUniversalBody,
     allocatedExistential, allocatedBody, afterOuterSubstitution,
     formulaSubstN, termSubst]
 
-private theorem exAmbient_eq :
+theorem exAmbient_eq :
     exAmbient = proofExistential := by
   simp [afterOuterSubstitution, innerRuleBody, proofExistential,
     exAmbient, formulaSubstN, termSubst]
@@ -109,7 +109,7 @@ theorem leafFormula_eq :
   simp [leafFormula, proofExistential, proofAtom,
     formulaSubstN, termSubst]
 
-private theorem proofAtom_rectified :
+theorem proofAtom_rectified :
     isRectified proofAtom :=
   AllRectified.isRectified_of_isQuantifierFree proofAtom (by
     simp [proofAtom, isQuantifierFree])
@@ -119,13 +119,13 @@ theorem leafFormula_rectified :
   rw [leafFormula_eq]
   exact proofAtom_rectified
 
-private theorem exAmbient_rectified :
+theorem exAmbient_rectified :
     isRectified exAmbient := by
   rw [exAmbient_eq]
   simp [proofExistential, proofAtom, isRectified, boundVarsFresh,
     distinctQuantifierBindings, formulaFVN, formulaBVN, termFV]
 
-private theorem innerAmbient_rectified :
+theorem innerAmbient_rectified :
     isRectified innerAmbient := by
   rw [innerAmbient_eq]
   simp [afterOuterSubstitution, isRectified, boundVarsFresh,

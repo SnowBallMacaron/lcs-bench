@@ -138,7 +138,6 @@ def maxQuantSubformulae {L : Language} (_hL : L.withoutEquality)
 
 namespace MaxQuantifierOccurrence
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The formula selected by an occurrence path belongs to the set-valued
 `QF(A)` API. -/
 theorem selected_mem {L : Language} {A : FormulaN L}

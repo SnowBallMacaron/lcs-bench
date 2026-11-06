@@ -84,7 +84,6 @@ def isFinishedTreeBool (mode : SearchMode) {s : Sequent} (dt : DeductionTree s) 
 
 -- ========= Transport lemmas for indexed DeductionTree =========
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Transport through a type-index equality does not change the list of
     leaves. -/
 theorem DeductionTree.leaves_eq_rec {s s' : Sequent} (heq : s' = s)
@@ -302,14 +301,12 @@ def expandLeaf (mode : SearchMode) (s : Sequent) : DeductionTree s :=
 -- ========= Theorem 3.4.1: search produces a finished tree =========
 
 -- Bridge: isAtomicBool reflects isAtomicFormula
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem isAtomicBool_iff (A : PropFormulaNormalized) :
     isAtomicBool A = true ↔ isAtomicFormula A := by
 -- BEGIN PROOF
   cases A <;> simp_all [isAtomicBool, isAtomicFormula]
 
 -- Bridge: isFinishedLeafBool reflects isFinishedLeaf
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem isFinishedLeafBool_iff (s : Sequent) :
     isFinishedLeafBool mode s = true ↔ isFinishedLeaf mode s := by
 -- BEGIN PROOF
@@ -326,7 +323,6 @@ theorem isFinishedLeafBool_iff (s : Sequent) :
     · exact Or.inr (fun A hA => (isAtomicBool_iff A).mpr (hall A hA))
 
 -- Bridge: isFinishedTreeBool reflects isFinishedTree
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem isFinishedTreeBool_iff_isFinishedTree {c : Sequent} (dt : DeductionTree c) :
     isFinishedTreeBool mode dt = true ↔ isFinishedTree mode dt := by
 -- BEGIN PROOF
@@ -348,7 +344,6 @@ theorem findFirstNonatomic_spec_aux (L : List PropFormulaNormalized) (k : Nat)
       rw [show i - k = (i - (k + 1)) + 1 from by omega]
       simp [List.getElem?_cons_succ]; exact step.2.1
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandFirstFormula_eq_scheduled_ante)
 theorem findFirstNonatomic_spec (L : List PropFormulaNormalized) (A : PropFormulaNormalized) (i : Nat)
     (h : findFirstNonatomic L = some (A, i)) :
     i < L.length ∧ L[i]? = some A ∧ isNonatomicBool A = true := by
@@ -358,7 +353,6 @@ theorem findFirstNonatomic_spec (L : List PropFormulaNormalized) (A : PropFormul
   exact ⟨Classical.byContradiction fun hge => by
     rw [List.getElem?_eq_none (by omega)] at hget; simp at hget, hget, hna⟩
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 theorem findFirstNonatomic_none_all_atomic (L : List PropFormulaNormalized) (k : Nat)
     (h : findFirstNonatomic L k = none) :
     ∀ A ∈ L, isAtomicFormula A := by
@@ -379,7 +373,6 @@ theorem findFirstNonatomic_none_all_atomic (L : List PropFormulaNormalized) (k :
         | _ => simp [isNonatomicBool] at hna
       | inr hmem => exact ih (k + 1) h A hmem
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 /-- Finished leaves are preserved by expansion. -/
 theorem expandLeaf_of_finished (s : Sequent) (h : isFinishedLeafBool mode s = true) :
     expandLeaf mode s = .leaf s := by simp [expandLeaf, h]
@@ -389,14 +382,12 @@ theorem suffixSchedule_succ (side : Bool) (n : Nat) :
     suffixSchedule side (n + 1) = (side, n) :: suffixSchedule side n := by
   simp [suffixSchedule, List.range_succ, List.reverse_append]
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search.Fairness
 /-- A suffix offset identifies its occurrence regardless of the prefix. -/
 theorem selectOffset_suffix (pre tail : List PropFormulaNormalized)
     (A : PropFormulaNormalized) :
     selectOffset tail.length (pre ++ A :: tail) = some (A, pre.length) := by
   simp [selectOffset, List.length_append]
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search.Fairness
 /-- A scheduled variable contributes no inference step. -/
 theorem expandScheduled_var {s : Sequent} (side : Bool) (offset i n : Nat)
     (h : selectOffset offset (if side then s.succedent else s.antecedent) =
@@ -417,7 +408,6 @@ theorem expandScheduled_var {s : Sequent} (side : Bool) (offset i n : Nat)
         rfl
       · rfl
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search.Fairness
 /-- A block of original variables is skipped without changing the tree.
     The already visited prefix remains in the current sequent. -/
 theorem expandSchedule_skip_atomic_prefix (s : Sequent) (side : Bool)
@@ -447,7 +437,6 @@ theorem expandSchedule_skip_atomic_prefix (s : Sequent) (side : Bool)
     | disj _ _ => simp [isAtomicFormula] at hA
     | impl _ _ => simp [isAtomicFormula] at hA
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 /-- The first nonatomic selector's preceding occurrences are variables. -/
 theorem findFirstNonatomic_atomic_prefix (L : List PropFormulaNormalized) (k : Nat)
     (A : PropFormulaNormalized) (i : Nat)
@@ -469,7 +458,6 @@ theorem findFirstNonatomic_atomic_prefix (L : List PropFormulaNormalized) (k : N
       · cases B <;> simp_all [isNonatomicBool, isAtomicFormula]
       · exact ih (k + 1) h B hB
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 /-- Finished leaves remain unchanged for any frozen schedule. -/
 theorem expandSchedule_finished (s : Sequent) (schedule : List (Bool × Nat))
     (h : isFinishedLeafBool mode s = true) :
@@ -480,7 +468,6 @@ theorem expandSchedule_finished (s : Sequent) (schedule : List (Bool × Nat))
     simpa only [expandSchedule, List.foldl_cons, mapLeaves, expandScheduled, h,
       ↓reduceIte] using ih
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 /-- The first antecedent occurrence is the first effective scheduled rule. -/
 theorem expandFirstFormula_eq_scheduled_ante (s : Sequent)
     (hunf : ¬isFinishedLeafBool mode s = true) (A : PropFormulaNormalized) (i : Nat)
@@ -508,7 +495,6 @@ theorem expandFirstFormula_eq_scheduled_ante (s : Sequent)
       | next hnone => simp [hnone] at hsel
   · next hnone => simp [hnone] at h
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search (expandLeaf_eq_full_schedule)
 /-- The first succedent occurrence is the first effective scheduled rule
     when every original antecedent occurrence is atomic. -/
 theorem expandFirstFormula_eq_scheduled_succ (s : Sequent)
@@ -542,7 +528,6 @@ theorem expandFirstFormula_eq_scheduled_succ (s : Sequent)
         | next hnone => simp [hnone] at hsel
     · next hnone => simp [hnone] at h
 
--- ATTACH-BLOCKER: used by LCS.Propositional.Systems.G.Search.Fairness
 /-- The implementation is exactly the two frozen occurrence loops in
     Definition 3.4.6. Skipping an initial block of variables only removes
     iterations that leave the tree unchanged. -/

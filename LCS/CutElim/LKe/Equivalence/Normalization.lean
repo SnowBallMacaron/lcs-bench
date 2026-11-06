@@ -100,16 +100,13 @@ def geqIsConjImplNormalized {L : Language}
     geqIsConjImplNormalized sub
 
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
       GEqProofTree hL s), geqDepth T = m → (∀ (s' : Sequent L), s' ∈ geqLeafSequents T →
       seqAllAtomicOrQuantified s') → ∃ (T' : GEqProofTree hL s), geqIsConjImplNormalized T' ∧ geqDepth T' =
       geqDepth T)
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ih
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqNormalize_target
     (s : Sequent L) (T : GEqProofTree hL s) (hleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents T →
       seqAllAtomicOrQuantified s') (htarget : sequentHasConjImplTarget s) (hdepth : geqDepth T = n)
@@ -149,7 +146,6 @@ theorem geqNormalize_target
     · simp only [p, geqDepth]
       omega
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqNormalize_other
     (s : Sequent L) (T : GEqProofTree hL s) (hdepth : geqDepth T = n) (hleaf : ∀ (s' : Sequent L), s' ∈
       geqLeafSequents T → seqAllAtomicOrQuantified s') (normOne : ∀ {prem conc : Sequent L} (rule :

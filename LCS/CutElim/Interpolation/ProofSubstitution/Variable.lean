@@ -22,10 +22,8 @@ open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (z y : Nat)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkVar_termSubstVarEqOfNotFree
 
     : ∀ (t : Term L), ¬y ∈ termFV t → termSubst t (Term.var z) y = t := by
@@ -43,7 +41,6 @@ theorem folkVar_termSubstVarEqOfNotFree
     funext i
     exact ih i (fun hmem => h ⟨i, hmem⟩)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkVar_formulaSubstVarEqOfNotFree
     (termSubstVarEqOfNotFree : ∀ (t : Term L), ¬y ∈ termFV t → termSubst t (Term.var z) y = t)
     : ∀ (F : FormulaN L), ¬y ∈ formulaFVN F → formulaSubstN F (Term.var z) y = F := by
@@ -82,7 +79,6 @@ theorem folkVar_formulaSubstVarEqOfNotFree
       exact ih (fun hm => h ⟨hm, bne_iff_ne.mp ‹y != w›⟩)
     · rfl
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkVar_renamedEigenFresh
     (formulaSubstVarEqOfNotFree : ∀ (F : FormulaN L), ¬y ∈ formulaFVN F → formulaSubstN F (Term.var z) y = F)
       (e : Nat) (F : FormulaN L) (he : ¬e ∈ formulaFVN F) (hz : ¬z ∈ formulaFVN F) (hez : e ≠ z)
@@ -95,7 +91,6 @@ theorem folkVar_renamedEigenFresh
   · simp only [if_neg hey]
     exact formulaFV_formulaSubst_ne F y z e he hez
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkVar_sequentFreshAfterSubst
     (renamedEigenFresh : ∀ (e : Nat) (F : FormulaN L), ¬e ∈ formulaFVN F → ¬z ∈ formulaFVN F → e ≠ z → ¬(if e
       = y then z else e) ∈ formulaFVN (formulaSubstN F (Term.var z) y)) (q : Sequent L) (e : Nat) (he : ∀ (F :
@@ -114,7 +109,6 @@ theorem folkVar_sequentFreshAfterSubst
     have hmem : G ∈ q.antecedent ++ q.succedent := List.mem_append.mpr (Or.inr hG)
     exact renamedEigenFresh e G (he G hmem) (hz G hmem).1 hez
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_allLeft
     (t₀ : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t₀ x A) (transformedTree : FOLKProofTree (sequentSubstVar (Sequent.mk (formulaSubstN A t₀ x
@@ -142,7 +136,6 @@ def folkVar_allLeft
         (Δ.map (fun F => formulaSubstN F (.var z) y)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_allRight
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -194,7 +187,6 @@ def folkVar_allRight
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_exLeft
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -246,7 +238,6 @@ def folkVar_exLeft
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_exRight
     (t₀ : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t₀ x A) (transformedTree : FOLKProofTree (sequentSubstVar (Sequent.mk (Γ) (Δ ++
@@ -273,7 +264,6 @@ def folkVar_exRight
         (Δ.map (fun F => formulaSubstN F (.var z) y)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_oneRule
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -372,7 +362,6 @@ def folkVar_oneRule
   | exRight t₀ x A Γ Δ hfree =>
     exact folkVar_exRight L z y t₀ x A Γ Δ hfree transformedTree hRuleNB hRuleNO
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def folkVar_twoRule
     (s : Sequent L) (prem1 : Sequent L) (prem2 : Sequent L) (rule : FOLKStep2 prem1 prem2 s) (transformedTree₁
       : FOLKProofTree (sequentSubstVar prem1 z y)) (transformedTree₂ : FOLKProofTree (sequentSubstVar prem2 z
@@ -480,10 +469,8 @@ where
   termination_by structural T
 
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (hL : L.withoutEquality) (z y : Nat)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_allLeft
     (t₀ : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t₀ x A) (transformedTree : FOLKDeductionTree hL (sequentSubstVar (Sequent.mk (formulaSubstN A
@@ -511,7 +498,6 @@ def dedVar_allLeft
         (Δ.map (fun F => formulaSubstN F (.var z) y)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_allRight
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -563,7 +549,6 @@ def dedVar_allRight
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_exLeft
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -615,7 +600,6 @@ def dedVar_exLeft
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_exRight
     (t₀ : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t₀ x A) (transformedTree : FOLKDeductionTree hL (sequentSubstVar (Sequent.mk (Γ) (Δ ++
@@ -642,7 +626,6 @@ def dedVar_exRight
         (Δ.map (fun F => formulaSubstN F (.var z) y)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_oneRule
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -741,7 +724,6 @@ def dedVar_oneRule
   | exRight t₀ x A Γ Δ hfree =>
     exact dedVar_exRight L hL z y t₀ x A Γ Δ hfree transformedTree hRuleNB hRuleNO
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def dedVar_twoRule
     (s : Sequent L) (prem1 : Sequent L) (prem2 : Sequent L) (rule : FOLKStep2 prem1 prem2 s) (transformedTree₁
       : FOLKDeductionTree hL (sequentSubstVar prem1 z y)) (transformedTree₂ : FOLKDeductionTree hL
@@ -843,7 +825,6 @@ where
       exact dedVar_twoRule L hL z y _ _ _ rule transformedTree₁ transformedTree₂
   termination_by structural T
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- On proof trees, deduction-tree substitution has exactly the proof-tree
 image given by `folkProofSubstVar`. -/
 theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.substVar_proof_image
@@ -858,13 +839,10 @@ theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.substVar_proof_image
   -- REPAIR(T6-41a): proof pending
   sorry
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (z : Nat) (y : Nat)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def stepVar_allLeft
     (t : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t x A) (hNotBound : (FOLKStep1.allLeft t x A Γ Δ hfree).notBoundIn y) (hNotOccurs :
@@ -885,7 +863,6 @@ def stepVar_allLeft
         (Γ.map (fun F => formulaSubstN F (.var z) y))
         (Δ.map (fun F => formulaSubstN F (.var z) y)) hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def stepVar_allRight
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -932,7 +909,6 @@ def stepVar_allRight
         (Δ.map (fun F => formulaSubstN F (.var z) y))
         hfresh' hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def stepVar_exLeft
     (sequentFreshAfterSubst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → sequentVarNotOccurs q z → e ≠ z → ∀ (F : FormulaN L), F ∈
@@ -979,7 +955,6 @@ def stepVar_exLeft
         (Δ.map (fun F => formulaSubstN F (.var z) y))
         hfresh' hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def stepVar_exRight
     (t : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t x A) (hNotBound : (FOLKStep1.exRight t x A Γ Δ hfree).notBoundIn y) (hNotOccurs :

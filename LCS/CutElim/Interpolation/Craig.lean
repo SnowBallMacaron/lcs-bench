@@ -254,7 +254,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 /-- Internal existence form of Craig interpolation in the common-predicate

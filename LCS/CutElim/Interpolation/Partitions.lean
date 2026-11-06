@@ -118,7 +118,6 @@ structure IsInterpolant {L : Language} (botP : L.predSymbols) (hBotArity : L.pre
   no_eq : (∀ A ∈ p.gamma1 ++ p.delta1 ++ p.gamma2 ++ p.delta2, formulaNoEq A) →
     formulaNoEq C
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 end LCS.CutElim.Interpolation

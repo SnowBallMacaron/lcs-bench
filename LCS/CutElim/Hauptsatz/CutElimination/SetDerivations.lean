@@ -14,32 +14,32 @@ open LCS.CutElim.Hauptsatz
 open LCS.CutElim.Hauptsatz.Completeness
 namespace LCS.CutElim.Hauptsatz
 
-private theorem finiteSet_of_finset {α : Type}
+theorem finiteSet_of_finset {α : Type}
     (s : LCS.Finset α) : Set.Finite (fun a => a ∈ s) :=
   ⟨s.toList, fun a => (LCS.Finset.mem_toList s a).symm⟩
 
-private theorem finiteSet_of_finset_cover {α : Type}
+theorem finiteSet_of_finset_cover {α : Type}
     {S : Set α} (s : LCS.Finset α)
     (hS : ∀ a, S a → a ∈ s) : Set.Finite S :=
   Set.Finite.subset (finiteSet_of_finset s) hS
 
-private noncomputable def finsetOfFiniteSet {α : Type}
+noncomputable def finsetOfFiniteSet {α : Type}
     [DecidableEq α] (S : Set α) (hS : Set.Finite S) : LCS.Finset α :=
   LCS.Finset.ofList (Classical.choose hS)
 
-private theorem mem_finsetOfFiniteSet {α : Type}
+theorem mem_finsetOfFiniteSet {α : Type}
     [DecidableEq α] (S : Set α) (hS : Set.Finite S) (a : α) :
     a ∈ finsetOfFiniteSet S hS ↔ S a := by
   rw [finsetOfFiniteSet, LCS.Finset.mem_ofList]
   exact (Classical.choose_spec hS a).symm
 
-private theorem mem_insert_represents_left {α : Type}
+theorem mem_insert_represents_left {α : Type}
     [DecidableEq α] {S : Set α} {s : LCS.Finset α}
     (a : α) (hs : ∀ x, x ∈ s ↔ S x) (x : α) :
     x ∈ LCS.Finset.insert a s ↔ x = a ∨ S x := by
   rw [LCS.Finset.mem_insert, hs x]
 
-private theorem mem_insert_represents_right {α : Type}
+theorem mem_insert_represents_right {α : Type}
     [DecidableEq α] {S : Set α} {s : LCS.Finset α}
     (a : α) (hs : ∀ x, x ∈ s ↔ S x) (x : α) :
     x ∈ LCS.Finset.insert a s ↔ S x ∨ x = a := by

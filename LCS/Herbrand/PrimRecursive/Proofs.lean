@@ -4,6 +4,16 @@ namespace LCS.Herbrand.PrimRecursive
 
 namespace minimize
 
+helper /-- Definition 7.7.5 (companion theorem): The graph characterization of the
+least zero, with strict definedness and nonzero values at every earlier index. -/
+theorem minimize.graphIff (n : Nat) (g : PartialNaryFunc (n + 1))
+    (args : Fin n → Nat) (y : Nat) :
+    minimize n g args y ↔
+      g (fun i => if h : i.val < n then args ⟨i.val, h⟩ else y) = some 0 ∧
+      ∀ z, z < y → ∃ v,
+        g (fun i => if h : i.val < n then args ⟨i.val, h⟩ else z) = some v ∧ v ≠ 0 :=
+  Iff.rfl
+
 proof_of domainIff := open LCS.Herbrand.PrimRecursive.Proofs.minimize in
   by
     classical

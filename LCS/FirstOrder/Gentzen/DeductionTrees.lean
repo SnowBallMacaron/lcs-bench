@@ -102,7 +102,6 @@ def isProof {L : Language} (hL : L.withoutEquality) : {s : Sequent L} → GDeduc
   | _, .onePremise _ t => t.isProof hL
   | _, .twoPremise _ t1 t2 => t1.isProof hL ∧ t2.isProof hL
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.4.2 (companion): Converts a deduction tree whose leaves
     are all axioms into a proof tree of the same conclusion. -/
 def toProofTree {L : Language} (hL : L.withoutEquality) :

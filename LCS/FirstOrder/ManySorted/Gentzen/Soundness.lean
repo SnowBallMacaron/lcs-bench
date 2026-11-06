@@ -64,7 +64,6 @@ theorem boolVal_ne_F_eq_T {b : BoolVal} (h : b ≠ BoolVal.F) : b = BoolVal.T :=
   | T => rfl
   | F => exact absurd rfl h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Direct term-level substitution-evaluation lemma (many-sorted analogue
 of one-sorted `termSubstEvalDirect`): substituting a term `t` of sort `u`
 for the sort-`u` variable `x` in a term `r` and evaluating equals
@@ -93,7 +92,6 @@ theorem msTermSubstEvalDirect {L : MSLanguage} [DecidableEq L.SortType]
     simp only [msTermSubst, msTermEval, funM]
     congr 1; funext j; exact ih j
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Direct formula-level substitution-evaluation lemma (many-sorted,
 `BoolVal`-valued analogue of one-sorted `formulaSubstEvalDirectN`): if
 `t` is free for `x` in `A`, then evaluating `A[t/x]` equals evaluating
@@ -286,26 +284,21 @@ theorem msSequentValid_iff_not_falsifiable {L : MSLanguage}
 -- BoolVal connective helper lemmas (Ch3 truth functions, T/F form)
 -- ===================================================================
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem hAnd_eq_T {a b : BoolVal} :
     hAnd a b = BoolVal.T ↔ a = BoolVal.T ∧ b = BoolVal.T := by
   cases a <;> cases b <;> simp [hAnd]
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem hOr_eq_F {a b : BoolVal} :
     hOr a b = BoolVal.F ↔ a = BoolVal.F ∧ b = BoolVal.F := by
   cases a <;> cases b <;> simp [hOr]
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem hImplies_eq_F {a b : BoolVal} :
     hImplies a b = BoolVal.F ↔ a = BoolVal.T ∧ b = BoolVal.F := by
   cases a <;> cases b <;> simp [hImplies]
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem hNeg_eq_T {a : BoolVal} : hNeg a = BoolVal.T ↔ a = BoolVal.F := by
   cases a <;> simp [hNeg]
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem hNeg_eq_F {a : BoolVal} : hNeg a = BoolVal.F ↔ a = BoolVal.T := by
   cases a <;> simp [hNeg]
 
@@ -313,7 +306,6 @@ theorem hNeg_eq_F {a : BoolVal} : hNeg a = BoolVal.F ↔ a = BoolVal.T := by
 -- Quantifier evaluation helper lemmas (forallM / existsM truth conditions)
 -- ===================================================================
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- The universally-quantified formula `∀_s x A` evaluates to `T` under
 `v` iff `A` evaluates to `T` under every update of `v` at `(s, x)`. -/
 theorem msEval_all_eq_T {L : MSLanguage} {M : MSStructure L}
@@ -328,7 +320,6 @@ theorem msEval_all_eq_T {L : MSLanguage} {M : MSStructure L}
     · intro hc; exact absurd hc (by decide)
     · intro hc; exact absurd hc h
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- The existentially-quantified formula `∃_s x A` evaluates to `T` under
 `v` iff `A` evaluates to `T` under some update of `v` at `(s, x)`. -/
 theorem msEval_ex_eq_T {L : MSLanguage} {M : MSStructure L}
@@ -343,7 +334,6 @@ theorem msEval_ex_eq_T {L : MSLanguage} {M : MSStructure L}
     · intro hc; exact absurd hc (by decide)
     · intro hc; exact absurd hc h
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- The universally-quantified formula `∀_s x A` evaluates to `F` under
 `v` iff `A` evaluates to `F` under some update of `v` at `(s, x)`. -/
 theorem msEval_all_eq_F {L : MSLanguage} {M : MSStructure L}
@@ -364,7 +354,6 @@ theorem msEval_all_eq_F {L : MSLanguage} {M : MSStructure L}
     intro hT
     exact absurd ((msEval_all_eq_T s x A v).mp hT a) (by rw [ha]; decide)
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- The existentially-quantified formula `∃_s x A` evaluates to `F` under
 `v` iff `A` evaluates to `F` under every update of `v` at `(s, x)`. -/
 theorem msEval_ex_eq_F {L : MSLanguage} {M : MSStructure L}
@@ -384,7 +373,6 @@ theorem msEval_ex_eq_F {L : MSLanguage} {M : MSStructure L}
     obtain ⟨a, ha⟩ := (msEval_ex_eq_T s x A v).mp hT
     exact absurd ha (by rw [h a]; decide)
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- Eigenvariable agreement helper: if no free variable of `A` other than
 the bound `(s, x)` equals the eigenvariable `(s, y)`, then the assignment
 that first sets the eigenvariable `(s, y) := a` and then the bound
@@ -417,7 +405,6 @@ theorem msAgreeUpdateFresh {L : MSLanguage} [DecidableEq L.SortType]
 -- List membership helpers (polymorphic; mirror one-sorted Gentzen)
 -- ===================================================================
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem1_cases {α : Type} {a : α} {Γ Δ : List α} {X : α}
     (h : a ∈ Γ ++ [X] ++ Δ) : a ∈ Γ ∨ a = X ∨ a ∈ Δ := by
   simp only [List.mem_append, List.mem_cons, List.mem_nil_iff, or_false] at h
@@ -426,20 +413,16 @@ theorem msMem1_cases {α : Type} {a : α} {Γ Δ : List α} {X : α}
   · exact Or.inr (Or.inl h2)
   · exact Or.inr (Or.inr h3)
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem1_left {α : Type} {a : α} {Γ Δ : List α} {X : α}
     (h : a ∈ Γ) : a ∈ Γ ++ [X] ++ Δ :=
   List.mem_append_left _ (List.mem_append_left _ h)
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem1_center {α : Type} {Γ Δ : List α} {X : α} :
     X ∈ Γ ++ [X] ++ Δ :=
   List.mem_append_left _ (List.mem_append_right _ (List.Mem.head _))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem1_right {α : Type} {a : α} {Γ Δ : List α} {X : α}
     (h : a ∈ Δ) : a ∈ Γ ++ [X] ++ Δ :=
   List.mem_append_right _ h
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem2_cases {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
     (h : a ∈ Γ ++ [X, Y] ++ Δ) : a ∈ Γ ∨ a = X ∨ a = Y ∨ a ∈ Δ := by
   simp only [List.mem_append, List.mem_cons, List.mem_nil_iff, or_false] at h
@@ -449,41 +432,31 @@ theorem msMem2_cases {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
   · exact Or.inr (Or.inr (Or.inl h3))
   · exact Or.inr (Or.inr (Or.inr h4))
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem2_left {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
     (h : a ∈ Γ) : a ∈ Γ ++ [X, Y] ++ Δ :=
   List.mem_append_left _ (List.mem_append_left _ h)
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem2_first {α : Type} {Γ Δ : List α} {X Y : α} :
     X ∈ Γ ++ [X, Y] ++ Δ :=
   List.mem_append_left _ (List.mem_append_right _ (List.Mem.head _))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem2_second {α : Type} {Γ Δ : List α} {X Y : α} :
     Y ∈ Γ ++ [X, Y] ++ Δ :=
   List.mem_append_left _ (List.mem_append_right _ (List.Mem.tail _ (List.Mem.head _)))
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMem2_right {α : Type} {a : α} {Γ Δ : List α} {X Y : α}
     (h : a ∈ Δ) : a ∈ Γ ++ [X, Y] ++ Δ :=
   List.mem_append_right _ h
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcat_cases {α : Type} {a : α} {Γ Δ : List α}
     (h : a ∈ Γ ++ Δ) : a ∈ Γ ∨ a ∈ Δ := List.mem_append.mp h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcat_left {α : Type} {a : α} {Γ Δ : List α}
     (h : a ∈ Γ) : a ∈ Γ ++ Δ := List.mem_append_left _ h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcat_right {α : Type} {a : α} {Γ Δ : List α}
     (h : a ∈ Δ) : a ∈ Γ ++ Δ := List.mem_append_right _ h
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcons_cases {α : Type} {a : α} {Γ : List α} {X : α}
     (h : a ∈ [X] ++ Γ) : a = X ∨ a ∈ Γ := by
   simp only [List.singleton_append, List.mem_cons] at h; exact h
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcons_head {α : Type} {Γ : List α} {X : α} :
     X ∈ [X] ++ Γ := List.mem_cons_self
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 theorem msMemcons_tail {α : Type} {a : α} {Γ : List α} {X : α}
     (h : a ∈ Γ) : a ∈ [X] ++ Γ := List.mem_cons.mpr (Or.inr h)
 
@@ -491,7 +464,6 @@ theorem msMemcons_tail {α : Type} {a : α} {Γ : List α} {X : α}
 -- Lemma 10.4.1: Rule falsification preservation (many-sorted)
 -- ===================================================================
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- Lemma 10.4.1 (companion): For each one-premise rule of G, the
 conclusion sequent is falsifiable in `M` iff the premise is. Many-sorted,
 `BoolVal`-valued analogue of one-sorted `ruleFalsificationIff1`. Reasons

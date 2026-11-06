@@ -416,7 +416,7 @@ by
         (fun F hF' => by
           simp [eqPairsList, List.mem_map] at hF'
           obtain ⟨i, _, rfl⟩ := hF'
-          exact rfl) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+          exact rfl)
 
 -- ===================================================================
 -- Lemma 5.6.1 (companion theorem): eqCongruence_pred
@@ -480,7 +480,7 @@ theorem eqCongruence_falsePred {L : Language}
     · exact False.elim (hHS.base.h0 (.predN P uu) rfl ⟨hTuu, hFuu⟩)
   exact ⟨forward ss ts hcong hss hts,
     forward ts ss (fun i => eqCongruence_symm hHS (ss i) (ts i)
-      (hss i) (hts i) (hcong i)) hts hss⟩ /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+      (hss i) (hts i) (hcong i)) hts hss⟩
 
 -- ===================================================================
 -- Lemma 5.6.1 (companion theorem): quotientTermEvalIdentity
@@ -533,7 +533,7 @@ noncomputable def chooseRep {L : Language}
     { t : Term L // t ∈ H } (eqSetoid hL H S hHS)
     (fun q' => ∃ (a : { t : Term L // t ∈ H }),
       q' = @Quotient.mk _ (eqSetoid hL H S hHS) a)
-    q (fun a => ⟨a, rfl⟩)) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    q (fun a => ⟨a, rfl⟩))
 
 noncomputable def finQuotLift {L : Language}
     {hL : L.hasEquality = true}
@@ -544,7 +544,7 @@ noncomputable def finQuotLift {L : Language}
     (_hg : ∀ xs ys : Fin n → { t : Term L // t ∈ H },
       (∀ i, @Setoid.r _ (eqSetoid hL H S hHS) (xs i) (ys i)) → g xs = g ys)
     (args : Fin n → QType hL H S hHS) : β :=
-  g (fun i => chooseRep (args i)) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  g (fun i => chooseRep (args i))
 
 -- The key property of finQuotLift: when all args are qmk of known values,
 -- the result agrees with applying g directly.

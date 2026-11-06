@@ -263,7 +263,6 @@ theorem geqConjRight_twoPremise
           exact Or.inr hs'))
 
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
       GEqProofTree hL s), geqDepth T = m → ∀ (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)), s = (Sequent.mk
@@ -272,10 +271,8 @@ variable
       ++ [B] ++ Λ))), 1 + max (geqDepth p1) (geqDepth p2) = geqDepth T ∧ (∀ (s' : Sequent L), s' ∈
       geqLeafSequents p1 → seqAllAtomicOrQuantified s') ∧ ∀ (s' : Sequent L), s' ∈ geqLeafSequents p2 →
       seqAllAtomicOrQuantified s')
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ih
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_conjLeft
     (A B : FormulaN L) (Γ Δ Λ Γr Δr succ : List (FormulaN L)) (X Y : FormulaN L) (sub : GEqProofTree hL
       (Sequent.mk (Γr ++ [X, Y] ++ Δr) (succ))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L),
@@ -297,7 +294,6 @@ theorem geqConjRight_conjLeft
   · simpa [geqLeafSequents] using hq1leaf
   · simpa [geqLeafSequents] using hq2leaf
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_disjRight
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
@@ -392,7 +388,6 @@ theorem geqConjRight_disjRight
     · exact geqLeafProperty_transport hout2 r2 (by
         simpa [r2, q2', geqLeafSequents] using (geqLeafProperty_transport hin2 q2 hq2leaf))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_implRight
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
@@ -489,7 +484,6 @@ theorem geqConjRight_implRight
     · exact geqLeafProperty_transport hout2 r2 (by
         simpa [r2, q2', geqLeafSequents] using (geqLeafProperty_transport hin2 q2 hq2leaf))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_negLeft
     (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁), geqDepth (heq ▸ p) =
       geqDepth p) (geqLeafProperty_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁),
@@ -526,7 +520,6 @@ theorem geqConjRight_negLeft
   · simpa [geqLeafSequents] using (geqLeafProperty_transport heq1 q1 hq1leaf)
   · simpa [geqLeafSequents] using (geqLeafProperty_transport heq2 q2 hq2leaf)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_negRight
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++

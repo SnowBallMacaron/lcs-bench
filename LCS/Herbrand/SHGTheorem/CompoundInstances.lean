@@ -97,7 +97,6 @@ end LCS.Herbrand.SHGTheorem
 namespace LCS.Herbrand.SHGTheorem
 open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN LCS.FirstOrder.SyntaxN.Substitution
 
--- ATTACH-BLOCKER: mutual
 mutual
 /-- Definition 7.6.3 (companion def): A CInstance derivation tree is WellFormed when every node's children have sources matching the textbook's Def 7.6.3 conditions: - `connective star C D H K`: sources of H and K match the parent's operands (Def 7.6.3(ii) requirement that H is a c-instance *of C* and K is a c-instance *of D*), and both children are recursively WellFormed. - `forallInst x C t₀ h₀ tsRest hsRest`: lengths `tsRest.length = hsRest.length` match, `h₀.source = C[t₀/x]` and each `hsRest[i]` has source `C[tsRest[i]/x]`, and every child is recursively WellFormed. (Non-emptiness k ≥ 1 is enforced structurally by the constructor splitting out `t₀, h₀`.) For atom and negAtom nodes, WellFormed holds trivially (no children). -/
 @[blueprint "chap7__definition_7_6_3"]
@@ -140,7 +139,6 @@ def isCInstanceOf {L : Language}
 -- Definition 7.6.3 (theorem): CInstance.isQuantifierFree
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: an atomic formula is quantifier-free. -/
 theorem isAtomic_isQuantifierFree {L : Language}
     (B : FormulaN L) (h : B.isAtomic) :

@@ -83,7 +83,6 @@ theorem LitSetAbs_source_same_atom {L : Language} (hNoEq : L.withoutEquality)
 -- Helper: opposite-sign contradiction under substitution
 -- ===================================================================
 
--- ATTACH-BLOCKER: size baseline: retain helper in front
 /-- Pairwise-equation version of `opposite_sign_contradiction`. The generated
     equations compare corresponding arguments with one common reference atom,
     so unrelated argument positions are never equated. -/
@@ -300,7 +299,6 @@ theorem resolvent_subtree_pw {L : Language} (hNoEq : L.withoutEquality)
       exact List.mem_map_of_mem (f := fun lit => formulaVarsList ((FOLiteral.formula (by all_goals exact hNoEq)) lit)) hlit_mem⟩
   exact (universalClosure_strip (hNoEq := by all_goals exact hNoEq)) M A C fvs (h fvs hfvs)
 
--- ATTACH-BLOCKER: size baseline: retain helper in front
 theorem resolvent_validity_pw {L : Language} (hNoEq : L.withoutEquality)
     [DecidableEq (FOLiteral L hNoEq)]
     (A B C : FOClause L hNoEq) (hRes : IsResolvent hNoEq C A B)

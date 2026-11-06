@@ -25,7 +25,7 @@ open LCS.FirstOrder.SemanticsN.Substitution
 open LCS.Herbrand.PrenexForm
 open LCS.Herbrand.NNFHauptsatz.Theorem
 
-private theorem universalPrenex_eval_prenexMatrix {L : Language}
+theorem universalPrenex_eval_prenexMatrix {L : Language}
     (B : FormulaN L) (hUniversal : UniversalPrenexFormula B)
     (M : Structure L) (s : Assignment M)
     (hEval : formulaEvalN M B s) :
@@ -48,9 +48,9 @@ private theorem universalPrenex_eval_prenexMatrix {L : Language}
         (by simp [prenexPrefix])
     cases hImpossible
   | predN _ _ | eq_ _ _ _ | neg _ | conj _ _ | disj _ _ | impl _ _ =>
-    exact hEval /- ATTACH-BLOCKER: private declaration -/
+    exact hEval
 
-private theorem applyGroundSubstitution_eval_of_all_assignments
+theorem applyGroundSubstitution_eval_of_all_assignments
     {L : Language} (M : Structure L) :
     ∀ (matrix : FormulaN L) (substs : List (Nat × Term L)),
       (∀ p ∈ substs, Term.isClosed p.2) →
@@ -79,7 +79,7 @@ private theorem applyGroundSubstitution_eval_of_all_assignments
       rw [formulaSubstEval_closed matrix p.2 p.1 hpClosed s']
       exact hAll _
     exact ih (formulaSubstN matrix p.2 p.1)
-      hRestClosed hSubAll s /- ATTACH-BLOCKER: private declaration -/
+      hRestClosed hSubAll s
 
 theorem universalPrenex_eval_groundSubstitution
     {L : Language} (B : FormulaN L)
@@ -103,7 +103,7 @@ theorem universalPrenex_eval_groundSubstitution
     exact universalPrenex_eval_prenexMatrix
       B hUniversal M s' (hEvalAll s')
   exact applyGroundSubstitution_eval_of_all_assignments
-    M (prenexMatrix B) substs hSubstsClosed hMatrixAll s /- ATTACH-BLOCKER: private declaration -/
+    M (prenexMatrix B) substs hSubstsClosed hMatrixAll s
 
 -- ===================================================================
 -- Corollary 7.6.1: shgCorollary_prenex

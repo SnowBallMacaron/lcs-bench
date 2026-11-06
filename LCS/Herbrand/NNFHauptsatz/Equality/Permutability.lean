@@ -190,7 +190,6 @@ def otherPremiseCount {L : Language} {hL : L.hasEquality = true} [DecidableEq (F
     (selected : G2nnfEqSelectedPremiseOccurrence T r sub) : Nat :=
   match selected.choice with | .only => 0 | _ => 1
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def node {L : Language} {hL : L.hasEquality = true} [DecidableEq (FormulaN L)]
     {Γ Δ Γp Δp : LCS.Finset (FormulaN L)} {T : G2nnfEqProofTree hL Γ Δ}
     {r : G2nnfRuleCore L} {sub : G2nnfEqProofTree hL Γp Δp} :
@@ -200,7 +199,6 @@ def node {L : Language} {hL : L.hasEquality = true} [DecidableEq (FormulaN L)]
   | .left ha hp hs sub₁ sub₂ _ => .twoPremise r ha hp hs sub₁ sub₂
   | .right ha hp hs sub₁ sub₂ _ => .twoPremise r ha hp hs sub₁ sub₂
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def path {L : Language} {hL : L.hasEquality = true} [DecidableEq (FormulaN L)]
     {Γ Δ Γp Δp : LCS.Finset (FormulaN L)} {T : G2nnfEqProofTree hL Γ Δ}
     {r : G2nnfRuleCore L} {sub : G2nnfEqProofTree hL Γp Δp}

@@ -180,18 +180,15 @@ def leaves {L : Language} :
   | _, .onePremise _ t => t.leaves
   | _, .twoPremise _ t1 t2 => t1.leaves ++ t2.leaves
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp]
 theorem leaves_leaf {L : Language} (s : Sequent L) :
     (GDeductionTreeExt.leaf s).leaves = [s] := rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp]
 theorem leaves_onePremise {L : Language} {prem conc : Sequent L}
     (rule : GentzenStep1Ext prem conc) (t : GDeductionTreeExt prem) :
     (GDeductionTreeExt.onePremise rule t).leaves = t.leaves := rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp]
 theorem leaves_twoPremise {L : Language} {p1 p2 conc : Sequent L}
     (rule : GentzenStep2Ext p1 p2 conc)
@@ -207,7 +204,6 @@ def isClosed {L : Language} {s : Sequent L}
     (t : GDeductionTreeExt s) : Prop :=
   ∀ l ∈ t.leaves, isAxiom l
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- An extended deduction tree is a proof
     tree (`isProof`) iff it is closed (all leaves are axioms). The two
     predicates agree definitionally on each constructor. -/

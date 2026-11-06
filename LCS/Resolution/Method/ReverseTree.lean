@@ -221,8 +221,6 @@ decreasing_by
 
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.Reverse
 /-- The returned tree is the object counted in the reverse size estimate. -/
 theorem toGCNF_leafCount_le (T : ResolutionTree) (hWF : T.IsWellFormed)
     (hEmpty : T.label = GCNF.Clause.empty) (hOrdinary : T.inputs.isOrdinary) :

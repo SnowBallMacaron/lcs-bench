@@ -23,7 +23,6 @@ open LCS.FOResolution.Method
 -- Helper: well-formed tree label validity (induction on tree)
 -- ===================================================================
 
--- ATTACH-BLOCKER: size baseline: retain helper in front
 /-- Every label of a well-formed resolution tree is satisfied whenever
     all source clauses are satisfied, using direct clause semantics. -/
 theorem tree_label_valid {L : Language} (hNoEq : L.withoutEquality)

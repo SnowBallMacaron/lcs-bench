@@ -19,11 +19,9 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 namespace CraigFreshBot
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- The source language with one genuinely fresh nullary predicate adjoined.
 Function and constant symbols, all of their arities, and equality are unchanged. -/
 def FreshBotLanguage (L : Language) : Language where
@@ -36,24 +34,20 @@ def FreshBotLanguage (L : Language) : Language where
     | .inr _ => 0
   hasEquality := L.hasEquality
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- The newly adjoined predicate symbol. -/
 def freshBot {L : Language} : (FreshBotLanguage L).predSymbols :=
   .inr ()
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 @[simp]
 theorem freshBot_arity {L : Language} :
     (FreshBotLanguage L).predArity (freshBot (L := L)) = 0 :=
   rfl
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 @[simp]
 theorem freshLanguage_withoutEquality {L : Language} :
     (FreshBotLanguage L).withoutEquality ↔ L.withoutEquality :=
   Iff.rfl
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Terms lift structurally because the extension changes no term-forming
 symbols. -/
 def freshLiftTerm {L : Language} : Term L → Term (FreshBotLanguage L)
@@ -61,7 +55,6 @@ def freshLiftTerm {L : Language} : Term L → Term (FreshBotLanguage L)
   | .const c => .const c
   | .func f ts => .func f (fun i => freshLiftTerm (ts i))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Formula lifting injects every old predicate through `Sum.inl`. -/
 def freshLiftFormula {L : Language} :
     FormulaN L → FormulaN (FreshBotLanguage L)
@@ -74,20 +67,17 @@ def freshLiftFormula {L : Language} :
   | .all x A => .all x (freshLiftFormula A)
   | .ex x A => .ex x (freshLiftFormula A)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Pointwise formula lifting for contexts. -/
 def freshLiftList {L : Language}
     (fs : List (FormulaN L)) : List (FormulaN (FreshBotLanguage L)) :=
   fs.map freshLiftFormula
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Pointwise lifting of both sides of a sequent. -/
 def freshLiftSequent {L : Language}
     (s : Sequent L) : Sequent (FreshBotLanguage L) :=
   { antecedent := freshLiftList s.antecedent
     succedent := freshLiftList s.succedent }
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Terms lower uniquely because the fresh extension has no new term-forming
 symbols. -/
 def freshLowerTerm {L : Language} : Term (FreshBotLanguage L) → Term L
@@ -95,7 +85,6 @@ def freshLowerTerm {L : Language} : Term (FreshBotLanguage L) → Term L
   | .const c => .const c
   | .func f ts => .func f (fun i => freshLowerTerm (ts i))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Lower a formula back to the source language, replacing each occurrence of
 the fresh nullary predicate by `R`. -/
 def freshLowerFormula {L : Language} (R : FormulaN L) :

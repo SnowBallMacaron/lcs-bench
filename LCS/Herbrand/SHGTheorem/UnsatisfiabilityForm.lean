@@ -173,7 +173,6 @@ def shgMotivSkolemized : FormulaN shgMotivLang :=
             (shgMotivVec1 (.const ShgMotivConst.a))))))
 
 namespace ShgMotivProof
--- ATTACH-BLOCKER: global set_option
 set_option backward.isDefEq.respectTransparency false
 open LCS.FirstOrder.SemanticsN LCS.FirstOrder.Semantics.Subformulae
 
@@ -189,33 +188,24 @@ abbrev p : F := .predN .P (shgMotivVec1 a)
 @[blueprint "chap7__example_7_6_1"]
 abbrev r (t : Term shgMotivLang) : F := .predN .R (shgMotivVec2 a t)
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev q : F := r (.var 1)
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev u : F := .all 2 (.neg (r (.var 2)))
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev e : F := .ex 1 (r (.var 1))
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev afterAll : F := .conj (.disj p q) (.conj u (.neg p))
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev afterEx : F := .conj (.disj p e) (.conj u (.neg p))
 
--- ATTACH-BLOCKER: variable
 variable [DecidableEq F]
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev Tree (Γ : LCS.Finset F) :=
   G2nnfProofTree (by rfl : shgMotivLang.withoutEquality) Γ ∅
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def castAnt {Γ Γ' : LCS.Finset F} (h : Γ = Γ') (t : Tree Γ) : Tree Γ' :=
   h ▸ t
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem substVec1 (u t : Term shgMotivLang) (x : Nat) :
     (fun i => termSubst (shgMotivVec1 u i) t x) =
       shgMotivVec1 (termSubst u t x) := by
@@ -225,7 +215,6 @@ theorem substVec1 (u t : Term shgMotivLang) (x : Nat) :
   subst i
   rfl
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem substVec2 (u v t : Term shgMotivLang) (x : Nat) :
     (fun i => termSubst (shgMotivVec2 u v i) t x) =
       shgMotivVec2 (termSubst u t x) (termSubst v t x) := by
@@ -236,7 +225,6 @@ theorem substVec2 (u v t : Term shgMotivLang) (x : Nat) :
   · have h : i = 1 := by omega
     subst i; rfl
 
--- ATTACH-BLOCKER: unsupported untagged macro
 macro "shg_motiv_set" : tactic => `(tactic|
   ((try simp only [List.getElem_cons_zero, List.getElem_cons_succ, Prod.fst, Prod.snd]) <;>
    (apply LCS.Finset.ext; intro F
@@ -246,7 +234,6 @@ macro "shg_motiv_set" : tactic => `(tactic|
       shgMotivLang, formulaSubstN, substVec1, substVec2, termSubst,
       MaxQuantifierOccurrence.replace, or_assoc, or_left_comm, or_comm])))
 
--- ATTACH-BLOCKER: unsupported untagged macro
 macro "shg_motiv_side" : tactic => `(tactic|
   (refine ⟨?_, ?_, ?_, ?_⟩ <;>
    simp [G2nnfRuleCore.LogicalSideConditions, G2nnfRuleCore.conclusion,
@@ -262,7 +249,6 @@ macro "shg_motiv_side" : tactic => `(tactic|
      shgMotivLang, termFV, shgMotivVec1, shgMotivVec2,
      Fin.exists_fin_succ, Fin.forall_fin_succ] <;> (intros; omega)))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def pAx : Tree (LCS.Finset.ofList [p, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .axiomCompLeft p rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.axiom_ rule ⟨rfl, rfl⟩ rfl ?_)
@@ -271,7 +257,6 @@ def pAx : Tree (LCS.Finset.ofList [p, .neg p]) := by
   · dsimp [rule]
     shg_motiv_side
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def rAx : Tree (LCS.Finset.ofList [q, .neg q]) := by
   let rule : G2nnfRuleCore shgMotivLang := .axiomCompLeft q rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.axiom_ rule ⟨rfl, rfl⟩ rfl ?_)
@@ -280,7 +265,6 @@ def rAx : Tree (LCS.Finset.ofList [q, .neg q]) := by
   · dsimp [rule]
     shg_motiv_side
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def pWeak : Tree (LCS.Finset.ofList [p, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .weakLeft (.neg q) (LCS.Finset.ofList [p, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -292,7 +276,6 @@ def pWeak : Tree (LCS.Finset.ofList [p, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def rWeak : Tree (LCS.Finset.ofList [q, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .weakLeft (.neg p) (LCS.Finset.ofList [q, .neg q]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -304,7 +287,6 @@ def rWeak : Tree (LCS.Finset.ofList [q, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def disjunction : Tree (LCS.Finset.ofList [.disj p q, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .disjLeft p q (LCS.Finset.ofList [.neg q, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.twoPremise rule trivial rfl ?_ ?_ ?_)
@@ -319,7 +301,6 @@ def disjunction : Tree (LCS.Finset.ofList [.disj p q, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def innerConj1 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p), .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft1 (.neg q) (.neg p) (LCS.Finset.ofList [.disj p q, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -331,7 +312,6 @@ def innerConj1 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p), .n
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def innerConj2 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft2 (.neg q) (.neg p) (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -343,7 +323,6 @@ def innerConj2 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) :
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def outerConj1 : Tree (LCS.Finset.ofList [shgMotivMidsequent, .conj (.neg q) (.neg p)]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft1 (.disj p q) (.conj (.neg q) (.neg p)) (LCS.Finset.ofList [.conj (.neg q) (.neg p)]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -355,7 +334,6 @@ def outerConj1 : Tree (LCS.Finset.ofList [shgMotivMidsequent, .conj (.neg q) (.n
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def midTree : Tree (LCS.Finset.ofList [shgMotivMidsequent]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft2 (.disj p q) (.conj (.neg q) (.neg p)) (LCS.Finset.ofList [shgMotivMidsequent]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -367,7 +345,6 @@ def midTree : Tree (LCS.Finset.ofList [shgMotivMidsequent]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def universalInner : Tree (LCS.Finset.ofList [afterAll]) := by
   let rule : G2nnfRuleCore shgMotivLang := .allSubLeft afterAll (.conjRight (.disj p q) (.conjLeft (.all 2 (.neg (r (.var 2)))) (.neg p))) 2 (.neg (r (.var 2))) (.var 1) rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -379,7 +356,6 @@ def universalInner : Tree (LCS.Finset.ofList [afterAll]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def existential : Tree (LCS.Finset.ofList [afterEx]) := by
   let rule : G2nnfRuleCore shgMotivLang := .exSubLeft afterEx (.conjLeft (.disjRight p (.ex 1 (r (.var 1)))) (.conj u (.neg p))) 1 (r (.var 1)) 1 rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -391,7 +367,6 @@ def existential : Tree (LCS.Finset.ofList [afterEx]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_motiv_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def originalTree : Tree (LCS.Finset.ofList [shgMotivNNFNeg]) := by
   let rule : G2nnfRuleCore shgMotivLang := .allSubLeft shgMotivNNFNeg (.all 0 _) 0 _ a rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -433,48 +408,36 @@ def shgMotivTransformedMidsequent : FormulaN shgMotivLang :=
       (.neg ShgMotivProof.p))
 
 namespace ShgMotivTransformedProof
--- ATTACH-BLOCKER: global set_option
 set_option backward.isDefEq.respectTransparency false
 open LCS.FirstOrder.SemanticsN LCS.FirstOrder.Semantics.Subformulae
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev F := FormulaN shgMotivLang
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev a : Term shgMotivLang := .const ShgMotivConst.a
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev p : F := .predN .P (shgMotivVec1 a)
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev r (t : Term shgMotivLang) : F := .predN .R (shgMotivVec2 a t)
 
 @[blueprint "chap7__example_7_6_1"]
 abbrev fa : Term shgMotivLang := .func .f (shgMotivVec1 a)
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev q : F := r fa
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev u : F := .all 2 (.neg (r (.var 2)))
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev afterAll : F := .conj (.disj p q) (.conj u (.neg p))
 
--- ATTACH-BLOCKER: variable
 variable [DecidableEq F]
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev Tree (Γ : LCS.Finset F) :=
   G2nnfProofTree (by rfl : shgMotivLang.withoutEquality) Γ ∅
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def castAnt {Γ Γ' : LCS.Finset F} (h : Γ = Γ') (t : Tree Γ) : Tree Γ' :=
   h ▸ t
 
 open ShgMotivProof (substVec1 substVec2)
 
--- ATTACH-BLOCKER: unsupported untagged macro
 macro "shg_transformed_set" : tactic => `(tactic|
   ((try simp only [List.getElem_cons_zero, List.getElem_cons_succ, Prod.fst, Prod.snd]) <;>
    (apply LCS.Finset.ext; intro F
@@ -485,7 +448,6 @@ macro "shg_transformed_set" : tactic => `(tactic|
       shgMotivLang, formulaSubstN, substVec1, substVec2, termSubst,
       MaxQuantifierOccurrence.replace, or_assoc, or_left_comm, or_comm])))
 
--- ATTACH-BLOCKER: unsupported untagged macro
 macro "shg_transformed_side" : tactic => `(tactic|
   (refine ⟨?_, ?_, ?_, ?_⟩ <;>
    simp [G2nnfRuleCore.LogicalSideConditions, G2nnfRuleCore.conclusion,
@@ -502,7 +464,6 @@ macro "shg_transformed_side" : tactic => `(tactic|
      shgMotivLang, termFV, shgMotivVec1, shgMotivVec2,
      Fin.exists_fin_succ, Fin.forall_fin_succ] <;> (intros; omega)))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def pAx : Tree (LCS.Finset.ofList [p, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .axiomCompLeft p rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.axiom_ rule ⟨rfl, rfl⟩ rfl ?_)
@@ -511,7 +472,6 @@ def pAx : Tree (LCS.Finset.ofList [p, .neg p]) := by
   · dsimp [rule]
     shg_transformed_side
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def rAx : Tree (LCS.Finset.ofList [q, .neg q]) := by
   let rule : G2nnfRuleCore shgMotivLang := .axiomCompLeft q rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.axiom_ rule ⟨rfl, rfl⟩ rfl ?_)
@@ -520,7 +480,6 @@ def rAx : Tree (LCS.Finset.ofList [q, .neg q]) := by
   · dsimp [rule]
     shg_transformed_side
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def pWeak : Tree (LCS.Finset.ofList [p, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .weakLeft (.neg q) (LCS.Finset.ofList [p, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -532,7 +491,6 @@ def pWeak : Tree (LCS.Finset.ofList [p, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def rWeak : Tree (LCS.Finset.ofList [q, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .weakLeft (.neg p) (LCS.Finset.ofList [q, .neg q]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -544,7 +502,6 @@ def rWeak : Tree (LCS.Finset.ofList [q, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def disjunction : Tree (LCS.Finset.ofList [.disj p q, .neg q, .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .disjLeft p q (LCS.Finset.ofList [.neg q, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.twoPremise rule trivial rfl ?_ ?_ ?_)
@@ -559,7 +516,6 @@ def disjunction : Tree (LCS.Finset.ofList [.disj p q, .neg q, .neg p]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def innerConj1 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p), .neg p]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft1 (.neg q) (.neg p) (LCS.Finset.ofList [.disj p q, .neg p]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -571,7 +527,6 @@ def innerConj1 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p), .n
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def innerConj2 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft2 (.neg q) (.neg p) (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -583,7 +538,6 @@ def innerConj2 : Tree (LCS.Finset.ofList [.disj p q, .conj (.neg q) (.neg p)]) :
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def outerConj1 : Tree (LCS.Finset.ofList [shgMotivTransformedMidsequent, .conj (.neg q) (.neg p)]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft1 (.disj p q) (.conj (.neg q) (.neg p)) (LCS.Finset.ofList [.conj (.neg q) (.neg p)]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -595,7 +549,6 @@ def outerConj1 : Tree (LCS.Finset.ofList [shgMotivTransformedMidsequent, .conj (
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def midTree : Tree (LCS.Finset.ofList [shgMotivTransformedMidsequent]) := by
   let rule : G2nnfRuleCore shgMotivLang := .conjLeft2 (.disj p q) (.conj (.neg q) (.neg p)) (LCS.Finset.ofList [shgMotivTransformedMidsequent]) ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -607,7 +560,6 @@ def midTree : Tree (LCS.Finset.ofList [shgMotivTransformedMidsequent]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def universalInner : Tree (LCS.Finset.ofList [afterAll]) := by
   let rule : G2nnfRuleCore shgMotivLang := .allSubLeft afterAll (.conjRight (.disj p q) (.conjLeft (.all 2 (.neg (r (.var 2)))) (.neg p))) 2 (.neg (r (.var 2))) fa rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)
@@ -619,7 +571,6 @@ def universalInner : Tree (LCS.Finset.ofList [afterAll]) := by
     dsimp only [rule, G2nnfRuleCore.premises]
     shg_transformed_set
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def transformedTree : Tree (LCS.Finset.ofList [shgMotivSkolemized]) := by
   let rule : G2nnfRuleCore shgMotivLang := .allSubLeft shgMotivSkolemized (.all 0 _) 0 _ a rfl ∅ ∅
   refine castAnt (Γ := rule.conclusion.1) ?_ (G2nnfDeductionTreeCore.onePremise rule trivial rfl ?_ ?_)

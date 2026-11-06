@@ -118,7 +118,6 @@ inductive LKeProofTree {L : Language} : Sequent L → Type where
 
 namespace LKeProofTree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 6.3.1 (construction adapter): recursively embeds an LK
 proof into the canonical LKe carrier. This preserves the established
 `LKeProofTree.lk t` source construction API without retaining a
@@ -130,7 +129,6 @@ def lk {L : Language} :
   | _, .twoPremise rule t1 t2 =>
       .twoPremise rule (lk t1) (lk t2)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 6.3.1 (construction adapter): the established LKe cut
 smart constructor, now represented by the canonical two-premise node. -/
 def cut {L : Language} (A : FormulaN L)
@@ -181,7 +179,6 @@ def isProof {L : Language} : {s : Sequent L} → LKeDeductionTree s → Prop
   | _, .onePremise _ t => t.isProof
   | _, .twoPremise _ t₁ t₂ => t₁.isProof ∧ t₂.isProof
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Convert an LKₑ deduction tree whose leaves are axioms to an LKₑ proof
 of the same sequent. At an arbitrary equality-axiom leaf, choose its schema
 witness from `isProof`; all inference nodes are preserved. -/

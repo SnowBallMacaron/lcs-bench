@@ -1,2 +1,2 @@
 -- Generated from the proof file.
-def AttachStamp.LCS.Herbrand.PrimRecursive : UInt64 := 192984008725499164
+def AttachStamp.LCS.Herbrand.PrimRecursive : UInt64 := 18153268122499084701

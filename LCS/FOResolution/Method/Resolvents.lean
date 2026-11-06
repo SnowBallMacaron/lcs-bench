@@ -93,12 +93,10 @@ def LitSetSamePred {L : Language} (hNoEq : L.withoutEquality)
   ∃ (P : L.predSymbols),
     ∀ lit, lit ∈ lits → ∃ args, lit.formula = FormulaN.predN P args
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The unsigned atomic payload of a literal. -/
 def literalAtom {L : Language} (hNoEq : L.withoutEquality) : FOLiteral L hNoEq → FOAtom L hNoEq
   | .pos atom | .neg atom => atom
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Per-position equations between two applications of the same predicate.
     Predicate mismatches and equality atoms are rejected visibly with `none`;
     resolution without equality only admits the successful predicate case. -/
@@ -114,7 +112,6 @@ noncomputable def atomUnifPairs? {L : Language} (hNoEq : L.withoutEquality)
           none
     | _, _ => none
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Build the equation system relating every remaining literal to one
     fixed reference literal, position by position. -/
 noncomputable def litSetUnifPairsAgainst {L : Language} (hNoEq : L.withoutEquality)
@@ -127,7 +124,6 @@ noncomputable def litSetUnifPairsAgainst {L : Language} (hNoEq : L.withoutEquali
       | some pairs, some restPairs => some (pairs ++ restPairs)
       | _, _ => none
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Extract the faithful pairwise unification problem for a nonempty literal
     set. The first atom is the common reference; a malformed or empty set is
     rejected with `none`. -/
@@ -254,7 +250,6 @@ theorem litSetUnifPairs_unifies_position {L : Language} (hNoEq : L.withoutEquali
       exact (toReference hMem₁ hLit₁ i).symm.trans
         (toReference hMem₂ hLit₂ i)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 8.5.2 with all resolution witnesses fixed explicitly.
     The selected literals yield one per-position equation system, and the
     stored substitution must be an MGU of exactly that system. The result

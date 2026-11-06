@@ -143,7 +143,6 @@ noncomputable def WellFormed {L : Language} {hL : L.hasEquality = true} :
     base.WellFormed ∧ base.IsEligibleAtom A ∧ A.isAtomic = true ∧
       A ∈ base.toSequent.1
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact Gentzen-orientation regression for negation-left. -/
 theorem toSequent_negLeft {L : Language} {hL : L.hasEquality = true}
     (base : G1nnfEqAxiom L hL) (A : FormulaN L) :
@@ -153,7 +152,6 @@ theorem toSequent_negLeft {L : Language} {hL : L.hasEquality = true}
   cases h : base.toSequent
   simp [toSequent, h]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact Gentzen-orientation regression for negation-right. -/
 theorem toSequent_negRight {L : Language} {hL : L.hasEquality = true}
     (base : G1nnfEqAxiom L hL) (A : FormulaN L) :

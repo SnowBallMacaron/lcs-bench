@@ -27,7 +27,7 @@ open LCS.FirstOrder.SemanticsN.Substitution
 The scope side condition is the capture invariant: variables used as
 arguments of the next exact Skolem term are not rebound in the current
 formula. -/
-private theorem skolemFormExactAux_forward_semantics {L : Language}
+theorem skolemFormExactAux_forward_semantics {L : Language}
     (S : SkolemSpec L) (N : Structure S.language) :
     ∀ (m : Nat) (A : FormulaN S.language) (scope : List Nat)
       (indices : List (Fin S.n)) (B : FormulaN S.language) (used : Nat),

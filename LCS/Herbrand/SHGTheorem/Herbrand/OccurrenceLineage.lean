@@ -217,7 +217,7 @@ noncomputable def g2nnfEqRetentiveAntecedentLineage
 
 /-- Every endpoint antecedent formula on a quantifier-only path has
 a retentive lineage from some formula in the root antecedent. -/
-private theorem g2nnfRetentiveAntecedentLineage_of_mem
+theorem g2nnfRetentiveAntecedentLineage_of_mem
     {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
     {Γroot Δroot Γnode Δnode : LCS.Finset (FormulaN L)}
     {root : G2nnfProofTree hL Γroot Δroot}
@@ -309,7 +309,7 @@ theorem g2nnfRetentiveAntecedentLineage_from_singleton
 
 /-- Equality-system retentive coverage along a quantifier-only exact
 path. -/
-private theorem g2nnfEqRetentiveAntecedentLineage_of_mem
+theorem g2nnfEqRetentiveAntecedentLineage_of_mem
     {L : Language} {hL : L.hasEquality = true}
     [DecidableEq (FormulaN L)]
     {Γroot Δroot Γnode Δnode : LCS.Finset (FormulaN L)}

@@ -96,7 +96,6 @@ theorem folkCutFree_of_eq {L : Language} {s1 s2 : Sequent L}
     folkCutFreeProvable s2 := heq ▸ h
 
 -- Sink an element from front past a segment
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_sinkLeftPast {L : Language}
     (pre mid post : List (FormulaN L)) (Λ : List (FormulaN L))
     (A : FormulaN L)
@@ -117,7 +116,6 @@ theorem folkCutFree_sinkLeftPast {L : Language}
     exact folkCutFree_of_eq (by simp) h4
 
 -- Sink an element from the end past a segment
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_sinkRightPast {L : Language}
     (pre mid post : List (FormulaN L)) (Γ : List (FormulaN L))
     (A : FormulaN L)
@@ -139,7 +137,6 @@ theorem folkCutFree_sinkRightPast {L : Language}
     have h4 := folkCutFree_exchangeRight_adj Γ pre B A (rest ++ post) h3
     exact folkCutFree_of_eq (by simp) h4
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem list_split_mem {L : Language} {A : FormulaN L} {lst : List (FormulaN L)}
     (h : A ∈ lst) : ∃ before after, lst = before ++ [A] ++ after := by
 -- BEGIN PROOF
@@ -152,7 +149,6 @@ theorem list_split_mem {L : Language} {A : FormulaN L} {lst : List (FormulaN L)}
       exact ⟨x :: before, after, by simp [heq]⟩
 
 -- Weaken left by appending after current antecedent
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_weakenLeftAppend {L : Language}
     (Γ' Γ Δ : List (FormulaN L))
     (h : folkCutFreeProvable (Sequent.mk Γ Δ)) :
@@ -170,7 +166,6 @@ theorem folkCutFree_weakenLeftAppend {L : Language}
     rwa [List.append_assoc] at h4
 
 -- Weaken right by prepending before current succedent
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_weakenRightPrepend {L : Language}
     (Δ' Γ Δ : List (FormulaN L))
     (h : folkCutFreeProvable (Sequent.mk Γ Δ)) :
@@ -186,7 +181,6 @@ theorem folkCutFree_weakenRightPrepend {L : Language}
     exact folkCutFree_of_eq (by simp) h3
 
 -- Shared axiom: from isAxiom to folkCutFreeProvable
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_shared_axiom {L : Language}
     (s : Sequent L) (h : isAxiom s) :
     folkCutFreeProvable s := by
@@ -206,7 +200,6 @@ theorem folkCutFree_shared_axiom {L : Language}
   have h4 := folkCutFree_weakenRightList after_s Γ (before_s ++ [A]) h3
   rw [hs_eq]; simpa [List.append_assoc] using h4
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_orLeft_head {L : Language}
     (A B : FormulaN L) (Γ Δ : List (FormulaN L))
     (h1 : folkCutFreeProvable (Sequent.mk (A :: Γ) Δ))
@@ -217,7 +210,6 @@ theorem folkCutFree_orLeft_head {L : Language}
   obtain ⟨t2, hcf2⟩ := h2
   exact ⟨.twoPremise (.orLeft A B Γ Δ) t1 t2, ⟨trivial, hcf1, hcf2⟩⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_implLeft_head {L : Language}
     (A B : FormulaN L) (Γ Δ Λ Θ : List (FormulaN L))
     (h1 : folkCutFreeProvable (Sequent.mk Γ (Δ ++ [A])))
@@ -228,7 +220,6 @@ theorem folkCutFree_implLeft_head {L : Language}
   obtain ⟨t2, hcf2⟩ := h2
   exact ⟨.twoPremise (.implLeft A B Γ Δ Λ Θ) t1 t2, ⟨trivial, hcf1, hcf2⟩⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_implRight_head {L : Language}
     (A B : FormulaN L) (Γ Δ : List (FormulaN L))
     (h : folkCutFreeProvable (Sequent.mk (A :: Γ) (Δ ++ [B]))) :
@@ -237,7 +228,6 @@ theorem folkCutFree_implRight_head {L : Language}
   obtain ⟨t, hcf⟩ := h
   exact ⟨.onePremise (.implRight A B Γ Δ) t, hcf⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_negLeft_head {L : Language}
     (A : FormulaN L) (Γ Δ : List (FormulaN L))
     (h : folkCutFreeProvable (Sequent.mk Γ (Δ ++ [A]))) :
@@ -246,7 +236,6 @@ theorem folkCutFree_negLeft_head {L : Language}
   obtain ⟨t, hcf⟩ := h
   exact ⟨.onePremise (.negLeft A Γ Δ) t, hcf⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem folkCutFree_allLeft_head {L : Language}
     (t_term : Term L) (x : Nat) (A : FormulaN L)
     (Γ Δ : List (FormulaN L))

@@ -120,7 +120,6 @@ def ex954_ii_sigma3 : Nat → Term exCorrectnessLang
 -- would otherwise clutter each refutation term. They are NOT tagged
 -- `@[lcsmain]`. -/
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Separating-pair helper for refutation (i) step 1. Since ρ_1 is the
     identity and C_2 (fact teacher(jean)) has no free variables, all
     seven conjuncts of IsSeparatingPair reduce either to
@@ -151,7 +150,6 @@ theorem ex954_i_hSep1 :
     -- so the implication is trivial
     intro _ _; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Separating-pair helper for refutation (i) step 2. Previous goal
     rich(jean) is ground (no free variables), so Term.var's range on
     prev is empty, giving trivial range-disjointness. ρ_2 maps C_4's
@@ -208,7 +206,6 @@ theorem ex954_i_hSep2 :
     · -- x = n+1 case: ρ₂ (n+1) = var (n+1) by definition
       rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Separating-pair helper for refutation (i) step 3. Previous goal
     rocksinger(jean) is ground, so Term.var's range on prev is empty,
     giving trivial range-disjointness. ρ_3 maps C_5's single FV (var 2)
@@ -401,7 +398,6 @@ theorem ex954_ii_hSep3 :
 -- for the concrete prevGoal / input-clause pair of that step.
 -- -------------------------------------------------------------------
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (i), init node: N_0 = `ofList (bodyAtoms · Term.var)` for
     the first goal clause (two atoms: teacher(X), rich(X)). -/
 noncomputable def exRefutation_i_init :
@@ -413,7 +409,6 @@ noncomputable def exRefutation_i_init :
     exCorrectnessGoalClause1
     (by unfold exCorrectnessGoals_i; simp))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (i), step 1 (resolve teacher(X) with teacher(jean)).
     Produces a new goal `rich(jean)` (after σ₁ applies). -/
 noncomputable def exRefutation_i_step1 :
@@ -453,7 +448,6 @@ noncomputable def exRefutation_i_step1 :
             FOHornClause.bodyFOAtoms, FOHornClauseCore.bodyFOAtoms, FOHornClauseCore.body, FOHornClause.fact, FOHornClause.rule, FOHornClause.goal, LCS.Finset.mem_toList, LCS.Finset.mem_ofList, finset_toList_empty, finset_toList_singleton]))
         ex954_i_hSep1)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (i), step 1's currentGoal Finset collapses to the singleton
     `{rich(jean)}`. Used to rewrite the prev Finset of step 2. -/
 theorem exRefutation_i_step1_currentGoal :
@@ -494,7 +488,6 @@ theorem exRefutation_i_step1_currentGoal :
       · intro h; have hp := (FOAtomCore.predN.inj h).1; cases hp
     · simp [mkCorrAtom, FOAtomCore.subst, FOAtomCore.mapTerms, termSubstAll, ex954_i_sigma1]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (i), step 2 (resolve rich(jean) with rich(X):-rocksinger(X)). -/
 noncomputable def exRefutation_i_step2 :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_i
@@ -534,7 +527,6 @@ noncomputable def exRefutation_i_step2 :
   rw [exRefutation_i_step1_currentGoal] at step2raw
   exact step2raw
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (i), step 2's currentGoal Finset collapses to the singleton
     `{rocksinger(jean)}`. Used to rewrite the prev Finset of step 3. -/
 theorem exRefutation_i_step2_currentGoal :
@@ -656,7 +648,6 @@ open LCS.FOResolution.Method.Soundness
 open LCS.SLD.FirstOrder
 open LCS.SLD.LogicProgramming
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (ii), init node: same initial goal clause as (i). -/
 noncomputable def exRefutation_ii_init :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_i
@@ -667,7 +658,6 @@ noncomputable def exRefutation_ii_init :
     exCorrectnessGoalClause1
     (by unfold exCorrectnessGoals_i; simp))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (ii), step 1 (resolve teacher(X) with teacher(susan)). -/
 noncomputable def exRefutation_ii_step1 :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_i
@@ -706,7 +696,6 @@ noncomputable def exRefutation_ii_step1 :
             FOHornClause.bodyFOAtoms, FOHornClauseCore.bodyFOAtoms, FOHornClauseCore.body, FOHornClause.fact, FOHornClause.rule, FOHornClause.goal, LCS.Finset.mem_toList, LCS.Finset.mem_ofList, finset_toList_empty, finset_toList_singleton]))
         ex954_ii_hSep1)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (ii), step 1 currentGoal collapses to `{rich(susan)}`. -/
 theorem exRefutation_ii_step1_currentGoal :
     ((((LCS.Finset.ofList
@@ -746,7 +735,6 @@ theorem exRefutation_ii_step1_currentGoal :
       · intro h; have hp := (FOAtomCore.predN.inj h).1; cases hp
     · simp [mkCorrAtom, FOAtomCore.subst, FOAtomCore.mapTerms, termSubstAll, ex954_ii_sigma1]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (ii), step 2 (resolve rich(susan) with rich(X):-rocksinger(X)). -/
 noncomputable def exRefutation_ii_step2 :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_i
@@ -786,7 +774,6 @@ noncomputable def exRefutation_ii_step2 :
   rw [exRefutation_ii_step1_currentGoal] at step2raw
   exact step2raw
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (ii), step 2 currentGoal collapses to `{rocksinger(susan)}`. -/
 theorem exRefutation_ii_step2_currentGoal :
     ((((LCS.Finset.ofList [mkCorrAtom .rich (Term.const .susan)]).erase

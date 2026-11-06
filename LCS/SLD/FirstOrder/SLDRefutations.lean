@@ -31,7 +31,6 @@ open LCS.FOResolution.Method.Completeness
 -- Definition 9.4.2: First-order SLD-derivation
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The exact per-position MGU certificate for two predicate atoms.
     `atomUnifPairs?` rejects predicate mismatches and equality atoms
     visibly; on success, `IsPairwiseMGU` supplies the unifier,

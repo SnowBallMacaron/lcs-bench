@@ -33,12 +33,10 @@ open LCS.FOResolution.Method.Completeness
 namespace GroundUnsatContractRegression
 open LCS.FirstOrder.SyntaxN.Variables
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 inductive AdvPred where
   | p | q
   deriving DecidableEq
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def advLang : Language where
   funSymbols := Empty
   funArity := Empty.elim
@@ -47,18 +45,14 @@ def advLang : Language where
   predArity := fun _ => 0
   hasEquality := false
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def p : FOAtom advLang rfl :=
   .predN AdvPred.p (fun i => Fin.elim0 i)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def q : FOAtom advLang rfl :=
   .predN AdvPred.q (fun i => Fin.elim0 i)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def D : List (FOHornClause advLang (by all_goals rfl)) := [FOHornClause.fact p rfl]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def goals : List (FOHornClause advLang (by all_goals rfl)) := [FOHornClause.goal (LCS.Finset.singleton q) rfl,
   FOHornClause.goal (LCS.Finset.singleton p) rfl]
 

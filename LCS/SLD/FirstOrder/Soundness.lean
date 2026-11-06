@@ -32,7 +32,6 @@ open LCS.FOResolution.Method.Completeness
 -- ===================================================================
 
 -- ATTACH-KEEP: existing oversized helper stays with its front size allowance
--- ATTACH-BLOCKER: existing oversized helper stays with its front size allowance
 /-- Key invariant for SLD-resolution soundness: if the SLD-derivation
     is indexed by `currentGoalVal` against D and goals, and a structure
     M satisfies the universal closures of all clause translations in

@@ -157,14 +157,12 @@ open FOHornClause
 def isDefinite {L : Language} (hNoEq : L.withoutEquality) : FOHornClause L hNoEq → Prop :=
   FOHornClauseCore.isDefinite
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Structural head view. Unlike `headAtom`, this exposes the
     type-level atomic carrier used by the constructors. -/
 @[blueprint "chap9__definition_9_4_2"]
 def headFOAtom {L : Language} (hNoEq : L.withoutEquality) : FOHornClause L hNoEq → Option (FOAtom L hNoEq) :=
   FOHornClauseCore.headFOAtom
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An enumeration of the finite body, exposing its atomic carriers.
     Clause equality is independent of this enumeration (SQ16). -/
 @[blueprint "chap9__definition_9_4_2"]
@@ -187,7 +185,6 @@ theorem atomToFormulaQF {L : Language} (hNoEq : L.withoutEquality)  (atom : FOAt
 
 end FOHornClause
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Companion helper: `clauseFV` depends only on membership of the
     underlying list, so two lists of literals with identical membership
     yield the same `clauseFV`. Used to bridge between
@@ -223,7 +220,6 @@ def isUnsatisfiable {L : Language} (hNoEq : L.withoutEquality)
 
 end FOHornClauseSet
 
--- ATTACH-BLOCKER: scoped helper requires manual relocation
 open LCS.FirstOrder.SyntaxN.Variables in
 /-- Exactly the free variables of the translated clause matrix (SQ25).
     The auxiliary contradiction contributes variables only for an empty clause. -/

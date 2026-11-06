@@ -116,7 +116,6 @@ abbrev SkolemData (L : Language) (Γ : List (FormulaN L)) :=
 -- Definition 7.5.1 (companion def): mkSkolemData
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonical Skolem data for the globally renamed input Γ. -/
 def mkSkolemData {L : Language} (Γ : List (FormulaN L))
     (hΓ : HerbrandInputConvention Γ) (hPrenex : ∀ A ∈ Γ, isPrenex A) :

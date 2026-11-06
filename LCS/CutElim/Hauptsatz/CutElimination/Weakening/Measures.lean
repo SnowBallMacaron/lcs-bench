@@ -27,7 +27,7 @@ theorem G1nnfProofTree.depth_mpr_left {L : Language} {hL : L.withoutEquality}
   subst Γ'
   have hp : htype = rfl := Subsingleton.elim _ _
   cases hp
-  rfl /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  rfl
 
 theorem G1nnfProofTree.depth_mp {L : Language} {hL : L.withoutEquality}
     {Γ Δ Γ' Δ' : LCS.Finset (FormulaN L)}
@@ -41,13 +41,13 @@ theorem G1nnfProofTree.depth_mp {L : Language} {hL : L.withoutEquality}
   subst Δ'
   have hp : htype = rfl := Subsingleton.elim _ _
   cases hp
-  rfl /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  rfl
 
 theorem nat_max_congr {a b c d : Nat} (h₁ : a = b) (h₂ : c = d) :
     max a c = max b d := by
   cases h₁
   cases h₂
-  rfl /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  rfl
 
 theorem G1nnfProofTree.weakenTreeLeft_depth {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfProofTree hL Γ Δ)
@@ -198,7 +198,7 @@ theorem G1nnfProofTree.weakenTreeLeft_depth {L : Language} {hL : L.withoutEquali
     | allLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
     | allRight _ _ _ => simp [G1nnfRule.premises] at hPrem
     | exLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
-    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem
 
 theorem G1nnfProofTree.cutRank_mpr_left {L : Language} {hL : L.withoutEquality}
     {Γ Γ' Δ : LCS.Finset (FormulaN L)}
@@ -211,7 +211,7 @@ theorem G1nnfProofTree.cutRank_mpr_left {L : Language} {hL : L.withoutEquality}
   subst Γ'
   have hp : htype = rfl := Subsingleton.elim _ _
   cases hp
-  rfl /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  rfl
 
 theorem G1nnfProofTree.cutRank_mp {L : Language} {hL : L.withoutEquality}
     {Γ Δ Γ' Δ' : LCS.Finset (FormulaN L)}
@@ -225,7 +225,7 @@ theorem G1nnfProofTree.cutRank_mp {L : Language} {hL : L.withoutEquality}
   subst Δ'
   have hp : htype = rfl := Subsingleton.elim _ _
   cases hp
-  rfl /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  rfl
 
 theorem G1nnfProofTree.weakenTreeLeft_cutRank {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfProofTree hL Γ Δ)
@@ -371,7 +371,7 @@ theorem G1nnfProofTree.weakenTreeLeft_cutRank {L : Language} {hL : L.withoutEqua
     | allLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
     | allRight _ _ _ => simp [G1nnfRule.premises] at hPrem
     | exLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
-    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem
 
 theorem G1nnfProofTree.depth_mpr_right {L : Language} {hL : L.withoutEquality}
     {Γ Δ Δ' : LCS.Finset (FormulaN L)}
@@ -384,7 +384,7 @@ theorem G1nnfProofTree.depth_mpr_right {L : Language} {hL : L.withoutEquality}
   subst Δ'
   have hp : htype = rfl := Subsingleton.elim _ _
   cases hp
-  rfl /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  rfl
 
 theorem G1nnfProofTree.weakenTreeRight_depth {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfProofTree hL Γ Δ)
@@ -537,9 +537,8 @@ theorem G1nnfProofTree.weakenTreeRight_depth {L : Language} {hL : L.withoutEqual
     | allLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
     | allRight _ _ _ => simp [G1nnfRule.premises] at hPrem
     | exLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
-    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+    | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem G1nnfProofTree.cutRank_mpr_right {L : Language} {hL : L.withoutEquality}
     {Γ Δ Δ' : LCS.Finset (FormulaN L)}
     (hidx : Δ = Δ')
@@ -553,7 +552,6 @@ theorem G1nnfProofTree.cutRank_mpr_right {L : Language} {hL : L.withoutEquality}
   cases hp
   rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem G1nnfProofTree.weakenTreeRight_cutRank {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfProofTree hL Γ Δ)
     (A : FormulaN L) (hNNF : A.isNNF)

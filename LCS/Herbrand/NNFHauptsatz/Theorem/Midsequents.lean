@@ -87,7 +87,6 @@ def AllRulesQuantifierOnPath {L : Language} {hL : L.withoutEquality} [DecidableE
   | .rightPremise rule _ _ _ _ _ subpath =>
     rule.isQuantifierRule ∧ AllRulesQuantifierOnPath subpath
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A quantifier-only path from an empty-succedent root reaches a node with
 empty succedent.  Left quantifier rules preserve the succedent, while right
 quantifier rules cannot have an empty conclusion succedent. -/
@@ -643,7 +642,6 @@ abbrev NNFHauptExFormula := FormulaN nnfHauptExLang
 abbrev NNFHauptExFormulaSet :=
   LCS.Finset NNFHauptExFormula
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 noncomputable abbrev nnfHauptExDeltaBase : NNFHauptExFormulaSet :=
   LCS.Finset.insert nnfHauptEx_Pa
     (LCS.Finset.insert nnfHauptEx_Qa LCS.Finset.empty)
@@ -654,7 +652,6 @@ noncomputable abbrev nnfHauptExDelta : NNFHauptExFormulaSet :=
     (LCS.Finset.insert nnfHauptEx_Qa
       (LCS.Finset.insert nnfHauptEx_RfaAndRfb LCS.Finset.empty))
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev nnfHauptEx_Ry : FormulaN nnfHauptExLang :=
   FormulaN.predN NNFHauptExPred.R
     (nnfHauptExVec1 (Term.var 1))

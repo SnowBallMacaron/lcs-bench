@@ -50,7 +50,6 @@ def isConsistentSetNoEq {L : Language} (hL : L.withoutEquality)
     (Gamma : Set (FormulaN L)) : Prop :=
   isConsistentSet Gamma
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- No finite list of members of Gamma proves the empty succedent. -/
 def isConsistentSetEmptySucc {L : Language} (Gamma : Set (FormulaN L)) : Prop :=
   ∀ (cs : List (FormulaN L)),
@@ -73,7 +72,6 @@ theorem isConsistentSet_iff_emptySucc {L : Language}
 -- Decomposition functions for the growing closure
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 5.5.1 (required companion): Decompose one antecedent
 FormulaN for the growing closure. Includes type-B decomposition
 (disj and impl in antecedent are also decomposed). For T(disj X Y),
@@ -92,7 +90,6 @@ def decompAntGrowing {L : Language} (A : FormulaN L) (t_c t_d : Term L) :
   | .predN _ _ => ([], [])
   | .eq_ _ _ _ => ([], [])
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 5.5.1 (required companion): Decompose one succedent
 FormulaN for the growing closure. Includes type-B decomposition
 (conj in succedent is also decomposed). For F(conj X Y), both X
@@ -113,7 +110,6 @@ def decompSuccGrowing {L : Language} (B : FormulaN L) (t_c t_d : Term L) :
 -- Parity renaming and selected branches
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rename every term variable to an even index. -/
 def evenTerm {L : Language} : Term L → Term L
   | .var x => .var (2 * x)
@@ -132,7 +128,6 @@ def evenFormula {L : Language} : FormulaN L → FormulaN L
   | .all x A => .all (2 * x) (evenFormula A)
   | .ex x A => .ex (2 * x) (evenFormula A)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The image of a set of formulae under even-index renaming. -/
 def evenSet {L : Language} (Gamma : Set (FormulaN L)) : Set (FormulaN L) :=
   fun B => ∃ A ∈ Gamma, evenFormula A = B
@@ -143,7 +138,6 @@ theorem isConsistentSet_iff_evenSet {L : Language} (Gamma : Set (FormulaN L)) :
   -- REPAIR(T22): proof pending
   sorry
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Decompose one signed formula, choosing one type-B component.
 Type-C instances are added only when substitution is free-for. -/
 noncomputable def decompAlong {L : Language} (bit : Bool) (tc td : Term L)
@@ -159,14 +153,12 @@ noncomputable def decompAlong {L : Language} (bit : Bool) (tc td : Term L)
   | .trueF A => decompAntGrowing A tc td
   | .falseF A => decompSuccGrowing A tc td
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A branch state stores its sequent, next choice index, and variable bound. -/
 structure BranchClosureState (L : Language) where
   seq : Sequent L
   nextChoice : Nat
   varBound : Nat
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Process one occurrence, reserving an odd witness above all variables
 in the current sequent, the current term, and previous witnesses. -/
 noncomputable def branchClosureStep {L : Language} (choice : Nat → Bool)
@@ -181,7 +173,6 @@ noncomputable def branchClosureStep {L : Language} (choice : Nat → Bool)
     nextChoice := st.nextChoice + 1
     varBound := witness }
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Process a snapshot of every signed occurrence for one type-C term. -/
 noncomputable def branchClosureRound {L : Language} (choice : Nat → Bool)
     (st : BranchClosureState L) (tc : Term L) : BranchClosureState L :=
@@ -189,7 +180,6 @@ noncomputable def branchClosureRound {L : Language} (choice : Nat → Bool)
     st.seq.succedent.map SignedFormula.falseF
   formulas.foldl (branchClosureStep choice tc) st
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Enumerate the even-renamed input and fairly revisit formulae and terms.
 Each occurrence uses its own choice position and fresh odd witness. -/
 noncomputable def growingClosureAlongState {L : Language}
@@ -207,7 +197,6 @@ noncomputable def growingClosureAlongState {L : Language}
     ((List.range (n + 2)).map (Countable.enumerate (α := Term L))).foldl
       (branchClosureRound choice) start
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The selected growing closure of the even-renamed input. -/
 noncomputable def growingClosureAlong {L : Language}
     [Countable (FormulaN L)] [Countable (Term L)]
@@ -294,7 +283,6 @@ theorem exists_consistent_branch {L : Language}
 -- Hintikka set via SearchTreeData (branching tree)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 5.5.1 (required companion): The signed set collected
 along an infinite path through a search tree. Given a SearchTreeData
 with path function f, this is the union of signed formulae from the

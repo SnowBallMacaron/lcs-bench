@@ -25,7 +25,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.CompletenessBridge
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
       GEqProofTree hL s), geqDepth T = m → ∀ (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)), s = (Sequent.mk
@@ -34,10 +33,8 @@ variable
       ++ [B] ++ Λ))), 1 + max (geqDepth p1) (geqDepth p2) = geqDepth T ∧ (∀ (s' : Sequent L), s' ∈
       geqLeafSequents p1 → seqAllAtomicOrQuantified s') ∧ ∀ (s' : Sequent L), s' ∈ geqLeafSequents p2 →
       seqAllAtomicOrQuantified s')
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ih
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_allLeft
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (ts : List (Term L)) (Γr Δr succ : List (FormulaN L)) (x :
       Nat) (X : FormulaN L) (hne : ts ≠ []) (hfree : ∀ (t : Term L), t ∈ ts → isFreeForN t x X) (sub :
@@ -61,7 +58,6 @@ theorem geqConjRight_allLeft
   · simpa [geqLeafSequents] using hq1leaf
   · simpa [geqLeafSequents] using hq2leaf
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_allRight
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
@@ -191,7 +187,6 @@ theorem geqConjRight_allRight
     · exact geqLeafProperty_transport hout2 r2 (by
         simpa [r2, geqLeafSequents] using (geqLeafProperty_transport hin2 q2 hq2leaf))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_exLeft
     (replaceConjFresh : ∀ (y : Nat) (ant D S : List (FormulaN L)) (C X : FormulaN L), formulaFVN X ⊆
       formulaFVN C → (∀ (F : FormulaN L), F ∈ ant ++ (D ++ [C] ++ S) → ¬y ∈ formulaFVN F) → ∀ (F : FormulaN
@@ -231,7 +226,6 @@ theorem geqConjRight_exLeft
   · simpa [geqLeafSequents] using hq1leaf
   · simpa [geqLeafSequents] using hq2leaf
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqConjRight_exRight
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
@@ -340,7 +334,7 @@ theorem geqConjRight_exRight
     · exact geqLeafProperty_transport hout2 r2 (by
         simpa [r2, geqLeafSequents] using (geqLeafProperty_transport hin2 q2 hq2leaf))
 
-private theorem geqConjRight_permOne
+theorem geqConjRight_permOne
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
       [Y] ++ K ∧ S = K ++ [X] ++ Q) (replaceConjFresh : ∀ (y : Nat) (ant D S : List (FormulaN L)) (C X :
@@ -377,7 +371,7 @@ private theorem geqConjRight_permOne
   | exRight ts Γr Δr Λr x X hne hfree =>
     exact geqConjRight_exRight L hL n ih markedSplit geqDepth_transport geqLeafProperty_transport A B Γ Δ Λ ts Γr Δr Λr x X hne hfree sub hsubdepth hsubleaf hconc
 
-private theorem geqConjRight_conjRight
+theorem geqConjRight_conjRight
     (markedSplit3 : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → (∃ (K
       : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ P = R ∧ X = Y ∧ Q = S ∨ ∃ (K : List
       (FormulaN L)), P = R ++ [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq :
@@ -517,7 +511,7 @@ private theorem geqConjRight_conjRight
       exact hs'.elim (geqLeafProperty_transport hb1eq b1 hb1leaf s')
         (geqLeafProperty_transport hb2eq b2 hb2leaf s')
 
-private theorem geqConjRight_disjLeft
+theorem geqConjRight_disjLeft
     (A B : FormulaN L) (Γ Δ Λ Γr Δr succ : List (FormulaN L)) (X Y : FormulaN L) (sub1 : GEqProofTree hL
       (Sequent.mk (Γr ++ [X] ++ Δr) (succ))) (hsub1depth : geqDepth sub1 < n) (hsub1leaf : ∀ (s' : Sequent L),
       s' ∈ geqLeafSequents sub1 → seqAllAtomicOrQuantified s') (sub2 : GEqProofTree hL (Sequent.mk (Γr ++ [Y]
@@ -547,7 +541,7 @@ private theorem geqConjRight_disjLeft
     simp only [p2, geqLeafSequents, List.mem_append] at hs'
     exact hs'.elim (hb1leaf s') (hb2leaf s')
 
-private theorem geqConjRight_implLeft
+theorem geqConjRight_implLeft
     (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁), geqDepth (heq ▸ p) =
       geqDepth p) (geqLeafProperty_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁),
       (∀ (s' : Sequent L), s' ∈ geqLeafSequents p → seqAllAtomicOrQuantified s') → ∀ (s' : Sequent L), s' ∈
@@ -591,7 +585,7 @@ private theorem geqConjRight_implLeft
     simp only [p2, geqLeafSequents, List.mem_append] at hs'
     exact hs'.elim (geqLeafProperty_transport hb1eq b1 hb1leaf s') (hb2leaf s')
 
-private theorem geqConjRight_permTwo
+theorem geqConjRight_permTwo
     (markedSplit3 : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → (∃ (K
       : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ P = R ∧ X = Y ∧ Q = S ∨ ∃ (K : List
       (FormulaN L)), P = R ++ [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq :
@@ -616,7 +610,7 @@ private theorem geqConjRight_permTwo
   | implLeft Γr Δr succ X Y =>
     exact geqConjRight_implLeft L hL n ih geqDepth_transport geqLeafProperty_transport A B Γ Δ Λ Γr Δr succ X Y sub1 hsub1depth hsub1leaf sub2 hsub2depth hsub2leaf hconc
 
-private theorem geqConjRight_eqRefl
+theorem geqConjRight_eqRefl
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (t : Term L) (Γe succ : List (FormulaN L)) (sub :
       GEqProofTree hL (Sequent.mk (Γe ++ [FormulaN.eq_ hL t t]) (succ))) (hseq : (Sequent.mk (Γe) (succ)) =
       (Sequent.mk (Γ) (Δ ++ [A.conj B] ++ Λ))) (hdepth : geqDepth (GEqProofTree.eqRefl t Γe succ sub) = n)
@@ -645,7 +639,7 @@ private theorem geqConjRight_eqRefl
   · simpa [p1, geqLeafSequents] using hq1leaf
   · simpa [p2, geqLeafSequents] using hq2leaf
 
-private theorem geqConjRight_eqFuncCong
+theorem geqConjRight_eqFuncCong
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (f : L.funSymbols) (ss ts : Fin (L.funArity f) → Term L)
       (Γe succ : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γe ++ [eqCongruenceImplFunc L hL f ss
       ts]) (succ))) (hseq : (Sequent.mk (Γe) (succ)) = (Sequent.mk (Γ) (Δ ++ [A.conj B] ++ Λ))) (hdepth :
@@ -674,7 +668,7 @@ private theorem geqConjRight_eqFuncCong
   · simpa [p1, geqLeafSequents] using hq1leaf
   · simpa [p2, geqLeafSequents] using hq2leaf
 
-private theorem geqConjRight_eqPredCong
+theorem geqConjRight_eqPredCong
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (P : L.predSymbols) (ss ts : Fin
       (L.predArity P) → Term L) (Γe succ : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γe ++
       [eqCongruenceImplPred L hL P ss ts]) (succ))) (hseq : (Sequent.mk (Γe) (succ)) = (Sequent.mk (Γ) (Δ ++
@@ -704,7 +698,7 @@ private theorem geqConjRight_eqPredCong
   · simpa [p1, geqLeafSequents] using hq1leaf
   · simpa [p2, geqLeafSequents] using hq2leaf
 
-private theorem geqConjRight_eqGeneral
+theorem geqConjRight_eqGeneral
     (A B : FormulaN L) (Γ Δ Λ axioms : List (FormulaN L)) (hne : axioms ≠ []) (haxioms : ∀ (A : FormulaN L), A
       ∈ axioms → isEqAxiomInstance hL A) (ant succ : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk
       (ant ++ axioms) (succ))) (hseq : (Sequent.mk (ant) (succ)) = (Sequent.mk (Γ) (Δ ++ [A.conj B] ++ Λ)))

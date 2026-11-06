@@ -117,7 +117,6 @@ def substAllInHornClause {L : Language} (hNoEq : L.withoutEquality)
     (c : FOHornClause L hNoEq) (σ : Nat → Term L) : FOHornClause L hNoEq :=
   FOHornClauseCore.subst σ c
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Theorem 9.4.1 (companion type): Per-step correspondence between a ground
     SLD transcript over a ground-instance program `D_g` and a non-ground
     source program `D_orig`. Each step in the transcript is witnessed to
@@ -154,7 +153,6 @@ inductive GroundSLDCorrespondence {L : Language} (hNoEq : L.withoutEquality)
 -- Direct hash-ground transcript adapter
 -- ===================================================================
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The first selected atom recorded by a ground transcript.  A transcript
     stores its chronological first step at the outermost `cons`, unlike
     `FOSLDDerivation`, whose chronological first step is the innermost
@@ -166,7 +164,6 @@ def GroundSLDTranscript.firstSelectedAtom {L : Language} (hNoEq : L.withoutEqual
   | .nil => none
   | .cons step _ => some step.Ak
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Left-biased selection composition.  It states the accumulator
     orientation used when a transcript is appended to an existing
     derivation: an earlier selection already present in the accumulator

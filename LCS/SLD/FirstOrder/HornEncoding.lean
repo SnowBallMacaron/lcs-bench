@@ -54,13 +54,11 @@ def hashLowerSubst {L : Language} (k : Nat)
     (σ : Nat → Term (HashLanguage L)) : Nat → Term L :=
   fun x => if x = k then .var k else hashLowerTerm k (σ x)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Finite raw-variable enumeration for one source Horn clause. -/
 def hashSourceClauseVarsList {L : Language} (hNoEq : L.withoutEquality)
     (c : FOHornClause L hNoEq) : List Nat :=
   (c.toFOClause.map (fun lit => formulaVarsList (FOLiteralCore.formula lit))).flatten
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The finite variable list of a source Horn problem.  It is computed
     solely from the concrete syntax of `D ++ goals`; no infinite set or
     ambient-language enumeration is involved. -/
@@ -68,7 +66,6 @@ def hashSourceProblemVarsList {L : Language} (hNoEq : L.withoutEquality)
     (D goals : List (FOHornClause L hNoEq)) : List Nat :=
   ((D ++ goals).map (hashSourceClauseVarsList (hNoEq := by all_goals exact hNoEq))).flatten.eraseDups
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A globally fresh even variable for the finite source Horn problem.
     It is twice one more than the maximum enumerated source variable. -/
 def hashFreshEvenVar {L : Language} (hNoEq : L.withoutEquality)

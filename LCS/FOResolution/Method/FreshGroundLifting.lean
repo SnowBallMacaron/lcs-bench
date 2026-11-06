@@ -19,7 +19,6 @@ open LCS.FOResolution.Unification
 namespace FOResolutionTree
 open FreshGroundLanguage
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural invariant certifying that every clause and substitution stored
     in a fresh-extension resolution tree uses only original symbols. -/
 def AllOriginal {L : Language} (hNoEq : L.withoutEquality) :
@@ -35,7 +34,6 @@ def AllOriginal {L : Language} (hNoEq : L.withoutEquality) :
       IsOriginalSubst rho' ∧
       IsOriginalSubst sigma
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Certified structural descent of a fresh-extension resolution tree. -/
 def lower {L : Language} (hNoEq : L.withoutEquality) :
     (T : FOResolutionTree (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)) →
@@ -53,7 +51,6 @@ def lower {L : Language} (hNoEq : L.withoutEquality) :
         (lowerSubst rho' hRho')
         (lowerSubst sigma hSigma)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The label of a certified lowered tree lifts back to the source label. -/
 theorem liftClause_lower_label {L : Language} (hNoEq : L.withoutEquality)
     [DecidableEq (FOLiteral L hNoEq)]
@@ -74,7 +71,6 @@ theorem liftClause_lower_label {L : Language} (hNoEq : L.withoutEquality)
         liftClause_substLits (hNoEq := by first | exact hNoEq | done), liftSubst_lowerSubst,
         liftClause_listDiff (hNoEq := by first | exact hNoEq | done), ih₂ h₂, liftClause_lowerClause (hNoEq := by first | exact hNoEq | done)]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every label of an all-original tree is an original-symbol clause. -/
 theorem AllOriginal.label {L : Language} (hNoEq : L.withoutEquality)
     [DecidableEq (FOLiteral L hNoEq)]

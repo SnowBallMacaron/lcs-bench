@@ -427,7 +427,7 @@ def G1nnfDeductionTree.treeSubstOk {L : Language} {hL : L.withoutEquality} :
 
 namespace G1nnfProofTree
 
-private theorem no_ruleEigenlabel_of_zero_premises {L : Language}
+theorem no_ruleEigenlabel_of_zero_premises {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L))
     (hAxiom : (rule.premises Γ Δ).length = 0)
@@ -437,7 +437,7 @@ private theorem no_ruleEigenlabel_of_zero_premises {L : Language}
   cases rule <;>
     simp [ruleEigenlabel, G1nnfRule.premises] at hAxiom hEv
 
-private theorem eigenvariables_onePremise_of_ruleEigenlabel
+theorem eigenvariables_onePremise_of_ruleEigenlabel
     {L : Language} {hL : L.withoutEquality}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L))
@@ -454,7 +454,7 @@ private theorem eigenvariables_onePremise_of_ruleEigenlabel
   apply Or.inl
   cases rule <;> simp_all [ruleEigenlabel]
 
-private theorem eigenvariables_twoPremise_of_ruleEigenlabel
+theorem eigenvariables_twoPremise_of_ruleEigenlabel
     {L : Language} {hL : L.withoutEquality}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L))

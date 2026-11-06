@@ -116,21 +116,18 @@ theorem lkeAllCutsAtomic_lk {L : Language} {s : Sequent L}
         simp_all [LKeProofTree.lk, lkeAllCutsAtomic,
           folkAllCutsAtomic, lkeStep2CutAtomic]
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- An LKe proof tree bundled with its all-cuts-atomic certificate. -/
 abbrev LKeAtomicProofTree {L : Language} (s : Sequent L) :=
   {T : LKeProofTree s // lkeAllCutsAtomic T}
 
 namespace LKeAtomicProofTree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Apply a canonical one-premise LKe rule to a certified proof. -/
 def onePremise {L : Language} {prem conc : Sequent L}
     (rule : FOLKStep1 prem conc) (t : LKeAtomicProofTree prem) :
     LKeAtomicProofTree conc :=
   ⟨LKeProofTree.onePremise rule t.1, t.2⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Apply a canonical two-premise LKe rule when its root cut, if any,
 is atomic. -/
 def twoPremise {L : Language}
@@ -143,7 +140,6 @@ def twoPremise {L : Language}
   ⟨LKeProofTree.twoPremise rule t1.1 t2.1,
     hRule, t1.2, t2.2⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Apply an atomic cut to two certified LKe proofs. -/
 def cut {L : Language} (A : FormulaN L)
     (Γ Δ Λ Θ : List (FormulaN L))

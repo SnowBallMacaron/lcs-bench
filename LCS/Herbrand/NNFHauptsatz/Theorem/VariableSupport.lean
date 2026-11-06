@@ -35,7 +35,6 @@ open LCS.CutElim.Hauptsatz.Completeness
 open LCS.CutElim.LK
 namespace LCS.Herbrand.NNFHauptsatz
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Complete finite support of a finite sequent. -/
 noncomputable def g2nnfSequentVariableSupport {L : Language}
     (S : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L)) :
@@ -45,7 +44,6 @@ noncomputable def g2nnfSequentVariableSupport {L : Language}
 
 namespace MaxQuantifierOccurrence
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Finite support of the proof-relevant occurrence annotation itself.  This
 recursion records the selected quantifier principal and every sibling formula
 along its exact left/right address. -/
@@ -71,7 +69,6 @@ noncomputable def variableSupport {L : Language} :
 end MaxQuantifierOccurrence
 namespace G2nnfRuleCore
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Finite support of formula, term, binder and selected-occurrence annotations.
 Stored side contexts are accounted for separately by `contextSupport`. -/
 noncomputable def annotationSupport {L : Language} :
@@ -108,7 +105,6 @@ noncomputable def annotationSupport {L : Language} :
             (LCS.Finset.union (formulaVariableSupport B)
               (termVariableSupport t))))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact support of all stored side contexts. -/
 noncomputable def contextSupport {L : Language} : G2nnfRuleCore L → LCS.Finset Nat
   | .cut _ Lambda Theta Gamma Delta =>
@@ -126,7 +122,6 @@ noncomputable def contextSupport {L : Language} : G2nnfRuleCore L → LCS.Finset
   | .exSubRight _ _ _ _ _ _ Gamma Delta =>
       g2nnfSequentVariableSupport (Gamma, Delta)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Complete rule support includes its annotations and every stored context. -/
 noncomputable def variableSupport {L : Language} (rule : G2nnfRuleCore L) :
     LCS.Finset Nat := LCS.Finset.union rule.annotationSupport rule.contextSupport
@@ -137,14 +132,12 @@ namespace LCS.Herbrand.NNFHauptsatz.G2nnfProofTree
 
 /-! ## Complete proof support and canonical root-fixed alpha copies -/
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Complete support contributed by one proof-tree node: its actual
 conclusion, every stored side context, and every hidden rule annotation. -/
 noncomputable def nodeVariableSupport {L : Language}
     [DecidableEq (FormulaN L)] (rule : G2nnfRuleCore L) : LCS.Finset Nat :=
   LCS.Finset.union (g2nnfSequentVariableSupport rule.conclusion) rule.variableSupport
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Full finite support of a G2nnf proof tree.  This includes every actual
 node sequent and all rule-only annotations throughout the tree. -/
 noncomputable def variableSupport {L : Language} {hL : L.withoutEquality}

@@ -464,12 +464,12 @@ theorem expandLeaf_addressed_fair {s t address ps side A}
   | true => exact hf.2 A hm hn
 
 
-private theorem treeCast_heq {s s'} (h : s = s') (t : DeductionTree s) :
+theorem treeCast_heq {s s'} (h : s = s') (t : DeductionTree s) :
     HEq (h ▸ t) t := by
   subst h
   rfl
 
-private theorem implTree_heq (Γ Δ Γ' Δ' Λ : List PropFormulaNormalized)
+theorem implTree_heq (Γ Δ Γ' Δ' Λ : List PropFormulaNormalized)
     (A B : PropFormulaNormalized) (hΓ : Γ = Γ') (hΔ : Δ = Δ') :
     HEq (DeductionTree.twoPremise (GentzenStep2.implLeft Γ Δ Λ A B)
       (.leaf ⟨Γ ++ Δ, A :: Λ⟩) (.leaf ⟨[B] ++ Γ ++ Δ, Λ⟩))
@@ -479,7 +479,7 @@ private theorem implTree_heq (Γ Δ Γ' Δ' Λ : List PropFormulaNormalized)
   subst hΔ
   rfl
 
-private theorem mapLeaves_cast {s s'} (h : s = s') (t : DeductionTree s)
+theorem mapLeaves_cast {s s'} (h : s = s') (t : DeductionTree s)
     (f : (s : Sequent) → DeductionTree s) :
     mapLeaves f (h ▸ t) = h ▸ mapLeaves f t := by
   subst h

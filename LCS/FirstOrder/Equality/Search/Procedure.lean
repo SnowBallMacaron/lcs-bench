@@ -118,7 +118,6 @@ noncomputable def outputEq {L : Language} (hL : L.hasEquality = true)
     else some .falsifiable
   else none
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Definition 5.6.3: Tree extension preserves every existing label and
 edge and adds nodes only below leaves. -/
 inductive InfGDeductionTreeExt.Extension {L : Language} :
@@ -135,7 +134,6 @@ inductive InfGDeductionTreeExt.Extension {L : Language} :
       {t u : InfGDeductionTreeExt (appendHeads (extendSeq s a b) heads)} :
       Extension t u → Extension (.extendEq a b heads hne t) (.extendEq a b heads hne u)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.6.3: Every search-stage tree extends itself. -/
 theorem InfGDeductionTreeExt.Extension.refl {L : Language} {s : Sequent L}
     (t : InfGDeductionTreeExt s) : Extension t t := by
@@ -146,7 +144,6 @@ theorem InfGDeductionTreeExt.Extension.refl {L : Language} {s : Sequent L}
   | extend a b _ ih => exact .intro a b ih
   | extendEq a b hs hn _ ih => exact .eqIntro a b hs hn ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.6.3: Successive leaf extensions compose. -/
 theorem InfGDeductionTreeExt.Extension.trans {L : Language} {s t u : Sequent L}
     {a : InfGDeductionTreeExt s} {b : InfGDeductionTreeExt t} {c : InfGDeductionTreeExt u}

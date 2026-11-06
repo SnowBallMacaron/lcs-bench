@@ -23,7 +23,6 @@ numbers identifying a position in a tree (as in Section 2.2). -/
 @[blueprint "chap8__definition_8_4_3"]
 abbrev TreeAddr := List Nat
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Labels of ranked trees distinguish variables from rigid symbols,
     even when a rigid symbol has rank zero. -/
 @[blueprint "chap8__definition_8_4_3"]
@@ -32,7 +31,6 @@ inductive RankedTreeLabel (Symbol : Type) where
   | rigid (symbol : Symbol)
   deriving DecidableEq
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Variable labels have rank zero; rigid labels retain their prescribed rank. -/
 def RankedTreeLabel.rank {Symbol : Type} (rank : Symbol → Nat) :
     RankedTreeLabel Symbol → Nat
@@ -65,14 +63,12 @@ def SyntaxTreeSymbol.rank {L : LCS.FirstOrder.Basic.Language} :
   | .predicate p => L.predArity p
   | .equality _ => 2
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The actual root label of a ranked tree. -/
 def RankedTreeData.rootLabel {Symbol : Type} {rank : Symbol → Nat} :
     RankedTreeData Symbol rank → RankedTreeLabel Symbol
   | .var x => .variable x
   | .node f _ => .rigid f
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Structural subtree lookup. The empty list names the root; child positions
     are one-based as in the source. Zero, out-of-rank children, and descent
     through a variable return none. -/
@@ -85,14 +81,12 @@ def RankedTreeData.subtreeAt {Symbol : Type} {rank : Symbol → Nat} :
   | .node f children, (i + 1) :: rest =>
       if h : i < rank f then (children ⟨i, h⟩).subtreeAt rest else none
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Actual label lookup, defined exactly where structural subtree lookup succeeds. -/
 @[blueprint "chap8__definition_8_4_3"]
 def RankedTreeData.labelAt {Symbol : Type} {rank : Symbol → Nat}
     (t : RankedTreeData Symbol rank) (u : TreeAddr) : Option (RankedTreeLabel Symbol) :=
   (t.subtreeAt u).map RankedTreeData.rootLabel
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- General navigation operations for the existing polymorphic algorithm
     consumers. The source-facing TreeNav restricts the tree and address types. -/
 @[blueprint "chap8__definition_8_4_3"]
@@ -111,7 +105,6 @@ structure TreeNavCore (Tree : Type) (Addr : Type) (Subst : Type) :
   tree t -/
   doSubstitution : Tree → Subst → Tree
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A finite-support substitution on ranked trees. The support list may
     contain fixed variables; outside it the map is the identity. -/
 @[blueprint "chap8__definition_8_4_3"]
@@ -120,7 +113,6 @@ structure FiniteTreeSubstitution (Symbol : Type) (rank : Symbol → Nat) where
   map : Nat → RankedTreeData Symbol rank
   outsideSupport : ∀ x, x ∉ support → map x = .var x
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Structural leafhood at a current-tree address; invalid addresses are false. -/
 def RankedTreeData.isLeaf {Symbol : Type} {rank : Symbol → Nat}
     (t : RankedTreeData Symbol rank) (u : TreeAddr) : Bool :=
@@ -129,7 +121,6 @@ def RankedTreeData.isLeaf {Symbol : Type} {rank : Symbol → Nat}
   | some (.node f _) => rank f == 0
   | none => false
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Variable classification consults the actual label, distinguishing constants. -/
 def RankedTreeData.isVariable {Symbol : Type} {rank : Symbol → Nat}
     (t : RankedTreeData Symbol rank) (u : TreeAddr) : Bool :=
@@ -137,13 +128,11 @@ def RankedTreeData.isVariable {Symbol : Type} {rank : Symbol → Nat}
   | some (.variable _) => true
   | _ => false
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- First child in the current tree, or none at leaves and invalid addresses. -/
 def RankedTreeData.firstChild {Symbol : Type} {rank : Symbol → Nat}
     (t : RankedTreeData Symbol rank) (u : TreeAddr) : Option TreeAddr :=
   if (t.subtreeAt u).isSome && !t.isLeaf u then some (u ++ [1]) else none
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Next sibling in the current tree. The root has no sibling.
     For a nonroot address ui, test the actual domain at u(i+1). -/
 def RankedTreeData.nextSibling {Symbol : Type} {rank : Symbol → Nat}
@@ -154,7 +143,6 @@ def RankedTreeData.nextSibling {Symbol : Type} {rank : Symbol → Nat}
       let next := u.dropLast ++ [i + 1]
       if (t.subtreeAt next).isSome then some next else none
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Simultaneous homomorphic substitution. Replacement trees are returned as
     supplied, and are not recursively substituted again. Rigid labels and the
     Fin-indexed order of their children are preserved. -/

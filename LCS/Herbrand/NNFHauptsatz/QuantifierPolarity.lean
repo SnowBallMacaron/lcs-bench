@@ -105,7 +105,6 @@ def quantifierPolarityExNNF : FormulaN qPolExLang :=
           (FormulaN.predN QPolExPred.Q
             (fun _ => Term.var 0)))))
 
--- ATTACH-BLOCKER: global set_option
 
 section QuantifierPolarity
 set_option backward.isDefEq.respectTransparency false
@@ -186,7 +185,6 @@ def QuantifierContextOccurrence.nnfAddress {L : Language} {A : FormulaN L}
   | .conjLeft o _ | .disjLeft o _ | .implLeft o _ => .left :: o.nnfAddress
   | .conjRight _ o | .disjRight _ o | .implRight _ o => .right :: o.nnfAddress
 
--- ATTACH-BLOCKER: section options: helper requires front context
 /-- Exact normalized occurrence and selected formula, for either incoming
 polarity. The address constraint prevents selecting an unrelated equal subformula. -/
 theorem QuantifierContextOccurrence.normalization {L : Language} {A : FormulaN L}

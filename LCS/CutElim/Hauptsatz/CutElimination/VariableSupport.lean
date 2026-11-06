@@ -144,7 +144,6 @@ theorem formulaFVN_mem_formulaVariableSupport {L : Language}
   | ex x A ih =>
       exact List.mem_cons.mpr (Or.inr (ih hv.1))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every bound variable of a formula is in its finite structural support. -/
 theorem formulaBVN_mem_formulaVariableSupport {L : Language}
     (A : FormulaN L) (v : Nat) (hv : formulaBVN A v) :
@@ -175,7 +174,6 @@ theorem formulaBVN_mem_formulaVariableSupport {L : Language}
         (fun h => List.mem_cons.mpr (Or.inr (ih h)))
         (fun h => List.mem_cons.mpr (Or.inl h))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Formula support is included in the support of any formula Finset that
 contains it. -/
 theorem formulaVariableSupport_subset_finsetSupport {L : Language}
@@ -384,7 +382,6 @@ noncomputable def variableSupport {L : Language} {hL : L.withoutEquality}
   LCS.Finset.union (formulaFinsetVariableSupport T.allFormulae)
     T.ruleDataVariableSupport
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Formula support from any actual proof-tree sequent is included in the
 complete proof-wide support. -/
 theorem variableSupport_of_formula_mem_allFormulae {L : Language} {hL : L.withoutEquality}
@@ -396,7 +393,6 @@ theorem variableSupport_of_formula_mem_allFormulae {L : Language} {hL : L.withou
     (Or.inl (formulaVariableSupport_subset_finsetSupport
       T.allFormulae A v hA hv))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every variable in recursively collected rule data is included in the
 complete proof-wide support. -/
 theorem variableSupport_of_ruleData {L : Language} {hL : L.withoutEquality}
@@ -532,7 +528,6 @@ theorem variableSupport_twoPremise_of_right_subtree {L : Language} {hL : L.witho
           (LCS.Finset.mem_union.mpr
             (Or.inr (LCS.Finset.mem_union.mpr (Or.inr hv))))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A deterministic variable strictly above every index in the finite
 proof-wide support and an additional finite avoidance set. -/
 noncomputable def freshVariableAvoiding {L : Language} {hL : L.withoutEquality}
@@ -540,7 +535,6 @@ noncomputable def freshVariableAvoiding {L : Language} {hL : L.withoutEquality}
     (T : G1nnfProofTree hL Γ Δ) (extra : LCS.Finset Nat) : Nat :=
   (LCS.Finset.union T.variableSupport extra).toList.foldl Nat.max 0 + 1
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem foldl_max_init_le (xs : List Nat) (init : Nat) :
     init ≤ xs.foldl Nat.max init := by
   induction xs generalizing init with
@@ -548,7 +542,6 @@ theorem foldl_max_init_le (xs : List Nat) (init : Nat) :
   | cons x xs ih =>
       exact Nat.le_trans (Nat.le_max_left init x) (ih _)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem foldl_max_mem_le (xs : List Nat) (init v : Nat)
     (hv : v ∈ xs) : v ≤ xs.foldl Nat.max init := by
   induction xs generalizing init with
@@ -560,7 +553,6 @@ theorem foldl_max_mem_le (xs : List Nat) (init v : Nat)
           (foldl_max_init_le xs (Nat.max init x))
       · exact ih (Nat.max init x) hv
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The avoiding selector is outside the complete proof-wide support. -/
 theorem freshVariableAvoiding_not_mem_variableSupport {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
@@ -600,7 +592,6 @@ theorem freshVariableAvoiding_not_mem_extra {L : Language} {hL : L.withoutEquali
   simp only [freshVariableAvoiding] at hLe
   omega
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A selected variable is not bound anywhere in the tree. This gives a
 concrete inhabitant of the non-vacuous `notBoundIn` predicate for every proof
 tree and every additional avoidance set. -/

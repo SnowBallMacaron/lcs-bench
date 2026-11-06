@@ -41,7 +41,6 @@ def toFormula {L : Language} : FOAtomCore L → FormulaN L
   | .predN P args => .predN P args
   | .eq_ hL lhs rhs => .eq_ hL lhs rhs
 
--- ATTACH-BLOCKER: unsupported untagged instance
 instance {L : Language} : Coe (FOAtomCore L) (FormulaN L) :=
   ⟨toFormula⟩
 
@@ -84,14 +83,12 @@ abbrev FOClauseCore (L : Language) : Type := List (FOLiteralCore L)
 
 namespace FOLiteralCore
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- General carrier: The conjugate of a first-order literal flips its
     sign: pos B has conjugate neg B, and neg B has conjugate pos B. -/
 def conjugate {L : Language} : FOLiteralCore L → FOLiteralCore L
   | .pos B => .neg B
   | .neg B => .pos B
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- General carrier: Extract the underlying formula from a first-order literal. -/
 def formula {L : Language} : FOLiteralCore L → FormulaN L
   | .pos B => B.toFormula
@@ -134,7 +131,6 @@ def formulaVars {L : Language} : FormulaN L → Set Nat
 
 namespace FOAtomCore
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Variable collection agrees with the ambient-formula embedding. -/
 theorem vars_eq_formulaVars {L : Language} (atom : FOAtomCore L) :
     atom.vars = formulaVars atom.toFormula := by
@@ -154,7 +150,6 @@ def vars {L : Language} (lit : FOLiteralCore L) : Set Nat :=
   match lit with
   | .pos atom | .neg atom => atom.vars
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Literal variables are exactly the variables of its embedded atom. -/
 theorem vars_eq_formulaVars {L : Language} (lit : FOLiteralCore L) :
     lit.vars = formulaVars lit.formula := by
@@ -177,7 +172,6 @@ end FOClauseCore
 
 namespace FOClauseCore
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- General carrier: A ground clause has no quantifiers and contains
     no variables (every literal references only ground terms). -/
 def isGround {L : Language} (c : FOClauseCore L) : Prop :=
@@ -456,7 +450,6 @@ end Formula
 
 namespace Formula
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A clause literal is an atomic predicate/equality formula or its
     immediate negation. -/
 def isClauseLiteral {L : Language} : FormulaN L → Prop
@@ -466,7 +459,6 @@ def isClauseLiteral {L : Language} : FormulaN L → Prop
   | .neg (.eq_ _ _ _) => True
   | _ => False
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A clause matrix is a nonempty disjunction tree whose leaves are
     clause literals. -/
 def isDisjunctionOfLiterals {L : Language} : FormulaN L → Prop
@@ -475,21 +467,18 @@ def isDisjunctionOfLiterals {L : Language} : FormulaN L → Prop
       Formula.isDisjunctionOfLiterals B
   | A => Formula.isClauseLiteral A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A CNF matrix is a nonempty conjunction tree whose leaves are
     disjunctions of literals. -/
 def isCNFMatrix {L : Language} : FormulaN L → Prop
   | .conj A B => Formula.isCNFMatrix A ∧ Formula.isCNFMatrix B
   | A => Formula.isDisjunctionOfLiterals A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 8.2.1 (companion): Split a formula's top-level conjunctions
     into the list of conjuncts. A non-conjunction is a singleton list. -/
 def splitConj {L : Language} : FormulaN L → List (FormulaN L)
   | .conj A B => splitConj A ++ splitConj B
   | A => [A]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Universal-prefix/disjunction grammar over an arbitrary language.
     This shape predicate does not assert closure or distinct bound names. -/
 def isUniversalClauseShape {L : Language} : FormulaN L → Prop
@@ -575,7 +564,6 @@ end Formula
 
 namespace Formula
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 8.2.1 (companion): Prepend a list of universal quantifiers to
     a formula: `prependAlls [i_1, ..., i_n] A = ∀ i_1 ... ∀ i_n . A`. -/
 def prependAlls {L : Language} :
@@ -583,7 +571,6 @@ def prependAlls {L : Language} :
   | [], A => A
   | i :: rest, A => FormulaN.all i (Formula.prependAlls rest A)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 8.2.1 (companion): Strip a leading universal prefix from a
     (universal-prenex) formula, returning the list of bound variables
     (outer-to-inner) and the matrix. On non-universal-prenex input the

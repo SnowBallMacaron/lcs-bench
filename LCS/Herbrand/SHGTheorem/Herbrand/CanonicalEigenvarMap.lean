@@ -223,7 +223,7 @@ theorem g2nnfEqRetentiveAllocationBinding_existsUnique
 /-- The computable data component of the allocation selected by a source
 existential binder.  `findIdx` supplies the `Nat`; the membership proof is
 used only for the `Fin` bound and never as a Prop-to-Type choice oracle. -/
-private def skolemAllocationIndexOfBinder
+def skolemAllocationIndexOfBinder
     {L : Language} (spec : SkolemSpec L) (x : Nat)
     (hx : x ∈ existentialBinderSequence spec.source) :
     Fin spec.n :=
@@ -244,7 +244,7 @@ private def skolemAllocationIndexOfBinder
 
 /-- The deterministic binder index agrees with any exact allocation whose
 descriptor has that binder.  Rectification supplies binder-list `Nodup`. -/
-private theorem skolemAllocationIndexOfBinder_eq_of_allocation
+theorem skolemAllocationIndexOfBinder_eq_of_allocation
     {L : Language} (spec : SkolemSpec L) (x : Nat)
     (hx : x ∈ existentialBinderSequence spec.source)
     (j : Fin spec.n) (sourceBody : FormulaN L)
@@ -305,7 +305,7 @@ private theorem skolemAllocationIndexOfBinder_eq_of_allocation
 
 /-- The source binder of one exact relevant G2nnf existential-left
 occurrence is present in the source allocation traversal. -/
-private theorem g2nnfRetentiveOccurrence_sourceBinder
+theorem g2nnfRetentiveOccurrence_sourceBinder
     {L : Language} {hNoEq : L.withoutEquality}
     [DecidableEq (FormulaN L)]
     (spec : SkolemSpec L)
@@ -332,7 +332,7 @@ private theorem g2nnfRetentiveOccurrence_sourceBinder
     occurrence.maxOccurrence occurrence.hSelected
 
 /-- Equality-system source-binder extraction. -/
-private theorem g2nnfEqRetentiveOccurrence_sourceBinder
+theorem g2nnfEqRetentiveOccurrence_sourceBinder
     {L : Language} {hL : L.hasEquality = true}
     [DecidableEq (FormulaN L)]
     (spec : SkolemSpec L)

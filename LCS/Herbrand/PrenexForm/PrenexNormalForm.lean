@@ -36,7 +36,6 @@ open LCS.FirstOrder.SemanticsN.Substitution
 -- Theorem 7.2.1 (infrastructure): Variable bound utilities
 -- ===================================================================
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Upper bound on all variable indices occurring in a term. -/
 def Term.varBound {L : Language} : Term L → Nat
   | .var i => i + 1

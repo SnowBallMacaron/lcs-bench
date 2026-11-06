@@ -25,7 +25,7 @@ open LCS.FirstOrder.Semantics.Subformulae
 
 /-- Equality-system Core construction trace, mirroring the five quantifier
 transitions of `ClosedG2nnfLowerTrace`. -/
-private inductive ClosedG2nnfEqLowerTrace
+inductive ClosedG2nnfEqLowerTrace
     {L : Language} {hL : L.hasEquality = true}
     [DecidableEq (FormulaN L)]
     (spec : SkolemSpec L)

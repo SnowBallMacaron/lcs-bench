@@ -22,13 +22,11 @@ def termSubstAll {L : Language} : Term L → (Nat → Term L) → Term L
 
 namespace SubstitutionCore
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The support D(sigma) of an arbitrary variable map:
     D(sigma) = {x | sigma(x) != var x}. -/
 def substSupport {L : Language} (sigma : Nat → Term L) : Set Nat :=
   fun x => sigma x ≠ Term.var x
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- For an arbitrary variable map, I(sigma) is the union
     of FV(sigma(x)) for all x in D(sigma). -/
 def substIntroduced {L : Language} (sigma : Nat → Term L) : Set Nat :=
@@ -44,7 +42,6 @@ def substCompose {L : Language}
 
 end SubstitutionCore
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A variable map with an explicit finite list containing its support.
     The list may include fixed variables; actual support is defined by inequality.
     Outside the list the map is the identity, as required by finite substitutions. -/
@@ -54,11 +51,9 @@ structure FiniteSubstitution (L : Language) where
   map : Nat → Term L
   outsideSupport : ∀ x, x ∉ support → map x = Term.var x
 
--- ATTACH-BLOCKER: unsupported untagged instance
 instance {L : Language} : CoeFun (FiniteSubstitution L) (fun _ => Nat → Term L) :=
   ⟨FiniteSubstitution.map⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The finite identity substitution, with empty support witness. -/
 @[blueprint "chap8__definition_8_4_1"]
 def FiniteSubstitution.identity {L : Language} : FiniteSubstitution L where
@@ -98,12 +93,10 @@ def substCompose {L : Language}
 -- Concrete equation-system foundation for Robinson unification
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The identity substitution on first-order terms. -/
 def identitySubst {L : Language} : Nat → Term L :=
   fun x => Term.var x
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Applying the identity substitution leaves a term unchanged. -/
 theorem termSubstAll_identity {L : Language} (t : Term L) :
     termSubstAll t identitySubst = t := by
@@ -117,7 +110,6 @@ theorem termSubstAll_identity {L : Language} (t : Term L) :
     funext i
     exact ih i
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Simultaneous substitution composition: applying `sigma` and then `theta`
     equals applying `SubstitutionCore.substCompose theta sigma` once. -/
 theorem SubstitutionCore.termSubstAll_compose {L : Language}
@@ -134,7 +126,6 @@ theorem SubstitutionCore.termSubstAll_compose {L : Language}
     funext i
     exact ih i
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Substitution composition is associative. -/
 theorem SubstitutionCore.substCompose_assoc {L : Language}
     (rho theta sigma : Nat → Term L) :
@@ -145,7 +136,6 @@ theorem SubstitutionCore.substCompose_assoc {L : Language}
   unfold SubstitutionCore.substCompose
   exact SubstitutionCore.termSubstAll_compose (sigma x) theta rho
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The identity substitution is a right identity for composition. -/
 theorem SubstitutionCore.substCompose_identity_right {L : Language}
     (sigma : Nat → Term L) :
@@ -153,7 +143,6 @@ theorem SubstitutionCore.substCompose_identity_right {L : Language}
 -- BEGIN PROOF
   rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Composition can only change a variable already changed by one of its two
     component substitutions. -/
 theorem SubstitutionCore.substSupport_compose_subset {L : Language}
@@ -174,7 +163,6 @@ theorem SubstitutionCore.substSupport_compose_subset {L : Language}
     rw [hSigmaEq]
     exact hTheta
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Two finite substitutions with the same support witness and pointwise map
     are equal; the outside-support proof carries no extra data. -/
 theorem FiniteSubstitution.ext {L : Language} {sigma theta : FiniteSubstitution L}

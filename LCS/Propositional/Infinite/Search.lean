@@ -87,7 +87,6 @@ def infIsFinishedLeafBool (state : InfSearchState) (s : Sequent) : Bool :=
     (state.L 0 == none && state.R 0 == none &&
       (s.antecedent ++ s.succedent).all isAtomicBool)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Exact executable while-loop guard. -/
 def infIsFinishedTreeBool (state : InfSearchState) : Bool :=
   state.tree.leaves.all (infIsFinishedLeafBool state)

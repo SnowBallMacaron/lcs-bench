@@ -29,7 +29,6 @@ empty path: in particular, a quantifier-free conjunctive matrix remains
 one matrix leaf rather than being split into its connective children.
 At a universal node, every child path is retained in constructor order
 and extended by the current binder and its chosen closed term. -/
--- ATTACH-BLOCKER: mutual
 mutual
 def cInstanceGroundSubstitutionPaths {L : Language} :
     CInstance L → List (List (Nat × Term L))
@@ -53,7 +52,6 @@ end
 
 /- Every term recorded in an enumerated substitution path is one of the
 closed choices carried by a `forallInst` constructor. -/
--- ATTACH-BLOCKER: mutual
 mutual
 theorem cInstanceGroundSubstitutionPaths_termsClosed
     {L : Language} :
@@ -91,7 +89,7 @@ theorem cInstanceGroundSubstitutionPaths_termsClosed
         cInstanceGroundSubstitutionPathsList_termsClosed
           x tsRest hsRest hGroundRest path hRest
 
-private theorem cInstanceGroundSubstitutionPathsList_termsClosed
+theorem cInstanceGroundSubstitutionPathsList_termsClosed
     {L : Language} (x : Nat) :
     ∀ (ts : List (Term L)) (hs : List (CInstance L)),
       (∀ t ∈ ts, Term.isClosed t) →
@@ -122,7 +120,6 @@ end
 
 /- Well-formedness aligns every enumerated path with the exact ordered
 universal prefix of the represented source. -/
--- ATTACH-BLOCKER: mutual
 mutual
 theorem cInstanceGroundSubstitutionPaths_complete
     {L : Language} :
@@ -181,7 +178,7 @@ theorem cInstanceGroundSubstitutionPaths_complete
           x C hBodyUniversal tsRest hsRest hWFRest
           path hRest
 
-private theorem cInstanceGroundSubstitutionPathsList_complete
+theorem cInstanceGroundSubstitutionPathsList_complete
     {L : Language} (x : Nat) (C : FormulaN L)
     (hBodyUniversal : UniversalPrenexFormula C) :
     ∀ (ts : List (Term L)) (hs : List (CInstance L)),
@@ -221,7 +218,7 @@ private theorem cInstanceGroundSubstitutionPathsList_complete
           path hRest
 end
 
-private theorem cInstance_toFormula_eq_source_of_qf
+theorem cInstance_toFormula_eq_source_of_qf
     {L : Language} (ci : CInstance L)
     (hWF : CInstance.WellFormed ci)
     (hQF : FirstOrder.SemanticsN.isQuantifierFree ci.source) :
@@ -267,9 +264,9 @@ private theorem cInstance_toFormula_eq_source_of_qf
         hSourceH, hSourceK]
   | forallInst _ _ _ _ _ _ _ _ =>
     exact hQF.elim
-termination_by sizeOf ci /- ATTACH-BLOCKER: private declaration -/
+termination_by sizeOf ci
 
-private theorem applyGroundSubstitution_cons_prenexMatrix_all
+theorem applyGroundSubstitution_cons_prenexMatrix_all
     {L : Language} (C : FormulaN L) (x : Nat)
     (t : Term L) (tail : List (Nat × Term L))
     (hx : ¬x ∈ formulaBVN C) :
@@ -281,13 +278,13 @@ private theorem applyGroundSubstitution_cons_prenexMatrix_all
   simp only [prenexMatrix, applyGroundSubstitution,
     List.foldl_cons]
   rw [Herbrand.prenexMatrix_formulaSubstN_of_not_bv
-    C t x hx] /- ATTACH-BLOCKER: private declaration -/
+    C t x hx]
 
 /- The enumerated leaves flatten exactly to `CInstance.toFormula`.
 The right-nested helper follows the `forallInst` output; both list
 certificates preserve each child's leaves without deduplication. -/
 mutual
-private theorem cInstanceGroundSubstitutionPaths_flattening
+theorem cInstanceGroundSubstitutionPaths_flattening
     {L : Language} :
     ∀ (ci : CInstance L),
       CInstance.WellFormed ci →
@@ -408,7 +405,7 @@ private theorem cInstanceGroundSubstitutionPaths_flattening
       Function.comp_def] using
       hFlatteningRest
 
-private theorem cInstanceGroundSubstitutionPathsList_flattening
+theorem cInstanceGroundSubstitutionPathsList_flattening
     {L : Language} (x : Nat) (C : FormulaN L)
     (hBodyUniversal : UniversalPrenexFormula C)
     (hBodyDistinct : distinctQuantifierBindings C)
@@ -450,7 +447,7 @@ private theorem cInstanceGroundSubstitutionPathsList_flattening
       List.map_append, List.map_map, List.append_assoc, Function.comp_def] using
       ConjunctionFlattening.conj hInit hTail
 
-end /- ATTACH-BLOCKER: mutual -/
+end
 
 /-- The proof-coupled ground matrix instances encoded by a well-formed
 `CInstance`, in exact path order and with multiplicity preserved. At each
@@ -479,9 +476,9 @@ def cInstance_groundMatrixInstances {L : Language}
         leafClosed :=
           applyGroundSubstitution_isClosed_of_fullPrefix
             ci.source path.1 hComplete hTermsClosed
-            hSourceClosed hUniversal hDistinct }) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+            hSourceClosed hUniversal hDistinct })
 
-private theorem cInstance_groundMatrixInstances_toFormula
+theorem cInstance_groundMatrixInstances_toFormula
     {L : Language}
     (ci : CInstance L)
     (hWF : CInstance.WellFormed ci)
@@ -501,7 +498,7 @@ private theorem cInstance_groundMatrixInstances_toFormula
       (l := cInstanceGroundSubstitutionPaths ci)
       (f := fun path =>
         applyGroundSubstitution
-          (prenexMatrix ci.source) path)) /- ATTACH-BLOCKER: private declaration -/
+          (prenexMatrix ci.source) path))
 
 /-- A well-formed c-instance of a closed universal-prenex NNF source is
 structurally a finite conjunction of complete ground instances of the
@@ -528,7 +525,7 @@ theorem cInstance_toFormula_isFiniteGroundConjunctionOfMatrix
     ci hWF hUniversal hDistinct hSourceClosed]
   exact
     cInstanceGroundSubstitutionPaths_flattening
-      ci hWF hUniversal hDistinct /- ATTACH-BLOCKER: private name in relocated declaration -/
+      ci hWF hUniversal hDistinct
 
 open LCS.Herbrand.PrenexForm
 open LCS.Herbrand.NNFHauptsatz.Theorem

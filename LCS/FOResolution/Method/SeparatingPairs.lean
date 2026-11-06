@@ -71,7 +71,6 @@ def LitSetConjugate {L : Language} (hNoEq : L.withoutEquality)
     (lits : List (FOLiteral L hNoEq)) : List (FOLiteral L hNoEq) :=
   lits.map (FOLiteral.conjugate hNoEq)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Internal total extension of literal-set absolute value retained for
     compatibility; the canonical Definition 8.5.1 boundary is
     `LitSetAbsSameSign`. -/

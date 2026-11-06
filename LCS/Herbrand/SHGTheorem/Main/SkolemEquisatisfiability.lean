@@ -88,7 +88,7 @@ def skolemFormulaSupported {L : Language} (S : SkolemSpec L)
   | .all _ A => skolemFormulaSupported S available A
   | .ex _ A => skolemFormulaSupported S available A
 
-private theorem skolemTermSupported_mono {L : Language}
+theorem skolemTermSupported_mono {L : Language}
     (S : SkolemSpec L) {xs ys : List (Fin S.n)}
     (hSub : ∀ i, i ∈ xs → i ∈ ys) :
     ∀ t, skolemTermSupported S xs t →
@@ -137,7 +137,7 @@ theorem skolemFormulaSupported_mono {L : Language}
   | all _ A ih => exact ih
   | ex _ A ih => exact ih
 
-private theorem liftTermSkolem_supported_nil {L : Language}
+theorem liftTermSkolem_supported_nil {L : Language}
     (S : SkolemSpec L) :
     ∀ t : Term L,
       skolemTermSupported S [] (liftTermSkolem t) := by
@@ -176,7 +176,7 @@ theorem exactSkolemTerm_supported {L : Language}
   · exact hi
   · exact ⟨hi, fun _ => trivial⟩
 
-private theorem termSubst_supported {L : Language}
+theorem termSubst_supported {L : Language}
     (S : SkolemSpec L) (available : List (Fin S.n)) :
     ∀ r t : Term S.language, skolemTermSupported S available r →
       skolemTermSupported S available t →
@@ -250,7 +250,7 @@ def skolemInterpretationsAgreeOn {L : Language}
     (K K' : SkolemInterpretation S M) : Prop :=
   ∀ i, i ∈ available → ∀ args, K i args = K' i args
 
-private theorem termEval_interpretationExpansion_eq {L : Language}
+theorem termEval_interpretationExpansion_eq {L : Language}
     (S : SkolemSpec L) (M : Structure L)
     (available : List (Fin S.n))
     (K K' : SkolemInterpretation S M)
@@ -400,7 +400,7 @@ theorem skolemSpec_indices_nodup {L : Language}
 
 /-- Every computed allocation is backed by an existential descriptor;
 the filter-map representation cannot allocate any other constructor. -/
-private theorem skolemAllocation_isExistential {L : Language}
+theorem skolemAllocation_isExistential {L : Language}
     (S : SkolemSpec L) (i : Fin S.n) :
     ∃ x D, (S.allocation i).1 = FormulaN.ex x D := by
   have hMem : S.allocation i ∈ S.allocations :=
@@ -430,14 +430,13 @@ noncomputable def skolemAllocationBinderBody {L : Language}
   let h := skolemAllocation_isExistential S i
   (Classical.choose h, Classical.choose (Classical.choose_spec h))
 
--- ATTACH-BLOCKER: private declaration
 /-- Context-strengthened semantic invariant for the backward direction.
 `processed` records the Skolem symbols already fixed by enclosing or
 earlier occurrences.  The returned interpretation changes only
 `indices`, so later disjoint traversal segments cannot invalidate an
 earlier result.  The guard `P` permits disjunction branches to select
 witnesses pointwise in their current universal-scope values. -/
-private theorem skolemFormExactAux_backward_semantics {L : Language}
+theorem skolemFormExactAux_backward_semantics {L : Language}
     (S : SkolemSpec L) (M : Structure L) :
     ∀ (m : Nat) (A : FormulaN S.language) (scope : List Nat)
       (indices : List (Fin S.n)) (B : FormulaN S.language) (used : Nat)
@@ -1058,7 +1057,6 @@ private theorem skolemFormExactAux_backward_semantics {L : Language}
 -- Lemma 7.6.3 (backward generalized): skolemForm_backward_genN
 -- ===================================================================
 
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Lemma 7.6.3 backward (FormulaN version): if M satisfies
 `spec.source`, then a coordinated expansion N of M to the
 Skolem-extended language satisfies `SK spec`. The public

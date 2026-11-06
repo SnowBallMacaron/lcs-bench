@@ -314,7 +314,6 @@ structure ImplicitDefinabilityFunc (L : Language) : Type 1 where
 -- ===================================================================
 -- Theorem 6.6.2 (companion, part b): ExplicitDefinabilityFunc
 -- ===================================================================
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- Theorem 6.6.2 (companion, part b): A positive-arity function f is
 defined explicitly from P_1,...,P_k by a formula D whose free
 variables are among {x_0,...,x_n}, where x_n is the output variable y,

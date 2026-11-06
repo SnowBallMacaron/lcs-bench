@@ -14,7 +14,6 @@ open LCS.FirstOrder.SyntaxN
 open LCS.FOResolution.ClauseForm
 open LCS.FOResolution.Unification
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A conservative extension of `L` with exactly one new constant symbol.
     Function symbols, predicate symbols, their arities, and the equality flag
     are unchanged.  This supplies a closed term for the ground phase of
@@ -30,24 +29,20 @@ def FreshGroundLanguage (L : Language) : Language where
 
 namespace FreshGroundLanguage
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The unique constant symbol added by `FreshGroundLanguage`. -/
 def freshConstantSymbol {L : Language} :
     (FreshGroundLanguage L).constSymbols :=
   Sum.inr ()
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The distinguished closed term supplied by the fresh extension. -/
 def seed {L : Language} : Term (FreshGroundLanguage L) :=
   .const freshConstantSymbol
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Adding the fresh constant neither adds nor removes equality. -/
 @[blueprint "chap8__lemma_8_5_4"]
 theorem withoutEquality_iff (L : Language) :
     (FreshGroundLanguage L).withoutEquality ↔ L.withoutEquality
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural embedding of base-language terms into the fresh extension. -/
 def liftTerm {L : Language} :
     Term L → Term (FreshGroundLanguage L)
@@ -55,34 +50,29 @@ def liftTerm {L : Language} :
   | .const c => .const (Sum.inl c)
   | .func f args => .func f (fun i => liftTerm (args i))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural embedding of base-language atoms into the fresh extension. -/
 def liftAtom {L : Language} (hNoEq : L.withoutEquality) :
     FOAtom L hNoEq → FOAtom (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)
   | .predN P args => .predN P (fun i => liftTerm (args i))
   | .eq_ hL lhs rhs => .eq_ hL (liftTerm lhs) (liftTerm rhs)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural embedding of base-language literals into the fresh extension. -/
 def liftLiteral {L : Language} (hNoEq : L.withoutEquality) :
     FOLiteral L hNoEq → FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)
   | .pos atom => .pos (liftAtom (hNoEq := by first | exact hNoEq | done) atom)
   | .neg atom => .neg (liftAtom (hNoEq := by first | exact hNoEq | done) atom)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Pointwise embedding of a base-language clause. -/
 @[blueprint "chap8__lemma_8_5_4"]
 def liftClause {L : Language} (hNoEq : L.withoutEquality) (C : FOClause L hNoEq) :
     FOClause (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq) :=
   C.map (liftLiteral (hNoEq := by first | exact hNoEq | done))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Pointwise embedding of a base-language substitution. -/
 def liftSubst {L : Language} (sigma : Nat → Term L) :
     Nat → Term (FreshGroundLanguage L) :=
   fun x => liftTerm (sigma x)
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- A term in the extension uses only original constants.  Since function
     symbols are unchanged, this is exactly the image predicate for `liftTerm`. -/
 inductive IsOriginalTerm {L : Language} :
@@ -95,7 +85,6 @@ inductive IsOriginalTerm {L : Language} :
       (hargs : ∀ i, IsOriginalTerm (args i)) :
       IsOriginalTerm (.func f args)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An original-term certificate for a function application exposes a
     certificate for each immediate argument. -/
 theorem IsOriginalTerm.func_arg {L : Language}
@@ -107,7 +96,6 @@ theorem IsOriginalTerm.func_arg {L : Language}
   | func _ _ hargs =>
       exact hargs i
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A fresh constant cannot carry an original-term certificate. -/
 theorem freshConstant_not_original {L : Language} (u : Unit) :
     ¬ IsOriginalTerm
@@ -115,7 +103,6 @@ theorem freshConstant_not_original {L : Language} (u : Unit) :
   intro h
   cases h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certified descent of an original-symbol term back to the base language. -/
 def lowerTerm {L : Language} :
     (t : Term (FreshGroundLanguage L)) → IsOriginalTerm t → Term L
@@ -126,7 +113,6 @@ def lowerTerm {L : Language} :
   | .func f args, h =>
       .func f (fun i => lowerTerm (args i) (h.func_arg i))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every lifted term is certified to use only original symbols. -/
 theorem liftTerm_isOriginal {L : Language} (t : Term L) :
     IsOriginalTerm (liftTerm t) := by
@@ -138,7 +124,6 @@ theorem liftTerm_isOriginal {L : Language} (t : Term L) :
   | func f args ih =>
       exact .func f (fun i => liftTerm (args i)) ih
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting after certified descent recovers the extension term exactly. -/
 theorem liftTerm_lowerTerm {L : Language}
     {t : Term (FreshGroundLanguage L)} (h : IsOriginalTerm t) :
@@ -193,14 +178,12 @@ theorem liftTerm_injective {L : Language} (hNoEq : L.withoutEquality) :
             eq_of_heq (Term.func.inj h).2
           exact congrFun hargs i
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural predicate that every term of an atom uses original symbols. -/
 def IsOriginalAtom {L : Language} (hNoEq : L.withoutEquality) :
     FOAtom (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq) → Prop
   | .predN _ args => ∀ i, IsOriginalTerm (args i)
   | .eq_ _ lhs rhs => IsOriginalTerm lhs ∧ IsOriginalTerm rhs
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certified descent of an original-symbol atom. -/
 def lowerAtom {L : Language} (hNoEq : L.withoutEquality)
     (atom : FOAtom (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq))
@@ -211,7 +194,6 @@ def lowerAtom {L : Language} (hNoEq : L.withoutEquality)
   | .eq_ hL lhs rhs =>
       .eq_ hL (lowerTerm lhs h.1) (lowerTerm rhs h.2)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every lifted atom is certified to use only original symbols. -/
 theorem liftAtom_isOriginal {L : Language} (hNoEq : L.withoutEquality) (atom : FOAtom L hNoEq) :
     IsOriginalAtom (hNoEq := by first | exact hNoEq | done) (liftAtom (hNoEq := by first | exact hNoEq | done) atom) := by
@@ -221,7 +203,6 @@ theorem liftAtom_isOriginal {L : Language} (hNoEq : L.withoutEquality) (atom : F
   | eq_ hL lhs rhs =>
       exact ⟨liftTerm_isOriginal lhs, liftTerm_isOriginal rhs⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting after certified atom descent recovers the atom exactly. -/
 theorem liftAtom_lowerAtom {L : Language} (hNoEq : L.withoutEquality)
     (atom : FOAtom (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq))
@@ -256,13 +237,11 @@ theorem liftAtom_injective {L : Language} (hNoEq : L.withoutEquality) :
   · have h' := FOAtomCore.eq_.inj h
     rw [liftTerm_injective (hNoEq := by first | exact hNoEq | done) h'.1, liftTerm_injective (hNoEq := by first | exact hNoEq | done) h'.2]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural predicate that a literal's atom uses original symbols. -/
 def IsOriginalLiteral {L : Language} (hNoEq : L.withoutEquality) :
     FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq) → Prop
   | .pos atom | .neg atom => IsOriginalAtom (hNoEq := by first | exact hNoEq | done) atom
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certified descent of an original-symbol literal. -/
 def lowerLiteral {L : Language} (hNoEq : L.withoutEquality)
     (lit : FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq))
@@ -271,13 +250,11 @@ def lowerLiteral {L : Language} (hNoEq : L.withoutEquality)
   | .pos atom => .pos (lowerAtom (hNoEq := by first | exact hNoEq | done) atom h)
   | .neg atom => .neg (lowerAtom (hNoEq := by first | exact hNoEq | done) atom h)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every lifted literal is certified to use only original symbols. -/
 theorem liftLiteral_isOriginal {L : Language} (hNoEq : L.withoutEquality) (lit : FOLiteral L hNoEq) :
     IsOriginalLiteral (hNoEq := by first | exact hNoEq | done) (liftLiteral (hNoEq := by first | exact hNoEq | done) lit) := by
   cases lit <;> apply liftAtom_isOriginal (hNoEq := by first | exact hNoEq | done)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting after certified literal descent recovers the literal exactly. -/
 theorem liftLiteral_lowerLiteral {L : Language} (hNoEq : L.withoutEquality)
     (lit : FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq))
@@ -302,7 +279,6 @@ theorem liftLiteral_injective {L : Language} (hNoEq : L.withoutEquality) :
   · exact congrArg FOLiteralCore.neg
       (liftAtom_injective (hNoEq := by first | exact hNoEq | done) (FOLiteralCore.neg.inj h))
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Structural certificate that every literal of a clause uses only original
     symbols.  This list-indexed form supports total constructive descent. -/
 inductive IsOriginalClause {L : Language} (hNoEq : L.withoutEquality) :
@@ -314,7 +290,6 @@ inductive IsOriginalClause {L : Language} (hNoEq : L.withoutEquality) :
       (hrest : IsOriginalClause (hNoEq := by first | exact hNoEq | done) rest) :
       IsOriginalClause (hNoEq := by first | exact hNoEq | done) (lit :: rest)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An original-clause certificate exposes its head-literal certificate. -/
 theorem IsOriginalClause.head {L : Language} (hNoEq : L.withoutEquality)
     {lit : FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -325,7 +300,6 @@ theorem IsOriginalClause.head {L : Language} (hNoEq : L.withoutEquality)
   | cons hlit _ =>
       exact hlit
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An original-clause certificate exposes its tail certificate. -/
 theorem IsOriginalClause.tail {L : Language} (hNoEq : L.withoutEquality)
     {lit : FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -336,7 +310,6 @@ theorem IsOriginalClause.tail {L : Language} (hNoEq : L.withoutEquality)
   | cons _ hrest =>
       exact hrest
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certified descent of an original-symbol clause. -/
 def lowerClause {L : Language} (hNoEq : L.withoutEquality) :
     (C : FOClause (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)) → IsOriginalClause (hNoEq := by first | exact hNoEq | done) C → FOClause L hNoEq
@@ -344,7 +317,6 @@ def lowerClause {L : Language} (hNoEq : L.withoutEquality) :
   | lit :: rest, h =>
       lowerLiteral (hNoEq := by first | exact hNoEq | done) lit h.head :: lowerClause (hNoEq := by first | exact hNoEq | done) rest h.tail
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every lifted clause is certified to use only original symbols. -/
 theorem liftClause_isOriginal {L : Language} (hNoEq : L.withoutEquality) (C : FOClause L hNoEq) :
     IsOriginalClause (hNoEq := by first | exact hNoEq | done) (liftClause (hNoEq := by first | exact hNoEq | done) C) := by
@@ -354,7 +326,6 @@ theorem liftClause_isOriginal {L : Language} (hNoEq : L.withoutEquality) (C : FO
   | cons lit rest ih =>
       exact .cons (liftLiteral_isOriginal (hNoEq := by first | exact hNoEq | done) lit) ih
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting after certified clause descent recovers the clause exactly. -/
 theorem liftClause_lowerClause {L : Language} (hNoEq : L.withoutEquality)
     {C : FOClause (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -370,20 +341,17 @@ theorem liftClause_lowerClause {L : Language} (hNoEq : L.withoutEquality)
           _ :: _
       rw [liftLiteral_lowerLiteral (hNoEq := by first | exact hNoEq | done) _ hlit, ih]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural image predicate for substitutions. -/
 def IsOriginalSubst {L : Language}
     (sigma : Nat → Term (FreshGroundLanguage L)) : Prop :=
   ∀ x, IsOriginalTerm (sigma x)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certified pointwise descent of an original-symbol substitution. -/
 def lowerSubst {L : Language}
     (sigma : Nat → Term (FreshGroundLanguage L))
     (h : IsOriginalSubst sigma) : Nat → Term L :=
   fun x => lowerTerm (sigma x) (h x)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting after certified substitution descent is exact. -/
 theorem liftSubst_lowerSubst {L : Language}
     (sigma : Nat → Term (FreshGroundLanguage L))
@@ -392,7 +360,6 @@ theorem liftSubst_lowerSubst {L : Language}
   funext x
   exact liftTerm_lowerTerm (h x)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Term lifting commutes with simultaneous substitution. -/
 theorem liftTerm_termSubstAll {L : Language}
     (t : Term L) (sigma : Nat → Term L) :
@@ -409,7 +376,6 @@ theorem liftTerm_termSubstAll {L : Language}
       funext i
       exact ih i
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Atom lifting commutes with simultaneous substitution. -/
 theorem liftAtom_subst {L : Language} (hNoEq : L.withoutEquality)
     (atom : FOAtom L hNoEq) (sigma : Nat → Term L) :
@@ -426,7 +392,6 @@ theorem liftAtom_subst {L : Language} (hNoEq : L.withoutEquality)
       rw [liftTerm_termSubstAll lhs sigma,
         liftTerm_termSubstAll rhs sigma]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Literal lifting commutes with simultaneous substitution. -/
 theorem liftLiteral_substLit {L : Language} (hNoEq : L.withoutEquality)
     (lit : FOLiteral L hNoEq) (sigma : Nat → Term L) :
@@ -435,7 +400,6 @@ theorem liftLiteral_substLit {L : Language} (hNoEq : L.withoutEquality)
   cases lit <;> simp only [substLit, liftLiteral] <;>
     rw [liftAtom_subst (hNoEq := by first | exact hNoEq | done)]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Clause lifting commutes with simultaneous substitution. -/
 theorem liftClause_substLits {L : Language} (hNoEq : L.withoutEquality)
     (C : FOClause L hNoEq) (sigma : Nat → Term L) :
@@ -446,7 +410,6 @@ theorem liftClause_substLits {L : Language} (hNoEq : L.withoutEquality)
   intro lit _
   exact liftLiteral_substLit (hNoEq := by first | exact hNoEq | done) lit sigma
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Original-symbol terms stay original under original-symbol substitutions. -/
 theorem IsOriginalTerm.subst {L : Language} (hNoEq : L.withoutEquality)
     {t : Term (FreshGroundLanguage L)}
@@ -458,7 +421,6 @@ theorem IsOriginalTerm.subst {L : Language} (hNoEq : L.withoutEquality)
     ← liftTerm_termSubstAll]
   exact liftTerm_isOriginal _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Original-symbol atoms stay original under original-symbol substitutions. -/
 theorem IsOriginalAtom.subst {L : Language} (hNoEq : L.withoutEquality)
     {atom : FOAtom (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -471,7 +433,6 @@ theorem IsOriginalAtom.subst {L : Language} (hNoEq : L.withoutEquality)
     ← liftAtom_subst (hNoEq := by first | exact hNoEq | done)]
   exact liftAtom_isOriginal (hNoEq := by first | exact hNoEq | done) _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Original-symbol literals stay original under original-symbol substitutions. -/
 theorem IsOriginalLiteral.subst {L : Language} (hNoEq : L.withoutEquality)
     {lit : FOLiteral (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -484,7 +445,6 @@ theorem IsOriginalLiteral.subst {L : Language} (hNoEq : L.withoutEquality)
     ← liftLiteral_substLit (hNoEq := by first | exact hNoEq | done)]
   exact liftLiteral_isOriginal (hNoEq := by first | exact hNoEq | done) _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Original-symbol clauses stay original under original-symbol substitutions. -/
 theorem IsOriginalClause.subst {L : Language} (hNoEq : L.withoutEquality)
     {C : FOClause (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -497,7 +457,6 @@ theorem IsOriginalClause.subst {L : Language} (hNoEq : L.withoutEquality)
     ← liftClause_substLits (hNoEq := by first | exact hNoEq | done)]
   exact liftClause_isOriginal (hNoEq := by first | exact hNoEq | done) _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Appending two original clauses preserves originality. -/
 theorem IsOriginalClause.append {L : Language} (hNoEq : L.withoutEquality)
     {left right : FOClause (FreshGroundLanguage L) ((FreshGroundLanguage.withoutEquality_iff L).2 hNoEq)}
@@ -517,7 +476,6 @@ theorem liftClause_append {L : Language} (hNoEq : L.withoutEquality)
     liftClause (hNoEq := by first | exact hNoEq | done) (left ++ right) = liftClause (hNoEq := by first | exact hNoEq | done) left ++ liftClause (hNoEq := by first | exact hNoEq | done) right :=
   List.map_append
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lifting commutes with list difference because the literal embedding is
     injective. -/
 theorem liftClause_listDiff {L : Language} (hNoEq : L.withoutEquality)

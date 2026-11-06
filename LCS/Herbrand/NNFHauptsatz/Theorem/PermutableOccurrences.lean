@@ -133,7 +133,6 @@ structure G2nnfPermutableOccurrence {L : Language} {hL : L.withoutEquality}
       quantifierApplication.rawGamma quantifierApplication.rawDelta
       lowerApplication.rawGamma lowerApplication.rawDelta
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Proof-relevant evidence that an exact root-to-node path is empty.  A
 single textbook `ba ↦ ab | abb | abbb` exchange is adjacent; a nonempty
 weakening section must be handled later by iterating this local relation. -/
@@ -201,7 +200,6 @@ inductive G2nnfExchangePrincipalCorrespondence {L : Language}
 
 namespace G2nnfExchangePrincipalCorrespondence
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact target occurrence determined by a context/focused principal
 correspondence. The propositional focused case lifts through the selected
 connective branch; a quantifier focused case supplies a maximal occurrence in

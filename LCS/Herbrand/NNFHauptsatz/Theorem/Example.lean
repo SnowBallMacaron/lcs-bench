@@ -44,16 +44,14 @@ open LCS.Herbrand.NNFHauptsatz.G2nnfProofTree
 open LCS.Herbrand.NNFHauptsatz.G2nnfRule
 noncomputable section
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptExVec1_apply
+theorem nnfHauptExVec1_apply
     (t : Term nnfHauptExLang) (i : Fin 1) :
     nnfHauptExVec1 t i = t := by
   have hi : i = (0 : Fin 1) := Subsingleton.elim _ _
   subst i
   rfl
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptEx_iUnion_fin_one
+theorem nnfHauptEx_iUnion_fin_one
     (s : Set Nat) :
     (Set.iUnion fun _ : Fin 1 => s) = s := by
   funext x
@@ -65,39 +63,33 @@ private theorem nnfHauptEx_iUnion_fin_one
   · intro hx
     exact ⟨0, hx⟩
 
--- ATTACH-BLOCKER: private declaration
-@[simp] private theorem nnfHauptEx_mem_empty_iff_false (x : Nat) :
+@[simp] theorem nnfHauptEx_mem_empty_iff_false (x : Nat) :
     x ∈ (∅ : Set Nat) ↔ False := by
   rfl
 
--- ATTACH-BLOCKER: private declaration
-@[simp] private theorem nnfHauptEx_mem_union_iff
+@[simp] theorem nnfHauptEx_mem_union_iff
     (x : Nat) (s t : Set Nat) :
     x ∈ s ∪ t ↔ x ∈ s ∨ x ∈ t := by
   rfl
 
--- ATTACH-BLOCKER: private declaration
-@[simp] private theorem nnfHauptEx_mem_diff_iff
+@[simp] theorem nnfHauptEx_mem_diff_iff
     (x : Nat) (s t : Set Nat) :
     x ∈ s \ t ↔ x ∈ s ∧ ¬x ∈ t := by
   rfl
 
--- ATTACH-BLOCKER: private declaration
-@[simp] private theorem nnfHauptEx_mem_singleton_iff
+@[simp] theorem nnfHauptEx_mem_singleton_iff
     (x y : Nat) :
     x ∈ Set.singleton y ↔ x = y := by
   rfl
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptEx_forallYRyRectified :
+theorem nnfHauptEx_forallYRyRectified :
     isRectified nnfHauptEx_forallYRy := by
   simp [nnfHauptEx_forallYRy, nnfHauptEx_Ry,
     nnfHauptExLang, nnfHauptExVec1_apply, nnfHauptEx_iUnion_fin_one,
     isRectified, boundVarsFresh, distinctQuantifierBindings, formulaFVN,
     formulaBVN, termFV]
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptEx_QaOrForallYRyRectified :
+theorem nnfHauptEx_QaOrForallYRyRectified :
     isRectified (.disj nnfHauptEx_Qa nnfHauptEx_forallYRy) := by
   simp [nnfHauptEx_forallYRy, nnfHauptEx_Ry,
     nnfHauptExLang, nnfHauptExVec1_apply, nnfHauptEx_iUnion_fin_one,
@@ -108,8 +100,7 @@ private theorem nnfHauptEx_QaOrForallYRyRectified :
       (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) → x ≠ 1
   simp [nnfHauptExVec1_apply, termFV]
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptEx_forallXBodyRectified :
+theorem nnfHauptEx_forallXBodyRectified :
     isRectified nnfHauptEx_forallXBody := by
   simp [nnfHauptEx_forallXBody, nnfHauptEx_QxOrForallYRy,
     nnfHauptEx_forallYRy, nnfHauptEx_Ry,
@@ -121,7 +112,6 @@ private theorem nnfHauptEx_forallXBodyRectified :
       (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) → x ≠ 0 → x ≠ 1 ∧ x ≠ 0
   simp [nnfHauptExVec1_apply, termFV]
 
--- ATTACH-BLOCKER: private name in relocated declaration
 theorem nnfHauptEx_antFormulaRectified :
     isRectified nnfHauptEx_antFormula := by
   simp [nnfHauptEx_antFormula, nnfHauptEx_forallXBody,
@@ -135,7 +125,6 @@ theorem nnfHauptEx_antFormulaRectified :
       (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) ∧ x ≠ 0) → x ≠ 1 ∧ x ≠ 0
   simp [nnfHauptExVec1_apply, termFV]
 
--- ATTACH-BLOCKER: private name in relocated declaration
 theorem nnfHauptEx_afterFirstInstRectified :
     isRectified nnfHauptEx_afterFirstInst := by
   simp [nnfHauptEx_afterFirstInst, nnfHauptEx_forallYRy,
@@ -147,7 +136,6 @@ theorem nnfHauptEx_afterFirstInstRectified :
       (∃ j : Fin 1, x ∈ termFV (nnfHauptExVec1 (Term.var 1) j)) ∧ x ≠ 1) → x ≠ 1
   simp [nnfHauptExVec1_apply, termFV]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem nnfHauptExDeltaRectified :
     AllRectified (LCS.Finset.empty, nnfHauptExDelta) :=
   AllRectified.insert_right nnfHauptEx_PaRectified
@@ -155,7 +143,6 @@ theorem nnfHauptExDeltaRectified :
       (AllRectified.insert_right nnfHauptEx_RfaAndRfbRectified
         AllRectified.empty))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem nnfHauptExInsertSelf
     (A : NNFHauptExFormula) (s : NNFHauptExFormulaSet) :
     LCS.Finset.insert A (LCS.Finset.insert A s) =
@@ -172,7 +159,6 @@ theorem nnfHauptExInsertSelf
     · exact Or.inl rfl
     · exact Or.inr (Or.inr hx)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem nnfHauptExInsertComm
     (A B : NNFHauptExFormula) (s : NNFHauptExFormulaSet) :
     LCS.Finset.insert A (LCS.Finset.insert B s) =
@@ -190,8 +176,7 @@ theorem nnfHauptExInsertComm
     · exact Or.inl rfl
     · exact Or.inr (Or.inr hx)
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptExVecSubstSame
+theorem nnfHauptExVecSubstSame
     (x : Nat) (t : Term nnfHauptExLang) :
     (fun i => termSubst (nnfHauptExVec1 (Term.var x) i) t x) =
       nnfHauptExVec1 t := by
@@ -201,8 +186,7 @@ private theorem nnfHauptExVecSubstSame
   subst i
   simp [nnfHauptExVec1, termSubst]
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptExVecSubstNe
+theorem nnfHauptExVecSubstNe
     (x y : Nat) (hxy : x ≠ y) (t : Term nnfHauptExLang) :
     (fun i => termSubst (nnfHauptExVec1 (Term.var y) i) t x) =
       nnfHauptExVec1 (Term.var y) := by
@@ -212,7 +196,6 @@ private theorem nnfHauptExVecSubstNe
   subst i
   simp [nnfHauptExVec1, termSubst, Ne.symm hxy]
 
--- ATTACH-BLOCKER: private name in relocated declaration
 theorem nnfHauptExSubstRy (t : Term nnfHauptExLang) :
     formulaSubstN nnfHauptEx_Ry t 1 =
       FormulaN.predN NNFHauptExPred.R (nnfHauptExVec1 t) := by
@@ -221,7 +204,6 @@ theorem nnfHauptExSubstRy (t : Term nnfHauptExLang) :
   exact congrArg (FormulaN.predN (L := nnfHauptExLang) NNFHauptExPred.R)
     (nnfHauptExVecSubstSame 1 t)
 
--- ATTACH-BLOCKER: private name in relocated declaration
 theorem nnfHauptExSubstQxOr :
     formulaSubstN nnfHauptEx_QxOrForallYRy
         (Term.const NNFHauptExConst.a) 0 =
@@ -238,7 +220,6 @@ theorem nnfHauptExSubstQxOr :
         (nnfHauptExVecSubstNe 0 1 (by omega)
           (Term.const NNFHauptExConst.a))⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Extend an explicit finite context list by one formula. -/
 theorem nnfHauptExOfListCons (A : NNFHauptExFormula)
     (xs : List NNFHauptExFormula) :
@@ -247,7 +228,6 @@ theorem nnfHauptExOfListCons (A : NNFHauptExFormula)
   intro F
   simp only [LCS.Finset.mem_ofList, LCS.Finset.mem_insert, List.mem_cons]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExWeakLeft
     (A : NNFHauptExFormula) (hNNF : A.isNNF) (hA : isRectified A)
     {Γ Δ : NNFHauptExFormulaSet}
@@ -259,7 +239,6 @@ def nnfHauptExWeakLeft
       (by intro seq h; simp only [G2nnfRuleCore.premises, List.mem_cons, List.not_mem_nil, or_false] at h; subst seq; exact hn),
       AllRectified.insert_left hA sub.allRectified⟩ sub
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExWeakRight
     (A : NNFHauptExFormula) (hNNF : A.isNNF) (hA : isRectified A)
     {Γ Δ : NNFHauptExFormulaSet}
@@ -271,7 +250,6 @@ def nnfHauptExWeakRight
       (by intro seq h; simp only [G2nnfRuleCore.premises, List.mem_cons, List.not_mem_nil, or_false] at h; subst seq; exact hn),
       AllRectified.insert_right hA sub.allRectified⟩ sub
 
--- ATTACH-BLOCKER: termination suffix
 /-- A bare atomic identity extended by the supplied context lists, in order.
 Every added formula carries its NNF and rectification evidence. -/
 def nnfHauptExAtomicAx
@@ -313,8 +291,7 @@ def nnfHauptExAtomicAx
       rfl (by rw [nnfHauptExOfListCons]; exact nnfHauptExInsertComm B A _)
 termination_by Γ.length + Δ.length
 
--- ATTACH-BLOCKER: private declaration
-private def nnfHauptExIdentity
+def nnfHauptExIdentity
     (A : NNFHauptExFormula) (hAtom : A.isAtomic) :
     G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality)
       (LCS.Finset.insert A LCS.Finset.empty)
@@ -323,8 +300,7 @@ private def nnfHauptExIdentity
     (by intro F h; rcases h with h | h <;> cases h)
     (by intro F h; rcases h with h | h <;> cases h)
 
--- ATTACH-BLOCKER: private declaration
-private def nnfHauptExAllYToR (t : Term nnfHauptExLang) :
+def nnfHauptExAllYToR (t : Term nnfHauptExLang) :
     G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality)
       (LCS.Finset.insert nnfHauptEx_forallYRy LCS.Finset.empty)
       (LCS.Finset.insert (.predN NNFHauptExPred.R (nnfHauptExVec1 t)) LCS.Finset.empty) := by
@@ -354,21 +330,18 @@ private def nnfHauptExAllYToR (t : Term nnfHauptExLang) :
         (AllRectified.insert_right (AllRectified.isRectified_of_isAtomic Rt rfl) AllRectified.empty)⟩
   exact .onePremise rule trivial rfl hSC sub
 
--- ATTACH-BLOCKER: private declaration
-private def nnfHauptExAllYToRfa :
+def nnfHauptExAllYToRfa :
     G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality)
       (LCS.Finset.insert nnfHauptEx_forallYRy LCS.Finset.empty)
       (LCS.Finset.insert nnfHauptEx_Rfa LCS.Finset.empty) :=
   nnfHauptExAllYToR nnfHauptEx_fa
 
--- ATTACH-BLOCKER: private declaration
-private def nnfHauptExAllYToRfb :
+def nnfHauptExAllYToRfb :
     G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality)
       (LCS.Finset.insert nnfHauptEx_forallYRy LCS.Finset.empty)
       (LCS.Finset.insert nnfHauptEx_Rfb LCS.Finset.empty) :=
   nnfHauptExAllYToR nnfHauptEx_fb
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem nnfHauptExFormula_not_mem_empty (A : NNFHauptExFormula) :
     ¬ A ∈ (LCS.Finset.empty : NNFHauptExFormulaSet) := LCS.Finset.not_mem_empty
 
@@ -517,12 +490,10 @@ def nnfHauptsatzExTree :
                 AllRectified.empty)))⟩
       paBranch t1
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev nnfHauptExMidGamma : NNFHauptExFormulaSet :=
   LCS.Finset.insert nnfHauptEx_midAnt1
     (LCS.Finset.insert nnfHauptEx_midAnt2 LCS.Finset.empty)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem nnfHauptExInsertOfMem
     (A : NNFHauptExFormula) (s : NNFHauptExFormulaSet)
     (hA : A ∈ s) :
@@ -536,13 +507,11 @@ theorem nnfHauptExInsertOfMem
     · exact hx
   · exact Or.inr
 
--- ATTACH-BLOCKER: unsupported untagged structure
 structure NNFHauptExPropTree
     (Γ Δ : NNFHauptExFormulaSet) where
   tree : G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality) Γ Δ
   allProp : AllRulesPropOrWeakening (hL := by rfl) tree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def NNFHauptExPropTree.cast
     {Γ Δ Γ' Δ' : NNFHauptExFormulaSet}
     (p : NNFHauptExPropTree Γ Δ)
@@ -551,8 +520,7 @@ def NNFHauptExPropTree.cast
   match hΓ, hΔ with
   | rfl, rfl => p
 
--- ATTACH-BLOCKER: private declaration
-private theorem nnfHauptExAllPropCast
+theorem nnfHauptExAllPropCast
     {Γ Δ Γ' Δ' : NNFHauptExFormulaSet}
     (T : G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality) Γ Δ)
     (hΓ : Γ = Γ') (hΔ : Δ = Δ') :
@@ -562,7 +530,6 @@ private theorem nnfHauptExAllPropCast
   cases hΔ
   rfl
 
--- ATTACH-BLOCKER: termination suffix
 theorem nnfHauptExAtomicAx_allProp
     (A : NNFHauptExFormula) (hAtom : A.isAtomic)
     (Γ Δ : List NNFHauptExFormula)
@@ -588,7 +555,6 @@ theorem nnfHauptExAtomicAx_allProp
     exact ⟨Or.inr trivial, ih⟩
 termination_by Γ.length + Δ.length
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Certify the same bare identity and explicit context weakenings used by
 `nnfHauptExAtomicAx`; the certificate introduces no separate derivation. -/
 def nnfHauptExAtomicCert
@@ -601,7 +567,6 @@ def nnfHauptExAtomicCert
   ⟨nnfHauptExAtomicAx A hAtom Γ Δ hNNF hRect,
     nnfHauptExAtomicAx_allProp A hAtom Γ Δ hNNF hRect⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExPaCert
     (Γ : List NNFHauptExFormula)
     (hNNF : ∀ F, F ∈ Γ → F.isNNF)
@@ -621,7 +586,6 @@ def nnfHauptExPaCert
       (nnfHauptExInsertOfMem nnfHauptEx_Pa nnfHauptExDelta
         (LCS.Finset.mem_insert.mpr (Or.inl rfl)))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExQaCert
     (Γ : List NNFHauptExFormula)
     (hNNF : ∀ F, F ∈ Γ → F.isNNF)
@@ -642,7 +606,6 @@ def nnfHauptExQaCert
         (LCS.Finset.mem_insert.mpr
           (Or.inr (LCS.Finset.mem_insert.mpr (Or.inl rfl)))))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExDisjCert
     (A B : NNFHauptExFormula) (Γ Δ : NNFHauptExFormulaSet)
     (hDisj : isRectified (.disj A B))
@@ -668,7 +631,6 @@ def nnfHauptExDisjCert
   · simp only [AllRulesPropOrWeakening, G2nnfRuleCore.isPropositionalRule, true_or, true_and]
     exact ⟨left.allProp, right.allProp⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExConjCert :
     NNFHauptExPropTree
       (LCS.Finset.insert nnfHauptEx_Rfa
@@ -727,7 +689,6 @@ def nnfHauptExConjCert :
           (nnfHauptExInsertComm _ _ _)
   exact raw.cast rfl hDelta
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExUpperCert :
     NNFHauptExPropTree nnfHauptExMidGamma nnfHauptExDelta := by
   let rfbBranch : NNFHauptExPropTree
@@ -781,7 +742,6 @@ def nnfHauptExUpperCert :
       (by intro F h; simp only [List.mem_cons, List.not_mem_nil, or_false] at h; subst F; exact nnfHauptEx_midAnt2Rectified))
     inner1
 
--- ATTACH-BLOCKER: unsupported untagged structure
 structure NNFHauptExMidConstruction
     (Γ Δ : NNFHauptExFormulaSet) where
   tree : G2nnfProofTree (by rfl : nnfHauptExLang.withoutEquality) Γ Δ
@@ -790,7 +750,6 @@ structure NNFHauptExMidConstruction
   above : AllRulesPropOrWeakening (hL := by rfl) node
   below : AllRulesQuantifierOnPath path
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def NNFHauptExMidConstruction.castRoot
     {Γ Δ Γ' Δ' : NNFHauptExFormulaSet}
     (c : NNFHauptExMidConstruction Γ Δ)
@@ -799,7 +758,6 @@ def NNFHauptExMidConstruction.castRoot
   match hΓ, hΔ with
   | rfl, rfl => c
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExUpperConstruction :
     NNFHauptExMidConstruction
       nnfHauptExMidGamma nnfHauptExDelta where
@@ -809,7 +767,6 @@ def nnfHauptExUpperConstruction :
   above := nnfHauptExUpperCert.allProp
   below := trivial
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExPrependQuantifier
     (rule : G2nnfRuleCore nnfHauptExLang)
     (hAdmit : rule.BareAtomicAxiom)
@@ -824,7 +781,6 @@ def nnfHauptExPrependQuantifier
   above := c.above
   below := ⟨hQuant, c.below⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def nnfHauptExNormalConstruction :
     NNFHauptExMidConstruction
       (LCS.Finset.insert nnfHauptEx_antFormula LCS.Finset.empty)

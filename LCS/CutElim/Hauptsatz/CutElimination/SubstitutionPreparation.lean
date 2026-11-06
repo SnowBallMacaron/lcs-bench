@@ -22,7 +22,7 @@ open LCS.CutElim.Hauptsatz.Completeness
 namespace LCS.CutElim.Hauptsatz
 namespace G1nnfProofTree
 
-private theorem allFormulae_substTerm {L : Language} {hL : L.withoutEquality}
+theorem allFormulae_substTerm {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (t : Term L) (y : Nat)
     (hOk : T.treeSubstOk t y) :
@@ -48,7 +48,7 @@ private theorem allFormulae_substTerm {L : Language} {hL : L.withoutEquality}
         substRule_conclusion_eq, substFormulaFinset_union,
         substFormulaFinset_union, substFormulaFinset_union]
 
-private theorem substTerm_preserves_notBound {L : Language} {hL : L.withoutEquality}
+theorem substTerm_preserves_notBound {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (t : Term L) (y w : Nat)
     (hOk : T.treeSubstOk t y) (hw : T.notBoundIn w) :
@@ -62,7 +62,7 @@ private theorem substTerm_preserves_notBound {L : Language} {hL : L.withoutEqual
       (LCS.FirstOrder.Gentzen.Hintikka.formulaBVN_formulaSubstN
         B t y w hBound)
 
-private theorem freeVariable_not_mem_atRoot_of_not_mem_variableSupport
+theorem freeVariable_not_mem_atRoot_of_not_mem_variableSupport
     {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (z : Nat)
@@ -226,7 +226,7 @@ noncomputable def EigenFresheningResult.rebuildTwo
         rw [G1nnfProofTree.eigenvariables_twoPremise]
         exact Or.inr (Or.inr hSubOld)
 
-private inductive EigenRuleAt {L : Language}
+inductive EigenRuleAt {L : Language}
     (v : Nat) : G1nnfRule L → Type where
   | allRight (x : Nat) (A : FormulaN L) :
       EigenRuleAt v (.allRight x A v)
@@ -721,7 +721,7 @@ noncomputable def freshenMatchingExLeft {L : Language} {hL : L.withoutEquality}
       rw [G1nnfProofTree.eigenvariables_onePremise]
       exact Or.inr hOld
 
-private noncomputable def freshenEigenvariable {L : Language} {hL : L.withoutEquality}
+noncomputable def freshenEigenvariable {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ)
     (v : Nat) (avoid : LCS.Finset Nat)
@@ -778,14 +778,14 @@ private noncomputable def freshenEigenvariable {L : Language} {hL : L.withoutEqu
         EigenFresheningResult.rebuildTwo
           rule Γ Δ hPrem hAC sub1 sub2 v avoid hBound R1 R2
           (no_ruleEigenlabel_of_two_premises
-            rule Γ Δ hPrem v) /- ATTACH-BLOCKER: private declaration -/
+            rule Γ Δ hPrem v)
 
 /-! ### Finite two-phase substitution preparation
 
 The first pass removes every forbidden label from bound positions, including
 hidden cut formulae and stored rule data.  The second pass changes only
 conflicting eigenlabels.  Both passes keep the indexed root fixed. -/
-private theorem termFV_of_mem_termVarIndicesList {L : Language}
+theorem termFV_of_mem_termVarIndicesList {L : Language}
     (t : Term L) (v : Nat) :
     v ∈ termVarIndicesList t → termFV t v := by
   induction t with
@@ -804,15 +804,15 @@ private theorem termFV_of_mem_termVarIndicesList {L : Language}
             (List.ofFn fun i : Fin (L.funArity f) => i) []).1 hv with
         hEmpty | ⟨i, hi, hvi⟩
       · exact (List.not_mem_nil hEmpty).elim
-      · exact ⟨i, ih i hvi⟩ /- ATTACH-BLOCKER: private declaration -/
+      · exact ⟨i, ih i hvi⟩
 
-private theorem mem_termVarIndicesList_of_termFV {L : Language}
+theorem mem_termVarIndicesList_of_termFV {L : Language}
     (t : Term L) (v : Nat) (hv : termFV t v) :
     v ∈ termVarIndicesList t := by
   have hSupport := termFV_mem_termVariableSupport t v hv
-  simpa only [termVariableSupport, LCS.Finset.mem_ofList] using hSupport /- ATTACH-BLOCKER: private declaration -/
+  simpa only [termVariableSupport, LCS.Finset.mem_ofList] using hSupport
 
-private theorem substitutionTargets_notBound_atRoot {L : Language} {hL : L.withoutEquality}
+theorem substitutionTargets_notBound_atRoot {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (t : Term L) (y : Nat)
     (hy : T.notBoundIn y)
@@ -835,9 +835,9 @@ private theorem substitutionTargets_notBound_atRoot {L : Language} {hL : L.witho
     · intro A hA
       exact
         FormulaN.notBoundIn_and_freeFor_termFV_not_bound
-          A t y w (hyRoot.2 A hA) (hFree.2 A hA) hwFV /- ATTACH-BLOCKER: private declaration -/
+          A t y w (hyRoot.2 A hA) (hFree.2 A hA) hwFV
 
-private structure BoundHygieneResult {L : Language} {hL : L.withoutEquality}
+structure BoundHygieneResult {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (targets : List Nat) where
   tree : G1nnfProofTree hL Γ Δ
@@ -846,9 +846,9 @@ private structure BoundHygieneResult {L : Language} {hL : L.withoutEquality}
   eigenvariables_eq :
     ∀ w, tree.eigenvariables w = T.eigenvariables w
   notBound_targets :
-    ∀ w, w ∈ targets → tree.notBoundIn w /- ATTACH-BLOCKER: private declaration -/
+    ∀ w, w ∈ targets → tree.notBoundIn w
 
-private noncomputable def hygienizeBoundVariables {L : Language} {hL : L.withoutEquality}
+noncomputable def hygienizeBoundVariables {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (targets : List Nat)
     (hRoot :
@@ -937,9 +937,9 @@ private noncomputable def hygienizeBoundVariables {L : Language} {hL : L.without
           simpa only [T'] using
             R.tree.alphaRenameBoundAtRoot_preserves_notBound
               v z w hvz hzTree hRootV hwz
-                (R.notBound_targets w hwTail) /- ATTACH-BLOCKER: private declaration -/
+                (R.notBound_targets w hwTail)
 
-private structure EigenHygieneResult {L : Language} {hL : L.withoutEquality}
+structure EigenHygieneResult {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (targets : List Nat)
     (avoid : LCS.Finset Nat) where
@@ -952,9 +952,9 @@ private structure EigenHygieneResult {L : Language} {hL : L.withoutEquality}
     ∀ w, w ∈ targets → ¬ tree.eigenvariables w
   eigenvariables_from_original :
     ∀ w, w ∈ avoid → tree.eigenvariables w →
-      T.eigenvariables w /- ATTACH-BLOCKER: private declaration -/
+      T.eigenvariables w
 
-private noncomputable def hygienizeEigenvariables {L : Language} {hL : L.withoutEquality}
+noncomputable def hygienizeEigenvariables {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (targets : List Nat)
     (avoid : LCS.Finset Nat)
@@ -1008,7 +1008,7 @@ private noncomputable def hygienizeEigenvariables {L : Language} {hL : L.without
         have hR :
             R.tree.eigenvariables w :=
           Q.eigenvariables_from_original w hw hEigen
-        exact (R.eigen_avoid w hw hR).2 /- ATTACH-BLOCKER: private declaration -/
+        exact (R.eigen_avoid w hw hR).2
 
 structure SubstitutionPreparation {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}

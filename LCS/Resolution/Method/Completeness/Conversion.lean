@@ -29,8 +29,7 @@ def canonicalInput (g : FiniteGraph) (i : Nat) : Nat :=
   | some ⟨C, none⟩ => g.table.findIdx (fun n => decide (n = ⟨C, none⟩))
   | _ => i
 
--- ATTACH-BLOCKER: private declaration
-private theorem firstInput_spec (g : FiniteGraph) (i : Nat) (C : Clause)
+theorem firstInput_spec (g : FiniteGraph) (i : Nat) (C : Clause)
     (hi : g.node i = some ⟨C, none⟩) :
     let j := g.table.findIdx (fun n => decide (n = ⟨C, none⟩))
     j ≤ i ∧ g.node j = some ⟨C, none⟩ := by
@@ -49,7 +48,6 @@ private theorem firstInput_spec (g : FiniteGraph) (i : Nat) (C : Clause)
     exact hnot he
   · exact List.getElem?_eq_some_iff.mpr ⟨hfound, hnode⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem canonicalInput_le (g : FiniteGraph) (i : Nat) : g.canonicalInput i ≤ i := by
   cases hn : g.node i with
   | none => simp [canonicalInput, hn]
@@ -59,7 +57,6 @@ theorem canonicalInput_le (g : FiniteGraph) (i : Nat) : g.canonicalInput i ≤ i
     | none => simpa [canonicalInput, hn] using (firstInput_spec g i C hn).1
     | some r => simp [canonicalInput, hn]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem node_canonicalInput (g : FiniteGraph) (i : Nat) :
     g.node (g.canonicalInput i) = g.node i := by
   cases hn : g.node i with
@@ -70,7 +67,6 @@ theorem canonicalInput_le (g : FiniteGraph) (i : Nat) : g.canonicalInput i ≤ i
     | none => simpa [canonicalInput, hn] using (firstInput_spec g i C hn).2
     | some r => simp [canonicalInput, hn]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem canonicalInput_internal (g : FiniteGraph) (i : Nat)
     (hi : g.isInternal i = true) : g.canonicalInput i = i := by
   cases hn : g.node i with
@@ -81,8 +77,7 @@ theorem canonicalInput_internal (g : FiniteGraph) (i : Nat)
     | none => simp [FiniteGraph.isInternal, hn] at hi
     | some r => simp [canonicalInput, hn]
 
--- ATTACH-BLOCKER: private declaration
-private def redirectInputNode (g : FiniteGraph) (n : FiniteGraph.Node) : FiniteGraph.Node :=
+def redirectInputNode (g : FiniteGraph) (n : FiniteGraph.Node) : FiniteGraph.Node :=
   { n with inference := n.inference.map fun r =>
       { r with left := g.canonicalInput r.left, right := g.canonicalInput r.right } }
 
@@ -93,24 +88,20 @@ def coalesceInputLeaves (g : FiniteGraph) : FiniteGraph :=
       { r with left := g.canonicalInput r.left, right := g.canonicalInput r.right } }),
     g.canonicalInput g.root⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem coalesceInputLeaves_table_length (g : FiniteGraph) :
     g.coalesceInputLeaves.table.length = g.table.length := by
   simp [coalesceInputLeaves]
 
--- ATTACH-BLOCKER: private declaration
-private theorem node_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
+theorem node_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
     g.coalesceInputLeaves.node i = (g.node i).map (redirectInputNode g) := by
   simp only [FiniteGraph.node, coalesceInputLeaves, List.getElem?_map]
   rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem label_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
     g.coalesceInputLeaves.label i = g.label i := by
   simp only [FiniteGraph.label, node_coalesceInputLeaves]
   cases g.node i <;> rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem isInternal_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
     g.coalesceInputLeaves.isInternal i = g.isInternal i := by
   simp only [FiniteGraph.isInternal, node_coalesceInputLeaves]
@@ -118,20 +109,17 @@ private theorem node_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
   | none => rfl
   | some n => cases hn : n.inference <;> simp [redirectInputNode, hn]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem isInternal_canonicalInput (g : FiniteGraph) (i : Nat) :
     g.isInternal (g.canonicalInput i) = g.isInternal i := by
   simp only [FiniteGraph.isInternal, node_canonicalInput]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem coalesceInputLeaves_rootLabel (g : FiniteGraph) :
     g.coalesceInputLeaves.rootLabel = g.rootLabel := by
   change g.coalesceInputLeaves.label (g.canonicalInput g.root) = g.label g.root
   rw [label_coalesceInputLeaves]
   simp only [FiniteGraph.label, node_canonicalInput]
 
--- ATTACH-BLOCKER: private declaration
-private theorem next_coalesceInputLeaves (g : FiniteGraph) (i p : Nat) :
+theorem next_coalesceInputLeaves (g : FiniteGraph) (i p : Nat) :
     g.coalesceInputLeaves.next (g.canonicalInput i) p =
       (g.next i p).map g.canonicalInput := by
   simp only [FiniteGraph.next, node_coalesceInputLeaves, node_canonicalInput]
@@ -145,8 +133,7 @@ private theorem next_coalesceInputLeaves (g : FiniteGraph) (i p : Nat) :
       · simp [redirectInputNode, hn, hp]
       · by_cases hp1 : p = 1 <;> simp [redirectInputNode, hn, hp, hp1]
 
--- ATTACH-BLOCKER: private declaration
-private theorem reachableFrom_coalesceInputLeaves (g : FiniteGraph) (depth i : Nat) :
+theorem reachableFrom_coalesceInputLeaves (g : FiniteGraph) (depth i : Nat) :
     g.coalesceInputLeaves.reachableFrom depth (g.canonicalInput i) =
       (g.reachableFrom depth i).map g.canonicalInput := by
   induction depth generalizing i with
@@ -155,8 +142,7 @@ private theorem reachableFrom_coalesceInputLeaves (g : FiniteGraph) (depth i : N
     simp only [FiniteGraph.reachableFrom, next_coalesceInputLeaves]
     cases h0 : g.next i 0 <;> cases h1 : g.next i 1 <;> simp [ih]
 
--- ATTACH-BLOCKER: private declaration
-private theorem vertexIds_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
+theorem vertexIds_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
     i ∈ g.coalesceInputLeaves.vertexIds ↔
       ∃ j, j ∈ g.vertexIds ∧ g.canonicalInput j = i := by
   simp only [FiniteGraph.vertexIds, List.mem_eraseDups]
@@ -165,7 +151,6 @@ private theorem vertexIds_coalesceInputLeaves (g : FiniteGraph) (i : Nat) :
   rw [coalesceInputLeaves_table_length, reachableFrom_coalesceInputLeaves]
   simp [List.mem_map]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Redirected references keep the original resolution equation and topological order. -/
 theorem coalesceInputLeaves_allRowsWellFormed (g : FiniteGraph)
     (hg : g.AllRowsWellFormed) : g.coalesceInputLeaves.AllRowsWellFormed := by
@@ -192,7 +177,6 @@ theorem coalesceInputLeaves_allRowsWellFormed (g : FiniteGraph)
         · simp only [node_coalesceInputLeaves, node_canonicalInput, ha, Option.map_some]
         · simp only [node_coalesceInputLeaves, node_canonicalInput, hb, Option.map_some]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every selected input keeps the label of a reachable original input. -/
 theorem coalesceInputLeaves_leavesFrom (g : FiniteGraph) (S : ClauseSequent)
     (hg : g.LeavesFrom S) : g.coalesceInputLeaves.LeavesFrom S := by
@@ -207,7 +191,6 @@ theorem coalesceInputLeaves_leavesFrom (g : FiniteGraph) (S : ClauseSequent)
   rw [label_coalesceInputLeaves]
   simpa only [FiniteGraph.label, node_canonicalInput] using hC
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Coalescing inputs keeps every reachable internal vertex ID. -/
 theorem stepIds_coalesceInputLeaves_subset (g : FiniteGraph) :
     ∀ i, i ∈ g.coalesceInputLeaves.stepIds → i ∈ g.stepIds := by
@@ -219,8 +202,7 @@ theorem stepIds_coalesceInputLeaves_subset (g : FiniteGraph) :
   rw [canonicalInput_internal g j hjInt]
   exact List.mem_filter.mpr ⟨hj, hjInt⟩
 
--- ATTACH-BLOCKER: private declaration
-private theorem nodup_length_le_of_subset {α : Type} [DecidableEq α]
+theorem nodup_length_le_of_subset {α : Type} [DecidableEq α]
     {xs ys : List α} (hNodup : xs.Nodup)
     (hSubset : ∀ x, x ∈ xs → x ∈ ys) :
     xs.length ≤ ys.length := by
@@ -241,7 +223,6 @@ private theorem nodup_length_le_of_subset {α : Type} [DecidableEq α]
     simp only [List.length_cons] at hLength ⊢
     omega
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Count distinct reachable resolution vertices after input identification. -/
 theorem coalesceInputLeaves_stepCount_le (g : FiniteGraph) :
     g.coalesceInputLeaves.stepCount ≤ g.stepCount :=
@@ -273,7 +254,6 @@ where
     have : n ≠ Classical.choose h := by intro he; exact hp (he ▸ hx)
     omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem table_node (g : FiniteGraph) (i : Fin g.table.length) :
     g.node i = some g.table[i] := by
   exact List.getElem?_eq_getElem i.isLt
@@ -302,8 +282,7 @@ def replay (g : FiniteGraph)
   ⟨List.ofFn (fun i : Fin g.table.length =>
     { g.table[i] with clause := replayLabel g f i }), g.root⟩
 
--- ATTACH-BLOCKER: private declaration
-private theorem resolve_bounds (a b a' b' : Clause) (L B : Literal)
+theorem resolve_bounds (a b a' b' : Clause) (L B : Literal)
     (ha : LCS.Finset.Subset a a' ∧ ∀ x ∈ a', x ∈ a ∨ x = B)
     (hb : LCS.Finset.Subset b b' ∧ ∀ x ∈ b', x ∈ b ∨ x = B) :
     LCS.Finset.Subset
@@ -323,7 +302,6 @@ private theorem resolve_bounds (a b a' b' : Clause) (L B : Literal)
     · exact (ha.2 x hx).elim (fun h => Or.inl (Or.inl ⟨h, hne⟩)) Or.inr
     · exact (hb.2 x hx).elim (fun h => Or.inl (Or.inr ⟨h, hne⟩)) Or.inr
 
--- ATTACH-BLOCKER: termination suffix
 /-- Replaying additions of B preserves all old literals and can add only B. -/
 theorem replayLabel_bounds (g : FiniteGraph) (hg : g.AllRowsWellFormed)
     (f : Clause → Clause) (B : Literal)

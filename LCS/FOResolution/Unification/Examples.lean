@@ -59,8 +59,7 @@ def unifVec2 (a b : α) : Fin 2 → α
   | ⟨0, _⟩ => a
   | ⟨1, _⟩ => b
 
--- ATTACH-BLOCKER: private declaration
-private inductive RobinsonRegressionConst : Type where
+inductive RobinsonRegressionConst : Type where
   | left
   | right
 

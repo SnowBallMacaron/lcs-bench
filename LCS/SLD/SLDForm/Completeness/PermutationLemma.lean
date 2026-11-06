@@ -47,7 +47,6 @@ def proofDepth : {S : ClauseSequent} → GCNFProofTree S → Nat
 
 -- ========= Internal encoding of an arbitrary root partition =========
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The derived root macro for a partition `A ∪ B`. An order enumerating `B`
     is peeled by genuine GCNF' rule nodes along the left spine. At each node,
     the residual clause `A ∪ remaining(B)` must occur in that rule's selected
@@ -63,7 +62,6 @@ def rootPartitionMacro (A : Clause) :
       Clause.union A (Clause.ofList (b' :: bs)) ∈ Cs ∧
       rootPartitionMacro A left (b' :: bs)
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- Structural certificate that `T` begins with the derived GCNF' root macro
     for an arbitrary nonempty disjoint partition `C = A ∪ B`. The duplicate-free
     order covers exactly `B`, and every peel is checked against an actual rule

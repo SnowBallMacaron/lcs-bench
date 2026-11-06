@@ -306,7 +306,6 @@ theorem formulaSubstEval_closed {L : Language} {M : Structure L}
 -- Theorem 7.6.1 (helper): c-instance source entails toFormula
 -- ===================================================================
 
--- ATTACH-BLOCKER: termination suffix
 /-- Helper theorem: A well-formed c-instance's source formula entails
 its extracted `toFormula`. That is, for any structure `M` and
 assignment `s`, if `M, s ⊨ ci.source`, then `M, s ⊨ ci.toFormula`.

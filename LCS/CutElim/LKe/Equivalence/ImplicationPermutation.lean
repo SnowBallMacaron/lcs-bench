@@ -205,8 +205,7 @@ theorem geqImplLeft_allRight
       simpa [r1, geqLeafSequents] using hs')
   · simpa [p2, r2, geqLeafSequents] using hq2leaf
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_exLeft
+theorem geqImplLeft_exLeft
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
       [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p :
@@ -344,8 +343,7 @@ private theorem geqImplLeft_exLeft
       exact hq2'leaf s' (by
         simpa [r2, geqLeafSequents] using hs')
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_exRight
+theorem geqImplLeft_exRight
     (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁), geqDepth (heq ▸ p) =
       geqDepth p) (geqLeaf_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁),
       geqLeafSequents (heq ▸ p) = geqLeafSequents p) (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (ts : List
@@ -389,8 +387,7 @@ private theorem geqImplLeft_exRight
       simpa [r1, geqLeafSequents] using hs')
   · simpa [p2, r2, geqLeafSequents] using hq2leaf
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_permOne
+theorem geqImplLeft_permOne
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
       [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p :
@@ -428,8 +425,7 @@ private theorem geqImplLeft_permOne
   | exRight ts Γr Δr Λr x X hne hfree =>
     exact geqImplLeft_exRight L hL n ih geqDepth_transport geqLeaf_transport A B Γ Δ Λ ts Γr Δr Λr x X hne hfree sub hsubdepth hsubleaf hconc
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_conjRight
+theorem geqImplLeft_conjRight
     (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁), geqDepth (heq ▸ p) =
       geqDepth p) (geqLeaf_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p : GEqProofTree hL s₁),
       geqLeafSequents (heq ▸ p) = geqLeafSequents p) (A B : FormulaN L) (Γ Δ Λ Γr Δr Λr : List (FormulaN L))
@@ -476,8 +472,7 @@ private theorem geqImplLeft_conjRight
     simp only [p2, r2, geqLeafSequents, List.mem_append] at hs'
     exact hs'.elim (hb1leaf s') (hb2leaf s')
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_disjLeft
+theorem geqImplLeft_disjLeft
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
       [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (p :
@@ -590,8 +585,7 @@ private theorem geqImplLeft_disjLeft
       simp only [r2, geqLeafSequents, List.mem_append] at hs'
       exact hs'.elim (hb1'leaf s') (hb2'leaf s')
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_implLeft
+theorem geqImplLeft_implLeft
     (markedSplit3 : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → (∃ (K
       : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ P = R ∧ X = Y ∧ Q = S ∨ ∃ (K : List
       (FormulaN L)), P = R ++ [Y] ++ K ∧ S = K ++ [X] ++ Q) (geqDepth_transport : ∀ {s₁ s₂ : Sequent L} (heq :
@@ -723,8 +717,7 @@ private theorem geqImplLeft_implLeft
       simp only [r2, geqLeafSequents, List.mem_append] at hs'
       exact hs'.elim (hb1'leaf s') (hb2'leaf s')
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_permTwo
+theorem geqImplLeft_permTwo
     (markedSplit : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++ [X] ++ Q = R ++ [Y] ++ S → X ≠ Y →
       (∃ (K : List (FormulaN L)), R = P ++ [X] ++ K ∧ Q = K ++ [Y] ++ S) ∨ ∃ (K : List (FormulaN L)), P = R ++
       [Y] ++ K ∧ S = K ++ [X] ++ Q) (markedSplit3 : ∀ {P Q R S : List (FormulaN L)} {X Y : FormulaN L}, P ++
@@ -750,8 +743,7 @@ private theorem geqImplLeft_permTwo
   | implLeft Γr Δr Λr X Y =>
     exact geqImplLeft_implLeft L hL n ih markedSplit3 geqDepth_transport geqLeaf_transport A B Γ Δ Λ Γr Δr Λr X Y sub1 hsub1depth hsub1leaf sub2 hsub2depth hsub2leaf hconc
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_eqRefl
+theorem geqImplLeft_eqRefl
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (t : Term L) (Γe Λe : List (FormulaN L)) (sub :
       GEqProofTree hL (Sequent.mk (Γe ++ [FormulaN.eq_ hL t t]) (Λe))) (hseq : (Sequent.mk (Γe) (Λe)) =
       (Sequent.mk (Γ ++ [A.impl B] ++ Δ) (Λ))) (hdepth : geqDepth (GEqProofTree.eqRefl t Γe Λe sub) = n)
@@ -787,8 +779,7 @@ private theorem geqImplLeft_eqRefl
   · simpa [p1, geqLeafSequents] using hq1'leaf
   · simpa [p2, geqLeafSequents] using hq2'leaf
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_eqFuncCong
+theorem geqImplLeft_eqFuncCong
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (f : L.funSymbols) (ss ts : Fin (L.funArity f) → Term L)
       (Γe Λe : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γe ++ [eqCongruenceImplFunc L hL f ss
       ts]) (Λe))) (hseq : (Sequent.mk (Γe) (Λe)) = (Sequent.mk (Γ ++ [A.impl B] ++ Δ) (Λ))) (hdepth : geqDepth
@@ -826,8 +817,7 @@ private theorem geqImplLeft_eqFuncCong
   · simpa [p1, geqLeafSequents] using hq1'leaf
   · simpa [p2, geqLeafSequents] using hq2'leaf
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_eqPredCong
+theorem geqImplLeft_eqPredCong
     (A B : FormulaN L) (Γ Δ Λ : List (FormulaN L)) (P : L.predSymbols) (ss ts : Fin
       (L.predArity P) → Term L) (Γe Λe : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γe ++
       [eqCongruenceImplPred L hL P ss ts]) (Λe))) (hseq : (Sequent.mk (Γe) (Λe)) = (Sequent.mk (Γ ++ [A.impl
@@ -866,8 +856,7 @@ private theorem geqImplLeft_eqPredCong
   · simpa [p1, geqLeafSequents] using hq1'leaf
   · simpa [p2, geqLeafSequents] using hq2'leaf
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqImplLeft_eqGeneral
+theorem geqImplLeft_eqGeneral
     (A B : FormulaN L) (Γ Δ Λ axioms : List (FormulaN L)) (hne : axioms ≠ []) (haxioms : ∀ (A : FormulaN L), A
       ∈ axioms → isEqAxiomInstance hL A) (Γe Λe : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γe ++
       axioms) (Λe))) (hseq : (Sequent.mk (Γe) (Λe)) = (Sequent.mk (Γ ++ [A.impl B] ++ Δ) (Λ))) (hdepth :
@@ -905,7 +894,6 @@ private theorem geqImplLeft_eqGeneral
 
 end
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper for Lemma 6.3.2: directly commute implication-left to the
 root of a G=-proof whose selected occurrence of `A ⊃ B` has arbitrary
 antecedent prefix and suffix contexts.  The returned trees are indexed

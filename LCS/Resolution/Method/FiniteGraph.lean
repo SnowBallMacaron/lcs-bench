@@ -81,7 +81,6 @@ def follow (g : FiniteGraph) (a : LCS.TreeAddr) : Option Nat :=
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.FiniteGraph (follow_append)
 theorem followFrom_append (g : FiniteGraph) (i : Nat)
     (a b : LCS.TreeAddr) :
     g.followFrom i (a ++ b) =
@@ -138,7 +137,6 @@ def WellFormed (g : FiniteGraph) : Prop :=
         (GCNF.Clause.remove a.clause r.pivot)
         (GCNF.Clause.remove b.clause r.pivot.conjugate)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The stronger invariant used when replaying every row of a table. -/
 def AllRowsWellFormed (g : FiniteGraph) : Prop :=
   g.root < g.table.length ∧
@@ -150,7 +148,6 @@ def AllRowsWellFormed (g : FiniteGraph) : Prop :=
         (GCNF.Clause.remove a.clause r.pivot)
         (GCNF.Clause.remove b.clause r.pivot.conjugate)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem AllRowsWellFormed.wellFormed {g : FiniteGraph}
     (h : g.AllRowsWellFormed) : g.WellFormed :=
   ⟨h.1, (fun i n hn r hr => ⟨(h.2 i n hn r hr).1, (h.2 i n hn r hr).2.1⟩),
@@ -200,7 +197,6 @@ def graft (donor recipient : FiniteGraph) (replace : Nat → Bool) : FiniteGraph
       { r with left := redirect r.left, right := redirect r.right } }
   ⟨donor.table ++ imported, redirect recipient.root⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem next_spec {g : FiniteGraph} {i p j : Nat} (h : g.next i p = some j) :
     ∃ n r, g.node i = some n ∧ n.inference = some r ∧
       ((p = 0 ∧ j = r.left) ∨ (p = 1 ∧ j = r.right)) := by
@@ -221,8 +217,6 @@ theorem next_spec {g : FiniteGraph} {i p j : Nat} (h : g.next i p = some j) :
 
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.FiniteGraph (followFrom_length_bound)
 theorem next_lt {g : FiniteGraph} (hg : g.WellFormed) {i p j : Nat}
     (h : g.next i p = some j) : j < i := by
   obtain ⟨n, r, hn, hr, hpos⟩ := next_spec h
@@ -242,7 +236,6 @@ theorem next_position_lt {g : FiniteGraph} {i p j : Nat}
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.FiniteGraph (next_mem_vertexIds)
 theorem followFrom_length_bound {g : FiniteGraph} (hg : g.WellFormed)
     {i j : Nat} {a : LCS.TreeAddr} (h : g.followFrom i a = some j) :
     j + a.length ≤ i := by
@@ -265,7 +258,6 @@ theorem follow_index_lt {g : FiniteGraph} (hg : g.WellFormed)
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.FiniteGraph (next_mem_vertexIds)
 theorem follow_append (g : FiniteGraph) (a b : LCS.TreeAddr) :
     g.follow (a ++ b) = (g.follow a).bind (fun i => g.followFrom i b) :=
   followFrom_append g g.root a b
@@ -340,7 +332,6 @@ def labeledTree (g : FiniteGraph) (hg : g.WellFormed) : LCS.LabeledTree Clause w
   label := fun a ha =>
     (g.table[g.vertexAt a ha]'(follow_index_lt hg (g.follow_vertexAt a ha))).clause
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem node_vertexAt (g : FiniteGraph) (hg : g.WellFormed)
     (a : LCS.TreeAddr) (ha : a ∈ g.domain) :
     g.label (g.vertexAt a ha) = some ((g.labeledTree hg).label a ha) := by
@@ -379,7 +370,6 @@ def toDAG (g : FiniteGraph) (hg : g.WellFormed) : DAG Clause where
     rw [labelAtOpt_labeledTree, labelAtOpt_labeledTree, addressRel_follow_eq h]
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem mem_reachableFrom_iff (g : FiniteGraph) (depth i j : Nat) :
     j ∈ g.reachableFrom depth i ↔
       ∃ a, g.followFrom i a = some j ∧ a.length < depth := by
@@ -422,7 +412,6 @@ theorem mem_reachableFrom_iff (g : FiniteGraph) (depth i j : Nat) :
           · exact Or.inr (Or.inl (by simpa [hn] using hm))
           · exact Or.inr (Or.inr (by simpa [hn] using hm))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem mem_vertexIds_iff (g : FiniteGraph) (j : Nat) :
     j ∈ g.vertexIds ↔
       ∃ a, g.follow a = some j ∧ a.length < g.table.length := by
@@ -432,8 +421,6 @@ theorem mem_vertexIds_iff (g : FiniteGraph) (j : Nat) :
 
 
 
--- ATTACH-BLOCKER: termination suffix
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth
 theorem root_mem_vertexIds (g : FiniteGraph) (hwf : g.WellFormed) :
     g.root ∈ g.vertexIds :=
   (mem_vertexIds_iff g g.root).mpr ⟨[], rfl, by have := hwf.1; simp; omega⟩
@@ -461,12 +448,9 @@ termination_by l.length
 
 
 
--- ATTACH-BLOCKER: termination suffix
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth, LCS.Resolution.Method.UnfoldBounds
 theorem vertexIds_nodup (g : FiniteGraph) : g.vertexIds.Nodup :=
   nodup_eraseDups_nat _
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.Completeness
 theorem stepIds_nodup (g : FiniteGraph) : g.stepIds.Nodup :=
   (vertexIds_nodup g).filter _
 
@@ -504,7 +488,6 @@ termination_by i
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.Unfold (unfold_leavesFrom)
 theorem follow_mem_vertexIds {g : FiniteGraph} (hg : g.WellFormed)
     {a : LCS.TreeAddr} {i : Nat} (h : g.follow a = some i) : i ∈ g.vertexIds := by
   apply (mem_vertexIds_iff g i).mpr
@@ -607,19 +590,16 @@ open LCS.Resolution.GCNF
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth
 theorem node_index_lt {g : FiniteGraph} {i : Nat} {n : Node}
     (h : g.node i = some n) : i < g.table.length := by
   have := List.getElem?_eq_some_iff.mp h
   exact this.1
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth
 theorem vertexIds_index_lt {g : FiniteGraph} (hg : g.WellFormed)
     {i : Nat} (hi : i ∈ g.vertexIds) : i < g.table.length := by
   obtain ⟨a, ha, _⟩ := (mem_vertexIds_iff g i).mp hi
   exact follow_index_lt hg ha
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth
 theorem next_mem_vertexIds {g : FiniteGraph} (hg : g.WellFormed)
     {i p j : Nat} (hi : i ∈ g.vertexIds) (hnext : g.next i p = some j) :
     j ∈ g.vertexIds := by
@@ -629,7 +609,6 @@ theorem next_mem_vertexIds {g : FiniteGraph} (hg : g.WellFormed)
   have hb := followFrom_length_bound hg hf
   exact (mem_vertexIds_iff g j).mpr ⟨a ++ [p], hf, by have := hg.1; omega⟩
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth
 theorem followFrom_closed {g : FiniteGraph} {P : Nat → Prop}
     (hstep : ∀ i p j, P i → g.next i p = some j → P j)
     {i j : Nat} {a : LCS.TreeAddr} (hi : P i) (hpath : g.followFrom i a = some j) :
@@ -642,7 +621,6 @@ theorem followFrom_closed {g : FiniteGraph} {P : Nat → Prop}
     | some k =>
       exact ih (hstep i p k hi hn) (by simpa [followFrom, hn] using hpath)
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.UnfoldBounds
 /-- Absence of sharing means that a reachable vertex has only one path from
 the root. Distinct vertices with equal labels are still distinct. -/
 theorem toResolutionDAG_isTreeShaped_iff (g : FiniteGraph) (hg : g.WellFormed) :

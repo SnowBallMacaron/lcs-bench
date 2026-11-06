@@ -213,7 +213,7 @@ end G1nnfProofTree
 
 `G1nnfSetDerivable` is the proposition-valued presentation used by the
 completeness proof, whereas the Chapter 7 normalization results consume
-the Finset-indexed `G1nnfProofTree`.  The following private utilities choose
+the Finset-indexed `G1nnfProofTree`.  The following utilities choose
 a Finset representative of a finite set and record the elementary
 membership transports used by the bridge. -/
 

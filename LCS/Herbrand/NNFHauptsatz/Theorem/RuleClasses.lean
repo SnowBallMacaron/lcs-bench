@@ -103,7 +103,6 @@ namespace LCS.Herbrand.NNFHauptsatz.Theorem
 open LCS.Herbrand.NNFHauptsatz.G2nnfProofTree
 open LCS.Herbrand.NNFHauptsatz.G2nnfRule
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Stored antecedent/succedent side contexts. For cut these are the first
 premise's frame; the independent second frame remains in the rule itself. -/
 def g2nnfRuleSideContexts {L : Language} : G2nnfRuleCore L →

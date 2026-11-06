@@ -26,7 +26,6 @@ open LCS.Propositional.Semantics.TruthFunctions
 def logEquivN (A B : PropFormulaNormalized) : Prop :=
   ∀ v : Valuation, hEquiv (evalExtN v A) (evalExtN v B) = BoolVal.T
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem tautological_equiv_iff_equal_evalN (A B : PropFormulaNormalized) :
     logEquivN A B ↔ ∀ v : Valuation, evalExtN v A = evalExtN v B := by
 -- BEGIN PROOF
@@ -238,7 +237,6 @@ def exCNFviaNNFResult : PropFormulaNormalized :=
 
 -- ========= Helpers: NNF conversion via polarity parameter =========
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def toNNFaux : Bool → PropFormulaNormalized → PropFormulaNormalized
   | true, .var n => .var n
   | false, .var n => .neg (.var n)
@@ -251,7 +249,6 @@ def toNNFaux : Bool → PropFormulaNormalized → PropFormulaNormalized
   | true, .impl A B => .disj (toNNFaux false A) (toNNFaux true B)
   | false, .impl A B => .conj (toNNFaux true A) (toNNFaux false B)
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 abbrev toNNF (A : PropFormulaNormalized) : PropFormulaNormalized := toNNFaux true A
 
 
@@ -340,7 +337,6 @@ inductive CNFRewrite : PropFormulaNormalized → PropFormulaNormalized → Prop 
   | disj {A A' B B'} : CNFRewrite A A' → CNFRewrite B B' →
       CNFRewrite (.disj A B) (.disj A' B')
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem CNFRewrite.sound {A B : PropFormulaNormalized} (h : CNFRewrite A B) :
     logEquivN A B := by
   apply (tautological_equiv_iff_equal_evalN A B).mpr

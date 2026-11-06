@@ -41,7 +41,6 @@ open Classical
 -- Theorem 5.6.4 (companion def): isConsistentSetEq
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- No finite list of members of Gamma proves the empty succedent in G_=. -/
 def isConsistentSetEqEmptySucc {L : Language} (hL : L.hasEquality = true)
     (Gamma : Set (FormulaN L)) : Prop :=
@@ -329,7 +328,6 @@ structure StructureIsomorphism
 -- Lindenbaum's Lemma for G_= (equality version)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lindenbaum chain for equality consistency. Same construction as the
     non-equality version but using isConsistentSetEq. -/
 noncomputable def lindenbaumChainEq {L : Language} (hL : L.hasEquality = true)
@@ -343,13 +341,11 @@ noncomputable def lindenbaumChainEq {L : Language} (hL : L.hasEquality = true)
     then fun x => prev x ∨ x = A
     else prev
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 noncomputable def lindenbaumLimitEq {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)]
     (Gamma : Set (FormulaN L)) : Set (FormulaN L) :=
   fun A => ∃ n, lindenbaumChainEq hL Gamma n A
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem chainEq_consistent {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)]
     (Gamma : Set (FormulaN L)) (hCon : isConsistentSetEq hL Gamma) :
@@ -365,7 +361,6 @@ theorem chainEq_consistent {L : Language} (hL : L.hasEquality = true)
       else lindenbaumChainEq hL Gamma k)
     split <;> assumption
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem chainEq_mono {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)] (Gamma : Set (FormulaN L)) :
     ∀ n A, lindenbaumChainEq hL Gamma n A →
@@ -380,7 +375,6 @@ theorem chainEq_mono {L : Language} (hL : L.hasEquality = true)
   · exact Or.inl hA
   · exact hA
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem chainEq_mono_ge {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)] (Gamma : Set (FormulaN L)) :
     ∀ n m, n ≤ m → ∀ A, lindenbaumChainEq hL Gamma n A →
@@ -390,7 +384,6 @@ theorem chainEq_mono_ge {L : Language} (hL : L.hasEquality = true)
   | refl => exact fun A hA => hA
   | step _ ih => exact fun A hA => chainEq_mono hL Gamma _ A (ih A hA)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem list_in_limitEq_bounded {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)] (Gamma : Set (FormulaN L))
     (cs : List (FormulaN L))
@@ -410,7 +403,6 @@ theorem list_in_limitEq_bounded {L : Language} (hL : L.hasEquality = true)
     · exact chainEq_mono_ge hL Gamma ka _ (Nat.le_max_left ka kas) _ hka
     · exact chainEq_mono_ge hL Gamma kas _ (Nat.le_max_right ka kas) c (hkas c hc)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The limit of the equality Lindenbaum chain is consistent. -/
 theorem limitEq_consistent {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)]
@@ -424,7 +416,6 @@ theorem limitEq_consistent {L : Language} (hL : L.hasEquality = true)
   exact (isConsistentSetEq_iff_emptySucc hL (lindenbaumChainEq hL Gamma k)).mp
     hConK cs (fun c hc => hk c hc) hprov
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The limit is maximal w.r.t. equality consistency. -/
 theorem limitEq_maximal {L : Language} (hL : L.hasEquality = true)
     [Countable (FormulaN L)]
@@ -459,7 +450,6 @@ theorem limitEq_maximal {L : Language} (hL : L.hasEquality = true)
       rw [dif_pos hConExt]; right; rfl
     exact ⟨n + 1, hStep⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lindenbaum's Lemma for G_=: every consistent set can be extended
     to a maximal consistent set. Identical construction to the
     non-equality version using isConsistentSetEq. -/
@@ -524,7 +514,6 @@ theorem consistentEq_implies_satisfiable_countable {L : Language} (hL : L.hasEqu
 -- Model existence for G_= (equality version)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Model existence for G_=: consistency implies satisfiability.
     Delegates to consistentEq_implies_satisfiable_countable and
     discards the countability witness. -/
@@ -621,7 +610,6 @@ theorem peanoNatStructure_models_peanoArithAxioms :
   -- REPAIR(T129): proof pending
   sorry
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.6.3: Expand 𝒩 to L′ by interpreting the new constant c as k. -/
 def expandedPeanoNatStructure (k : Nat) : Structure expandedArithLanguage where
   carrier := Nat

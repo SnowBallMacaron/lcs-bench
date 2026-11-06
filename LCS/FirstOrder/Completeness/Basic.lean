@@ -24,7 +24,6 @@ open LCS.FirstOrder.Gentzen
 open LCS.FirstOrder.Gentzen.SignedFormulae
 open LCS.FirstOrder.Gentzen.Hintikka
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A finite list of term/formula records, finite availability lists, and
 an activated-variable counter. -/
 structure SearchState (L : Language) : Type 1 where
@@ -350,7 +349,6 @@ theorem exCounterDomainH_y2 : exCounterDomainH (Term.var 5)
 theorem exCounterDomainH_func (t : Term exLangPQa) (ht : exCounterDomainH t) :
     exCounterDomainH (Term.func ExFuncFa.f (fun _ => t)) 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.5.3: The structure on H interprets f and a as term
 constructors, P as true exactly at y₂, and Q as true exactly at a.
 The odd-index supply represents y₁ by 3 and y₂ by 5. -/

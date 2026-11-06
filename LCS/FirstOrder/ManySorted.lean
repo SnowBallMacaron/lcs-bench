@@ -20,7 +20,6 @@ namespace LCS.FirstOrder.ManySorted
 -- Definition 10.2.1: Many-sorted first-order language
 -- ===================================================================
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A general many-sorted signature with nonempty data sorts and positive
 function ranks. It permits arbitrary symbol carriers, including the names
 for all elements of a structure in the semantic expansion L(M). -/
@@ -427,7 +426,6 @@ theorem msTermSize_foldl_ofFn_ge_elem {L : MSLanguage} {n : Nat}
 -- ===================================================================
 -- Section 10.2.3: Free and Bound Variables, Substitutions
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- §10.2.3: The set FV(t) of free variables of a many-sorted term t of
 sort s. Extends Definition 5.2.4 to the many-sorted case — each free
 variable carries its sort, so FV(t) ⊆ V = ⋃_s V_s is represented as a
@@ -442,7 +440,6 @@ def msTermFV {L : MSLanguage} :
   | _, .func _ ts    =>
     Set.iUnion (fun i => msTermFV (ts i))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- §10.2.3: The set FV(A) of free variables of a many-sorted formula A.
 Extends Definition 5.2.4; quantifier cases remove the bound variable
 (with its sort) from the subformula's free-variable set. -/
@@ -462,7 +459,6 @@ def msFormulaFV {L : MSLanguage} : MSFormula L → Set (MSVar L)
 
 namespace MSFormula
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- §10.2.3: A many-sorted formula A is closed if FV(A) = ∅. -/
 def isClosed {L : MSLanguage} (A : MSFormula L) : Prop :=
   msFormulaFV A = ∅
@@ -501,7 +497,6 @@ def msFormulaBV {L : MSLanguage} : MSFormula L → Set (MSVar L)
   | .all s i A      => msFormulaBV A ∪ Set.singleton (s, i)
   | .ex s i A       => msFormulaBV A ∪ Set.singleton (s, i)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- §10.2.3: Substitution of a term t of sort u for the variable x_i^u in
 a term of sort s. Extends Definition 5.2.6; the textbook imposes that
 the sort of t must match the sort of the replaced variable — this is

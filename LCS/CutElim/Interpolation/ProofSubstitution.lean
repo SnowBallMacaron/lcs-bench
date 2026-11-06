@@ -23,7 +23,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 /-- A variable is not bound in any node sequent or rule annotation of an LKₑ deduction tree. -/
@@ -155,7 +154,6 @@ noncomputable def _root_.LCS.CutElim.LKe.LKeDeductionTree.substConst {L : Langua
       (transform t₂ hNO.2.2)
   exact transform T hNotOccurs
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Variable substitution preserves the `isProof` predicate on LKₑ deduction trees. -/
 theorem _root_.LCS.CutElim.LKe.LKeDeductionTree.substVar_isProof
     {L : Language} {s : Sequent L} (T : LKeDeductionTree s) (z y : Nat)
@@ -164,7 +162,6 @@ theorem _root_.LCS.CutElim.LKe.LKeDeductionTree.substVar_isProof
   -- REPAIR(T6-42b): proof pending
   sorry
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Constant substitution preserves the `isProof` predicate on LKₑ deduction trees. -/
 theorem _root_.LCS.CutElim.LKe.LKeDeductionTree.substConst_isProof
     {L : Language} {s : Sequent L} (T : LKeDeductionTree s) (z : Nat)

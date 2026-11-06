@@ -309,7 +309,6 @@ abbrev G2nnfProofTreeCore {L : Language} [DecidableEq (FormulaN L)]
     (extraAxiom : LCS.Finset (FormulaN L) × LCS.Finset (FormulaN L) → Prop) :=
   G2nnfDeductionTreeCore admitRule extraAxiom (fun _ => False)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every node of a core tree has an NNF conclusion, including open leaves
 and extra axioms. Applying this lemma to any subtree gives the same invariant. -/
 theorem G2nnfDeductionTreeCore.allNNF {L : Language} [DecidableEq (FormulaN L)]

@@ -46,7 +46,6 @@ def isAtomicOrQuantified {L : Language}
 -- ===================================================================
 -- Lemma 6.3.1 (required def): formulaWeight
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 6.3.1 (required def): The number of logical connectives
 (conj, disj, neg, impl) in a non-atomic, non-quantified formula.
 Returns 0 for atomic formulae and for quantified formulae
@@ -65,7 +64,6 @@ def formulaWeight {L : Language} : FormulaN L → Nat
 -- ===================================================================
 -- Lemma 6.3.1 (required def): sequentWeight
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 6.3.1 (required def): The sum of formulaWeight over all
 formulae in both the antecedent and succedent of the sequent. -/
 def sequentWeight {L : Language} (s : Sequent L) : Nat :=
@@ -127,14 +125,12 @@ def seqAllAtomicOrQuantified {L : Language}
 -- ===================================================================
 -- Lemma 6.3.1 (helpers): foldl arithmetic
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_foldl_add_acc {xs : List Nat} {n : Nat} :
     xs.foldl (· + ·) n = n + xs.foldl (· + ·) 0 := by
   induction xs generalizing n with
   | nil => simp [List.foldl]
   | cons a as ih => simp [List.foldl]; rw [ih (n := n + a), ih (n := a)]; omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_mem_split {α : Type} (A : α) (xs : List α) (h : A ∈ xs) :
     ∃ L₁ L₂ : List α, xs = L₁ ++ [A] ++ L₂ := by
 -- BEGIN PROOF
@@ -148,12 +144,10 @@ theorem perm_mem_split {α : Type} (A : α) (xs : List α) (h : A ∈ xs) :
       exact ⟨x :: L₁, L₂, by simp [hL]⟩
 
 -- Recursive sum for simpler omega proofs
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def perm_listWeightSum {L : Language} : List (FormulaN L) → Nat
   | [] => 0
   | A :: rest => formulaWeight A + perm_listWeightSum rest
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_listWeightSum_eq {L : Language} (xs : List (FormulaN L)) :
     perm_listWeightSum xs = (xs.map formulaWeight).foldl (· + ·) 0 := by
 -- BEGIN PROOF
@@ -164,7 +158,6 @@ theorem perm_listWeightSum_eq {L : Language} (xs : List (FormulaN L)) :
     rw [show (List.map formulaWeight as).foldl (· + ·) (formulaWeight a) =
       formulaWeight a + (List.map formulaWeight as).foldl (· + ·) 0 from perm_foldl_add_acc]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_listWeightSum_append {L : Language}
     (xs ys : List (FormulaN L)) :
     perm_listWeightSum (xs ++ ys) =
@@ -174,7 +167,6 @@ theorem perm_listWeightSum_append {L : Language}
   | nil => simp [perm_listWeightSum]
   | cons a as ih => simp [perm_listWeightSum, ih]; omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_seqWeight_eq {L : Language}
     (ante succ : List (FormulaN L)) :
     sequentWeight (Sequent.mk ante succ) =
@@ -182,7 +174,6 @@ theorem perm_seqWeight_eq {L : Language}
 -- BEGIN PROOF
   simp [sequentWeight, perm_listWeightSum_eq]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_map_foldl_split {L : Language} (Γ₁ Γ₂ : List (FormulaN L))
     (A : FormulaN L) :
     ((Γ₁ ++ [A] ++ Γ₂).map formulaWeight).foldl (· + ·) 0 =
@@ -195,7 +186,6 @@ theorem perm_map_foldl_split {L : Language} (Γ₁ Γ₂ : List (FormulaN L))
         formulaWeight A :: Γ₂.map formulaWeight from by simp]
   simp only [List.foldl]; rw [perm_foldl_add_acc]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_map_foldl_split2 {L : Language} (Γ₁ Γ₂ : List (FormulaN L))
     (A B : FormulaN L) :
     ((Γ₁ ++ [A, B] ++ Γ₂).map formulaWeight).foldl (· + ·) 0 =
@@ -213,28 +203,24 @@ theorem perm_map_foldl_split2 {L : Language} (Γ₁ Γ₂ : List (FormulaN L))
 -- ===================================================================
 -- Lemma 6.3.1 (helpers): isAxiom preservation for both-sides leaves
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_conj_both_leaf1_ax {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     isAxiom (Sequent.mk (Γ₁ ++ [A, B] ++ Γ₂) (Δ₁ ++ [A] ++ Δ₂)) :=
 -- BEGIN PROOF
   ⟨A, by simp [List.mem_append], by simp [List.mem_append]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_conj_both_leaf2_ax {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     isAxiom (Sequent.mk (Γ₁ ++ [A, B] ++ Γ₂) (Δ₁ ++ [B] ++ Δ₂)) :=
 -- BEGIN PROOF
   ⟨B, by simp [List.mem_append], by simp [List.mem_append]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_disj_both_leaf1_ax {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     isAxiom (Sequent.mk (Γ₁ ++ [A] ++ Γ₂) (Δ₁ ++ [A, B] ++ Δ₂)) :=
 -- BEGIN PROOF
   ⟨A, by simp [List.mem_append], by simp [List.mem_append]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_disj_both_leaf2_ax {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     isAxiom (Sequent.mk (Γ₁ ++ [B] ++ Γ₂) (Δ₁ ++ [A, B] ++ Δ₂)) :=
@@ -244,7 +230,6 @@ theorem perm_disj_both_leaf2_ax {L : Language}
 -- ===================================================================
 -- Lemma 6.3.1 (helpers): weight decrease for both-sides decomp
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_conj_both_weight_leaf1 {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     sequentWeight (Sequent.mk (Γ₁ ++ [A, B] ++ Γ₂) (Δ₁ ++ [A] ++ Δ₂)) <
@@ -257,7 +242,6 @@ theorem perm_conj_both_weight_leaf1 {L : Language}
   rw [perm_map_foldl_split2 Γ₁ Γ₂ A B, perm_map_foldl_split Δ₁ Δ₂ A]
   simp [formulaWeight]; omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem perm_conj_both_weight_leaf2 {L : Language}
     (A B : FormulaN L) (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) :
     sequentWeight (Sequent.mk (Γ₁ ++ [A, B] ++ Γ₂) (Δ₁ ++ [B] ++ Δ₂)) <
@@ -271,14 +255,11 @@ theorem perm_conj_both_weight_leaf2 {L : Language}
   simp [formulaWeight]; omega
 
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (n : Nat) (ihS : ∀ (s' : Sequent L), sequentWeight s' < n → isAxiom s' → ∃ (g :
       GProofTreeExt s'), ∀ (l : Sequent L), l ∈ gProofTreeLeafSequents g → seqAllAtomicOrQuantified l)
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ihS
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_left_neg
     (Δ : List (FormulaN L)) (P : FormulaN L) (Γ₁ Γ₂ : List (FormulaN L)) (hPctx : P ∈ Γ₁ ++ Γ₂) (A : FormulaN
       L) (hweight : sequentWeight (Sequent.mk (Γ₁ ++ [A.neg] ++ Γ₂) (Δ)) = n) (hPΔ : P ∈ (Δ))
@@ -293,7 +274,6 @@ theorem axiom_atomic_left_neg
   refine ⟨.onePremise (.negLeft Γ₁ Γ₂ Δ A) g, ?_⟩
   simpa [gProofTreeLeafSequents] using hg
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_left_conj
     (Δ : List (FormulaN L)) (P : FormulaN L) (mem_insert_middle : ∀ (X : FormulaN L) (xs mid ys : List
       (FormulaN L)), X ∈ xs ++ ys → X ∈ xs ++ mid ++ ys) (Γ₁ Γ₂ : List (FormulaN L)) (hPctx : P ∈ Γ₁ ++ Γ₂) (A
@@ -310,7 +290,6 @@ theorem axiom_atomic_left_conj
   refine ⟨.onePremise (.conjLeft Γ₁ Γ₂ Δ A B) g, ?_⟩
   simpa [gProofTreeLeafSequents] using hg
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_left_disj
     (Δ : List (FormulaN L)) (P : FormulaN L) (mem_insert_middle : ∀ (X : FormulaN L) (xs mid ys : List
       (FormulaN L)), X ∈ xs ++ ys → X ∈ xs ++ mid ++ ys) (Γ₁ Γ₂ : List (FormulaN L)) (hPctx : P ∈ Γ₁ ++ Γ₂) (A
@@ -336,7 +315,6 @@ theorem axiom_atomic_left_disj
   simp only [gProofTreeLeafSequents, List.mem_append] at hl
   exact hl.elim (hg₁ l) (hg₂ l)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_left_impl
     (Δ : List (FormulaN L)) (P : FormulaN L) (Γ₁ Γ₂ : List (FormulaN L)) (hPctx : P ∈ Γ₁ ++ Γ₂) (A B :
       FormulaN L) (hweight : sequentWeight (Sequent.mk (Γ₁ ++ [A.impl B] ++ Γ₂) (Δ)) = n) (hPΔ : P ∈ (Δ))
@@ -361,7 +339,6 @@ theorem axiom_atomic_left_impl
   simp only [gProofTreeLeafSequents, List.mem_append] at hl
   exact hl.elim (hg₁ l) (hg₂ l)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_right_neg
     (Γ : List (FormulaN L)) (P : FormulaN L) (Δ₁ Δ₂ : List (FormulaN L)) (hPctx : P ∈ Δ₁ ++ Δ₂) (A : FormulaN
       L) (hweight : sequentWeight (Sequent.mk (Γ) (Δ₁ ++ [A.neg] ++ Δ₂)) = n) (hPΓ : P ∈ (Γ))
@@ -378,7 +355,6 @@ theorem axiom_atomic_right_neg
   refine ⟨.onePremise (.negRight Γ Δ₁ Δ₂ A) g, ?_⟩
   simpa [gProofTreeLeafSequents] using hg
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_right_conj
     (Γ : List (FormulaN L)) (P : FormulaN L) (mem_insert_middle : ∀ (X : FormulaN L) (xs mid ys : List
       (FormulaN L)), X ∈ xs ++ ys → X ∈ xs ++ mid ++ ys) (Δ₁ Δ₂ : List (FormulaN L)) (hPctx : P ∈ Δ₁ ++ Δ₂) (A
@@ -404,7 +380,6 @@ theorem axiom_atomic_right_conj
   simp only [gProofTreeLeafSequents, List.mem_append] at hl
   exact hl.elim (hg₁ l) (hg₂ l)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_right_disj
     (Γ : List (FormulaN L)) (P : FormulaN L) (mem_insert_middle : ∀ (X : FormulaN L) (xs mid ys : List
       (FormulaN L)), X ∈ xs ++ ys → X ∈ xs ++ mid ++ ys) (Δ₁ Δ₂ : List (FormulaN L)) (hPctx : P ∈ Δ₁ ++ Δ₂) (A
@@ -421,7 +396,6 @@ theorem axiom_atomic_right_disj
   refine ⟨.onePremise (.disjRight Γ Δ₁ Δ₂ A B) g, ?_⟩
   simpa [gProofTreeLeafSequents] using hg
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_right_impl
     (Γ : List (FormulaN L)) (P : FormulaN L) (Δ₁ Δ₂ : List (FormulaN L)) (hPctx : P ∈ Δ₁ ++ Δ₂) (A B :
       FormulaN L) (hweight : sequentWeight (Sequent.mk (Γ) (Δ₁ ++ [A.impl B] ++ Δ₂)) = n) (hPΓ : P ∈ (Γ))
@@ -439,7 +413,6 @@ theorem axiom_atomic_right_impl
   refine ⟨.onePremise (.implRight Γ Δ₁ Δ₂ A B) g, ?_⟩
   simpa [gProofTreeLeafSequents] using hg
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_both_conj
     (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) (A B : FormulaN L) (hweight : sequentWeight (Sequent.mk (Γ₁ ++ [A.conj
       B] ++ Γ₂) (Δ₁ ++ [A.conj B] ++ Δ₂)) = n)
@@ -460,7 +433,6 @@ theorem axiom_atomic_both_conj
   simp only [gProofTreeLeafSequents, List.mem_append] at hl
   exact hl.elim (hg₁ l) (hg₂ l)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_both_disj
     (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) (A B : FormulaN L) (hweight : sequentWeight (Sequent.mk (Γ₁ ++ [A.disj
       B] ++ Γ₂) (Δ₁ ++ [A.disj B] ++ Δ₂)) = n)
@@ -483,7 +455,6 @@ theorem axiom_atomic_both_disj
   simp only [gProofTreeLeafSequents, List.mem_append] at hl
   exact hl.elim (hg₁ l) (hg₂ l)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_both_neg
     (leafProperty_transport : ∀ {s₁ s₂ : Sequent L} (heq : s₁ = s₂) (g : GProofTreeExt s₁), (∀ (l : Sequent
       L), l ∈ gProofTreeLeafSequents g → seqAllAtomicOrQuantified l) → ∀ (l : Sequent L), l ∈
@@ -510,7 +481,6 @@ theorem axiom_atomic_both_neg
   refine ⟨.onePremise (.negRight (Γ₁ ++ [FormulaN.neg A] ++ Γ₂) Δ₁ Δ₂ A) gmid, ?_⟩
   simpa [gProofTreeLeafSequents] using hgmid
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem axiom_atomic_both_impl
     (Γ₁ Γ₂ Δ₁ Δ₂ : List (FormulaN L)) (A B : FormulaN L) (hweight : sequentWeight (Sequent.mk (Γ₁ ++ [A.impl
       B] ++ Γ₂) (Δ₁ ++ [A.impl B] ++ Δ₂)) = n)

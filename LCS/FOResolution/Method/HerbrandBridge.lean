@@ -836,18 +836,18 @@ theorem clauseSentence_midsequent_matrixInstances
     exact g2nnf_tree_soundness hNoEq M occurrence.node
       ⟨s, hAntecedent, hSuccedentFalse⟩
 
-private def replaySingleSubst {L : Language}
+def replaySingleSubst {L : Language}
     (x : Nat) (t : Term L) : Nat → Term L :=
   fun y => if y = x then t else .var y
 
-private def replaySimultaneousSubst {L : Language} :
+def replaySimultaneousSubst {L : Language} :
     List (Nat × Term L) → Nat → Term L
   | [] => identitySubst
   | (x, t) :: rest =>
       SubstitutionCore.substCompose (replaySimultaneousSubst rest)
         (replaySingleSubst x t)
 
-private theorem termSubst_eq_replaySingleSubst {L : Language}
+theorem termSubst_eq_replaySingleSubst {L : Language}
     (source replacement : Term L) (x : Nat) :
     termSubst source replacement x =
       termSubstAll source (replaySingleSubst x replacement) := by
@@ -862,7 +862,7 @@ private theorem termSubst_eq_replaySingleSubst {L : Language}
       funext i
       exact ih i
 
-private theorem formulaSubstN_eq_replaySingleSubst_of_qf
+theorem formulaSubstN_eq_replaySingleSubst_of_qf
     {L : Language}
     (F : FormulaN L) (replacement : Term L) (x : Nat)
     (hQF : isQuantifierFree F) :
@@ -899,7 +899,7 @@ private theorem formulaSubstN_eq_replaySingleSubst_of_qf
   | all _ _ | ex _ _ =>
       exact hQF.elim
 
-private theorem substFormula_identity {L : Language}
+theorem substFormula_identity {L : Language}
     (F : FormulaN L) :
     substLit.substFormula identitySubst F = F := by
   induction F with
@@ -927,7 +927,7 @@ private theorem substFormula_identity {L : Language}
   | ex x F ih =>
       exact congrArg (FormulaN.ex x) ih
 
-private theorem substFormula_comp_local {L : Language}
+theorem substFormula_comp_local {L : Language}
     (F : FormulaN L) (sigma theta : Nat → Term L) :
     substLit.substFormula sigma (substLit.substFormula theta F) =
       substLit.substFormula (SubstitutionCore.substCompose sigma theta) F := by
@@ -958,7 +958,7 @@ private theorem substFormula_comp_local {L : Language}
   | ex x F ih =>
       exact congrArg (FormulaN.ex x) ih
 
-private theorem replayFormula_eq_substFormula_of_qf {L : Language}
+theorem replayFormula_eq_substFormula_of_qf {L : Language}
     (substitutions : List (Nat × Term L))
     (F : FormulaN L) (hQF : isQuantifierFree F) :
     replayQuantifierSubstitutionsFormula substitutions F =
@@ -979,7 +979,7 @@ private theorem replayFormula_eq_substFormula_of_qf {L : Language}
         (replaySimultaneousSubst rest)
         (replaySingleSubst x replacement)
 
-private theorem clauseEval_of_isSatisfied {L : Language} (hNoEq : L.withoutEquality)
+theorem clauseEval_of_isSatisfied {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure L) (s : Assignment M)
     (A : FormulaN L) (C : FOClause L hNoEq)
     (hSat : (FOClause.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s C) :
@@ -988,7 +988,7 @@ private theorem clauseEval_of_isSatisfied {L : Language} (hNoEq : L.withoutEqual
   apply (clauseToFormula_true_of_mem (hNoEq := by all_goals exact hNoEq)) M s A C lit hLit
   cases lit <;> exact hLitSat
 
-private theorem false_substituted_matrix_source_clause
+theorem false_substituted_matrix_source_clause
     {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure L) (s : Assignment M)
     (A : FormulaN L) (head : FOClause L hNoEq)
@@ -1029,7 +1029,7 @@ private theorem false_substituted_matrix_source_clause
     exact (clauseEval_of_isSatisfied (hNoEq := by all_goals exact hNoEq)) M s A _
       (hAllSatisfied C (List.mem_cons_of_mem head hC))
 
-private theorem substLit_comp_local {L : Language} (hNoEq : L.withoutEquality)
+theorem substLit_comp_local {L : Language} (hNoEq : L.withoutEquality)
     (lit : FOLiteral L hNoEq) (sigma theta : Nat → Term L) :
     (substLit (hNoEq := by all_goals exact hNoEq)) sigma ((substLit (hNoEq := by all_goals exact hNoEq)) theta lit) =
       (substLit (hNoEq := by all_goals exact hNoEq)) (SubstitutionCore.substCompose sigma theta) lit := by
@@ -1049,7 +1049,7 @@ private theorem substLit_comp_local {L : Language} (hNoEq : L.withoutEquality)
           · exact SubstitutionCore.termSubstAll_compose lhs theta sigma
           · exact SubstitutionCore.termSubstAll_compose rhs theta sigma
 
-private theorem substLits_comp_local {L : Language} (hNoEq : L.withoutEquality)
+theorem substLits_comp_local {L : Language} (hNoEq : L.withoutEquality)
     (C : FOClause L hNoEq) (sigma theta : Nat → Term L) :
     (substLits (hNoEq := by all_goals exact hNoEq)) sigma ((substLits (hNoEq := by all_goals exact hNoEq)) theta C) =
       (substLits (hNoEq := by all_goals exact hNoEq)) (SubstitutionCore.substCompose sigma theta) C := by
@@ -1058,7 +1058,7 @@ private theorem substLits_comp_local {L : Language} (hNoEq : L.withoutEquality)
   intro lit _
   exact (substLit_comp_local (hNoEq := by all_goals exact hNoEq)) lit sigma theta
 
-private theorem seed_lift_substLits_eq {L : Language} (hNoEq : L.withoutEquality)
+theorem seed_lift_substLits_eq {L : Language} (hNoEq : L.withoutEquality)
     (C : FOClause L hNoEq) (sigma : Nat → Term L) :
     (substLits (hNoEq := by all_goals exact hNoEq)) FreshGroundLanguage.seedSubst
         ((FreshGroundLanguage.liftClause (hNoEq := by all_goals exact hNoEq)) ((substLits (hNoEq := by all_goals exact hNoEq)) sigma C)) =
@@ -1072,7 +1072,7 @@ private theorem seed_lift_substLits_eq {L : Language} (hNoEq : L.withoutEquality
     FreshGroundLanguage.seedSubst
     (FreshGroundLanguage.liftSubst sigma)
 
-private def freshGroundReduct {L : Language}
+def freshGroundReduct {L : Language}
     (M : Structure (FreshGroundLanguage L)) : Structure L where
   carrier := M.carrier
   carrierNonempty := M.carrierNonempty
@@ -1080,7 +1080,7 @@ private def freshGroundReduct {L : Language}
   interpConst := fun c => M.interpConst (Sum.inl c)
   interpPred := M.interpPred
 
-private theorem termEval_liftTerm_reduct {L : Language}
+theorem termEval_liftTerm_reduct {L : Language}
     (M : Structure (FreshGroundLanguage L))
     (s : Assignment M) (t : Term L) :
     termEval M s (FreshGroundLanguage.liftTerm t) =
@@ -1097,7 +1097,7 @@ private theorem termEval_liftTerm_reduct {L : Language}
       funext i
       exact ih i
 
-private theorem atomEval_liftAtom_reduct {L : Language} (hNoEq : L.withoutEquality)
+theorem atomEval_liftAtom_reduct {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure (FreshGroundLanguage L))
     (s : Assignment M) (atom : FOAtom L hNoEq) :
     formulaEvalN M ((FreshGroundLanguage.liftAtom (hNoEq := by all_goals exact hNoEq)) atom).toFormula s ↔
@@ -1118,7 +1118,7 @@ private theorem atomEval_liftAtom_reduct {L : Language} (hNoEq : L.withoutEquali
         termEval_liftTerm_reduct M s rhs]
       exact Iff.rfl
 
-private theorem literalSatisfied_liftLiteral_reduct {L : Language} (hNoEq : L.withoutEquality)
+theorem literalSatisfied_liftLiteral_reduct {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure (FreshGroundLanguage L))
     (s : Assignment M) (lit : FOLiteral L hNoEq) :
     (FOLiteral.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s
@@ -1130,7 +1130,7 @@ private theorem literalSatisfied_liftLiteral_reduct {L : Language} (hNoEq : L.wi
   | neg atom =>
       exact not_congr ((atomEval_liftAtom_reduct (hNoEq := by all_goals exact hNoEq)) M s atom)
 
-private theorem clauseSatisfied_liftClause_reduct {L : Language} (hNoEq : L.withoutEquality)
+theorem clauseSatisfied_liftClause_reduct {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure (FreshGroundLanguage L))
     (s : Assignment M) (C : FOClause L hNoEq) :
     (FOClause.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s ((FreshGroundLanguage.liftClause (hNoEq := by all_goals exact hNoEq)) C) ↔
@@ -1145,7 +1145,7 @@ private theorem clauseSatisfied_liftClause_reduct {L : Language} (hNoEq : L.with
       List.mem_map_of_mem hLit, ?_⟩
     exact ((literalSatisfied_liftLiteral_reduct (hNoEq := by all_goals exact hNoEq)) M s lit).mpr hSat
 
-private theorem literalSatisfied_substLit {L : Language} (hNoEq : L.withoutEquality)
+theorem literalSatisfied_substLit {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure L) (s : Assignment M)
     (sigma : Nat → Term L) (lit : FOLiteral L hNoEq) :
     (FOLiteral.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s ((substLit (hNoEq := by all_goals exact hNoEq)) sigma lit) ↔
@@ -1163,7 +1163,7 @@ private theorem literalSatisfied_substLit {L : Language} (hNoEq : L.withoutEqual
         (substLit_eval (hNoEq := by all_goals exact hNoEq)) M s sigma (.neg atom)
           ((litToFormula_isQuantifierFree (hNoEq := by all_goals exact hNoEq)) (.neg atom))
 
-private theorem clauseSatisfied_substLits {L : Language} (hNoEq : L.withoutEquality)
+theorem clauseSatisfied_substLits {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure L) (s : Assignment M)
     (sigma : Nat → Term L) (C : FOClause L hNoEq) :
     (FOClause.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s ((substLits (hNoEq := by all_goals exact hNoEq)) sigma C) ↔
@@ -1178,7 +1178,7 @@ private theorem clauseSatisfied_substLits {L : Language} (hNoEq : L.withoutEqual
     refine ⟨(substLit (hNoEq := by all_goals exact hNoEq)) sigma lit, List.mem_map_of_mem hLit, ?_⟩
     exact ((literalSatisfied_substLit (hNoEq := by all_goals exact hNoEq)) M s sigma lit).mpr hSat
 
-private theorem seededLift_satisfied_iff {L : Language} (hNoEq : L.withoutEquality)
+theorem seededLift_satisfied_iff {L : Language} (hNoEq : L.withoutEquality)
     (M : Structure (FreshGroundLanguage L))
     (s : Assignment M) (C : FOClause L hNoEq) :
     (FOClause.isSatisfied (hNoEq := by all_goals exact hNoEq)) M s

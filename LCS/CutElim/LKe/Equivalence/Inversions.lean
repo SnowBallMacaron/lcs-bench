@@ -25,7 +25,6 @@ open LCS.CutElim.LKe
 open LCS.CutElim.CompletenessBridge
 namespace ConjProjection
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Select succedent occurrences of a conjunction and record their chosen conjunct. -/
 inductive Mask {L : Language} (A B : FormulaN L) (pick : Bool) :
     List (FormulaN L) → List (FormulaN L) → Type where
@@ -35,14 +34,12 @@ inductive Mask {L : Language} (A B : FormulaN L) (pick : Bool) :
   | project {xs ys} (tail : Mask A B pick xs ys) :
       Mask A B pick (FormulaN.conj A B :: xs) ((if pick then A else B) :: ys)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Leave every formula occurrence unchanged. -/
 def Mask.refl {L : Language} {A B : FormulaN L} {pick} :
     (xs : List (FormulaN L)) → Mask A B pick xs xs
   | [] => .nil
   | F :: xs => .keep F (Mask.refl xs)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Concatenate two occurrence selections. -/
 def Mask.append {L : Language} {A B : FormulaN L} {pick xs xs' ys ys'}
     (p : Mask A B pick xs xs') (q : Mask A B pick ys ys') :
@@ -52,7 +49,6 @@ def Mask.append {L : Language} {A B : FormulaN L} {pick xs xs' ys ys'}
   | .keep F p => .keep F (p.append q)
   | .project p => .project (p.append q)
 
--- ATTACH-BLOCKER: termination suffix
 /-- Split an occurrence selection at a given source-context boundary. -/
 def Mask.split {L : Language} {A B : FormulaN L} {pick}
     (xs ys : List (FormulaN L)) {zs} (p : Mask A B pick (xs ++ ys) zs) :
@@ -69,7 +65,6 @@ def Mask.split {L : Language} {A B : FormulaN L} {pick}
       exact ⟨(if pick then A else B) :: xs', ys', ⟨.project p, q⟩, by simp [h]⟩
 termination_by structural xs
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Read the resulting formula of a singleton occurrence selection. -/
 def Mask.singleton {L : Language} {A B : FormulaN L} {pick F ys}
     (p : Mask A B pick [F] ys) : {G : FormulaN L // ys = [G]} := by
@@ -77,7 +72,6 @@ def Mask.singleton {L : Language} {A B : FormulaN L} {pick F ys}
   | keep F p => cases p; exact ⟨F, rfl⟩
   | project p => cases p; exact ⟨if pick then A else B, rfl⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Selecting a conjunct preserves eigenvariable freshness. -/
 theorem Mask.fresh {L : Language} {A B : FormulaN L} {pick xs ys}
     (p : Mask A B pick xs ys) (x : Nat)
@@ -98,7 +92,6 @@ theorem Mask.fresh {L : Language} {A B : FormulaN L} {pick xs ys}
       | true => exact fun hx => hAB (Or.inl hx)
     · exact ih (fun H hH => h H (List.mem_cons_of_mem _ hH)) G hG
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rebuild a unary rule using a recursive projection callback. -/
 def one {L : Language} (A B : FormulaN L) (pick : Bool)
     {prem conc : Sequent L} (rule : FOLKStep1 prem conc)
@@ -201,7 +194,6 @@ def one {L : Language} (A B : FormulaN L) (pick : Bool)
     simpa [List.append_assoc] using LKeProofTree.onePremise
       (.exchangeRight Γ Δ' F' G' Λ') (ih mask)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rebuild a binary rule using recursive projection callbacks. -/
 def two {L : Language} (A B : FormulaN L) (pick : Bool)
     {prem1 prem2 conc : Sequent L} (rule : FOLKStep2 prem1 prem2 conc)
@@ -237,7 +229,6 @@ def two {L : Language} (A B : FormulaN L) (pick : Bool)
       | false => exact ih2 (md.append (.keep B .nil))
       | true => exact ih1 (md.append (.keep A .nil))
 
--- ATTACH-BLOCKER: termination suffix
 /-- Project selected conjunction occurrences by structural recursion on the tree. -/
 def invert {L : Language} (A B : FormulaN L) (pick : Bool)
     {s : Sequent L} (T : LKeProofTree s) {out : List (FormulaN L)}
@@ -286,7 +277,6 @@ termination_by structural T
 end ConjProjection
 open LCS.FirstOrder.Equality
 
--- ATTACH-BLOCKER: termination suffix
 /-- Project one indexed conjunct from a finite right-associated conjunction
 in the succedent by structural inversion of the proof tree. -/
 def lkeProjectConjoinRight {L : Language} (d : FormulaN L)
@@ -321,7 +311,6 @@ termination_by structural atoms
 
 namespace ImplLeftProjection
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Select antecedent implications and replace them by their consequents. -/
 inductive Mask {L : Language} (A B : FormulaN L) :
     List (FormulaN L) → List (FormulaN L) → Type where
@@ -331,14 +320,12 @@ inductive Mask {L : Language} (A B : FormulaN L) :
   | project {xs ys} (tail : Mask A B xs ys) :
       Mask A B (FormulaN.impl A B :: xs) (B :: ys)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Leave every antecedent occurrence unchanged. -/
 def Mask.refl {L : Language} {A B : FormulaN L}  :
     (xs : List (FormulaN L)) → Mask A B xs xs
   | [] => .nil
   | F :: xs => .keep F (Mask.refl xs)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Concatenate two antecedent occurrence selections. -/
 def Mask.append {L : Language} {A B : FormulaN L} {xs xs' ys ys'}
     (p : Mask A B xs xs') (q : Mask A B ys ys') :
@@ -348,7 +335,6 @@ def Mask.append {L : Language} {A B : FormulaN L} {xs xs' ys ys'}
   | .keep F p => .keep F (p.append q)
   | .project p => .project (p.append q)
 
--- ATTACH-BLOCKER: termination suffix
 /-- Split an occurrence selection at a source-context boundary. -/
 def Mask.split {L : Language} {A B : FormulaN L}
     (xs ys : List (FormulaN L)) {zs} (p : Mask A B (xs ++ ys) zs) :
@@ -365,7 +351,6 @@ def Mask.split {L : Language} {A B : FormulaN L}
       exact ⟨B :: xs', ys', ⟨.project p, q⟩, by simp [h]⟩
 termination_by structural xs
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Read the resulting formula of a singleton selection. -/
 def Mask.singleton {L : Language} {A B : FormulaN L} {F ys}
     (p : Mask A B [F] ys) : {G : FormulaN L // ys = [G]} := by
@@ -373,7 +358,6 @@ def Mask.singleton {L : Language} {A B : FormulaN L} {F ys}
   | keep F p => cases p; exact ⟨F, rfl⟩
   | project p => cases p; exact ⟨B, rfl⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Replacing selected implications by consequents preserves freshness. -/
 theorem Mask.fresh {L : Language} {A B : FormulaN L} {xs ys}
     (p : Mask A B xs ys) (x : Nat)
@@ -392,7 +376,6 @@ theorem Mask.fresh {L : Language} {A B : FormulaN L} {xs ys}
       exact fun hx => hAB (Or.inr hx)
     · exact ih (fun H hH => h H (List.mem_cons_of_mem _ hH)) G hG
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An atomic antecedent has no implication occurrence to replace. -/
 theorem Mask.atomicEq {L : Language} {A B : FormulaN L} {xs ys}
     (m : Mask A B xs ys) (h : ∀ F ∈ xs, F.isAtomic) : ys = xs := by
@@ -404,7 +387,6 @@ theorem Mask.atomicEq {L : Language} {A B : FormulaN L} {xs ys}
     have hi := h _ List.mem_cons_self
     simp [FormulaN.isAtomic] at hi
 
--- ATTACH-BLOCKER: termination suffix
 /-- Move a succedent block past its following context by adjacent exchanges. -/
 def blockRight {L : Language} (pre block mid post Γ : List (FormulaN L))
     (T : LKeProofTree (Sequent.mk Γ (pre ++ block ++ mid ++ post))) :
@@ -421,7 +403,6 @@ def blockRight {L : Language} (pre block mid post Γ : List (FormulaN L))
     simpa using q4.val
 termination_by structural block
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rebuild a unary rule using a recursive consequent-projection callback. -/
 def one {L : Language} (A B : FormulaN L)
     {prem conc : Sequent L} (rule : FOLKStep1 prem conc)
@@ -487,7 +468,6 @@ def one {L : Language} (A B : FormulaN L)
     simpa [List.append_assoc] using LKeProofTree.onePremise
       (.exchangeLeft Γ' F' G' Δ' Λ) (ih mask)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rebuild a binary rule using recursive consequent-projection callbacks. -/
 def two {L : Language} (A B : FormulaN L)
     {prem1 prem2 conc : Sequent L} (rule : FOLKStep2 prem1 prem2 conc)
@@ -519,7 +499,6 @@ def two {L : Language} (A B : FormulaN L)
         simpa using q4.val
       simpa using blockRight [] Θ Δ [] (B :: (Γ' ++ Λ')) q5
 
--- ATTACH-BLOCKER: termination suffix
 /-- Replace selected implication assumptions by structural recursion on a proof tree. -/
 def invert {L : Language} (A B : FormulaN L)
     {s : Sequent L} (T : LKeProofTree s) {out : List (FormulaN L)}

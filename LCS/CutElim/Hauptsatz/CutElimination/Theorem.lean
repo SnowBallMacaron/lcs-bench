@@ -112,7 +112,6 @@ theorem g1nnf_cut_rank_threshold {L : Language} {hL : L.withoutEquality}
   -- REPAIR(T6-32): proof pending (hand proof: feasibility-T6-78 §A)
   sorry
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.4.1 (required helper): Single-step cut-rank reduction
 procedure under the adopted end-sequent convention of E-CUTFB.
 Given a G1nnf proof T, constructs
@@ -126,7 +125,6 @@ noncomputable def g1nnf_cut_rank_reduce {L : Language} {hL : L.withoutEquality}
   Classical.choose
     (g1nnf_cut_rank_threshold T hEnd (T.cutRank - 1) (by omega))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Bounds for the single-step cut-rank reduction
 `g1nnf_cut_rank_reduce`. The constructed proof has strictly smaller
 cut-rank than the input, and its depth is bounded by `2 ^ depth(T)`. -/

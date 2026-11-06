@@ -26,19 +26,16 @@ open LCS.FirstOrder.Equality
 -- ===================================================================
 -- Semantic bridge infrastructure: finite-support term enumeration
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Diagonal successor on pairs of naturals. -/
 def validBridgePairStep : Nat × Nat → Nat × Nat
   | (a, 0) => (0, a + 1)
   | (a, b + 1) => (a + 1, b)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Diagonal enumeration of pairs of naturals. -/
 def validBridgeUnpair : Nat → Nat × Nat
   | 0 => (0, 0)
   | n + 1 => validBridgePairStep (validBridgeUnpair n)
 
--- ATTACH-BLOCKER: termination suffix
 /-- A right inverse to `validBridgeUnpair`.  The recursion follows the
 same diagonal traversal, but its well-founded measure avoids any use of
 number-theoretic pairing infrastructure. -/
@@ -49,7 +46,6 @@ def validBridgePair : Nat → Nat → Nat
 termination_by a b => (a + b, a)
 decreasing_by all_goals omega
 
--- ATTACH-BLOCKER: termination suffix
 theorem validBridgeUnpair_pair : ∀ a b,
     validBridgeUnpair (validBridgePair a b) = (a, b)
   | 0, 0 => by simp [validBridgePair, validBridgeUnpair]
@@ -62,14 +58,12 @@ theorem validBridgeUnpair_pair : ∀ a b,
 termination_by a b => (a + b, a)
 decreasing_by all_goals omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem validBridgePair_injective {a b c d : Nat}
     (h : validBridgePair a b = validBridgePair c d) :
     a = c ∧ b = d := by
   have hu := congrArg validBridgeUnpair h
   simpa [validBridgeUnpair_pair] using hu
 
--- ATTACH-BLOCKER: mutual
 mutual
   /-- Unranked raw terms used only to enumerate the terms of a finite
   support language. -/
@@ -84,7 +78,6 @@ mutual
     | cons : ValidBridgeRawTerm → ValidBridgeRawTerms → ValidBridgeRawTerms
 end
 
--- ATTACH-BLOCKER: mutual
 mutual
   def validBridgeRawTermCode : ValidBridgeRawTerm → Nat
     | .var n => validBridgePair 0 n
@@ -99,7 +92,6 @@ mutual
           (validBridgeRawTermsCode ts) + 1
 end
 
--- ATTACH-BLOCKER: mutual
 mutual
   theorem validBridgeRawTermCode_injective :
       Function.Injective validBridgeRawTermCode
@@ -162,7 +154,6 @@ mutual
         rfl
 end
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 noncomputable def validBridgeRawEnumerate (n : Nat) :
     ValidBridgeRawTerm := by
   classical
@@ -171,7 +162,6 @@ noncomputable def validBridgeRawEnumerate (n : Nat) :
     else
       .var 0
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem validBridgeRawEnumerate_surjective :
     Function.Surjective validBridgeRawEnumerate := by
   intro t
@@ -184,19 +174,16 @@ theorem validBridgeRawEnumerate_surjective :
   · rename_i h
     exact (h ⟨t, rfl⟩).elim
 
--- ATTACH-BLOCKER: unsupported untagged instance
 noncomputable instance validBridgeCountableRawTerm :
     Countable ValidBridgeRawTerm where
   enumerate := validBridgeRawEnumerate
   enumerate_surj := validBridgeRawEnumerate_surjective
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def ValidBridgeRawTerms.ofList :
     List ValidBridgeRawTerm → ValidBridgeRawTerms
   | [] => .nil
   | t :: ts => .cons t (ValidBridgeRawTerms.ofList ts)
 
--- ATTACH-BLOCKER: mutual
 mutual
   /-- Interpret raw terms using two finite symbol lists.  Invalid raw
   symbol indices harmlessly decode as `x₀`; surjectivity only uses valid
@@ -225,7 +212,6 @@ mutual
           validBridgeRawTermsToList fs cs ts
 end
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem validBridgeRawTermsToList_ofList {L : Language}
     (fs : List L.funSymbols) (cs : List L.constSymbols)
     (ts : List ValidBridgeRawTerm) :
@@ -236,7 +222,6 @@ theorem validBridgeRawTermsToList_ofList {L : Language}
   | cons t ts ih =>
       simp [ValidBridgeRawTerms.ofList, validBridgeRawTermsToList, ih]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem validBridgeRawToTerm_surjective {L : Language}
     (fs : List L.funSymbols) (cs : List L.constSymbols)
     (hfs : ∀ f : L.funSymbols, f ∈ fs)
@@ -271,7 +256,6 @@ theorem validBridgeRawToTerm_surjective {L : Language}
         simp
       simp [hget, hspec]
 
--- ATTACH-BLOCKER: unsupported helper attributes
 @[reducible]
 noncomputable def validBridgeTermCountable (L : Language)
     (fs : List L.funSymbols) (cs : List L.constSymbols)

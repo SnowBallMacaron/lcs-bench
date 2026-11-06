@@ -74,7 +74,6 @@ open LCS.FirstOrder.Semantics.Subformulae
 -- Lemma 6.4.2 (required def): G1nnfProvable
 -- ===================================================================
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Lemma 6.4.2 (helper): Set-level derivability for G1nnf sequents.
 The inference rules of G1nnf operate directly on sets (matching the
 textbook's use of finite sets), avoiding the list-position management

@@ -181,7 +181,6 @@ def isProof {L : Language} {hL : L.hasEquality = true} :
   | _, .eqPredCong _ _ _ _ _ t => t.isProof
   | _, .eqGeneral _ _ _ _ _ t => t.isProof
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.6.2 (companion): Converts a G_= deduction tree whose
     leaves are all axioms into a `GEqProofTree` of the same conclusion. -/
 def toProofTree {L : Language} {hL : L.hasEquality = true} :
@@ -222,7 +221,6 @@ inductive ExFuncEq1 : Type where
 
 namespace GEqProofTree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.6.2 (companion): Returns the conclusion sequent
 of the G_= proof tree. Since GEqProofTree is indexed by its
 conclusion, the conclusion IS the index. This is a shim for

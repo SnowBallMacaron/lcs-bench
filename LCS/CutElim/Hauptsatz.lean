@@ -73,14 +73,12 @@ As an extension outside the source clauses, implication is converted to
 def toNNF {L : Language} (A : FormulaN L) : FormulaN L :=
   toNNFAux true A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Proof of Lemma 6.4.1: The conversion produces a formula in NNF. -/
 theorem toNNF_isNNF {L : Language} (A : FormulaN L) : (toNNF A).isNNF := by
   have h (B : FormulaN L) (pol : Bool) : (toNNFAux pol B).isNNF := by
     induction B generalizing pol <;> cases pol <;> simp_all [toNNFAux, isNNF]
   exact h A true
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Proof of Lemma 6.4.1: The conversion preserves logical equivalence. -/
 theorem toNNF_equiv {L : Language} (A : FormulaN L) :
     foLogEquivN A (toNNF A) := by
@@ -199,21 +197,18 @@ theorem mk {L : Language} {Gamma Delta : LCS.Finset (FormulaN L)}
     IsNNF (Gamma, Delta) :=
   ⟨hGamma, hDelta⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every antecedent member of an NNF Finset sequent is in NNF. -/
 theorem left {L : Language} {Gamma Delta : LCS.Finset (FormulaN L)}
     (h : IsNNF (Gamma, Delta)) {A : FormulaN L} (hA : A ∈ Gamma) :
     FormulaN.isNNF A :=
   h.1 A hA
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every succedent member of an NNF Finset sequent is in NNF. -/
 theorem right {L : Language} {Gamma Delta : LCS.Finset (FormulaN L)}
     (h : IsNNF (Gamma, Delta)) {A : FormulaN L} (hA : A ∈ Delta) :
     FormulaN.isNNF A :=
   h.2 A hA
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Inserting on the left preserves and reflects Finset-sequent NNF. -/
 theorem insert_left_iff {L : Language} (A : FormulaN L)
     (Gamma Delta : LCS.Finset (FormulaN L)) :
@@ -232,7 +227,6 @@ theorem insert_left_iff {L : Language} (A : FormulaN L)
     · exact hBA ▸ hA
     · exact h.left hB
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Inserting an NNF formula on the left preserves Finset-sequent NNF. -/
 theorem insert_left {L : Language} {A : FormulaN L}
     {Gamma Delta : LCS.Finset (FormulaN L)}
@@ -240,7 +234,6 @@ theorem insert_left {L : Language} {A : FormulaN L}
     IsNNF (LCS.Finset.insert A Gamma, Delta) :=
   (insert_left_iff A Gamma Delta).2 ⟨hA, h⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Inserting on the right preserves and reflects Finset-sequent NNF. -/
 theorem insert_right_iff {L : Language} (A : FormulaN L)
     (Gamma Delta : LCS.Finset (FormulaN L)) :
@@ -259,7 +252,6 @@ theorem insert_right_iff {L : Language} (A : FormulaN L)
     · exact hBA ▸ hA
     · exact h.right hB
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Inserting an NNF formula on the right preserves Finset-sequent NNF. -/
 theorem insert_right {L : Language} {A : FormulaN L}
     {Gamma Delta : LCS.Finset (FormulaN L)}
@@ -267,7 +259,6 @@ theorem insert_right {L : Language} {A : FormulaN L}
     IsNNF (Gamma, LCS.Finset.insert A Delta) :=
   (insert_right_iff A Gamma Delta).2 ⟨hA, h⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Pointwise union on both sides preserves and reflects Finset-sequent NNF. -/
 theorem union_iff {L : Language}
     (Gamma₁ Delta₁ Gamma₂ Delta₂ : LCS.Finset (FormulaN L)) :
@@ -296,7 +287,6 @@ theorem union_iff {L : Language}
       · exact h₁.right hA
       · exact h₂.right hA
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Pointwise union of two NNF Finset sequents is in NNF. -/
 theorem union {L : Language}
     {Gamma₁ Delta₁ Gamma₂ Delta₂ : LCS.Finset (FormulaN L)}

@@ -114,7 +114,7 @@ def existentialSitesAux {L : Language} :
               site.1, site.2))
   | _, _ => []
 
-private theorem map_fst_map_siteAddressPrefix
+theorem map_fst_map_siteAddressPrefix
     {α : Type} (step : FormulaOccurrenceAddressStep)
     (sites : List (FormulaOccurrenceAddress × α)) :
     (sites.map
@@ -128,7 +128,7 @@ private theorem map_fst_map_siteAddressPrefix
 
 /-- Erasing descriptor payloads from the paired site traversal recovers
 the exact occurrence-address traversal, including multiplicity. -/
-private theorem existentialSitesAux_addresses {L : Language}
+theorem existentialSitesAux_addresses {L : Language}
     (A : FormulaN L) (scope : List Nat) :
     (existentialSitesAux A scope).map Prod.fst =
       existentialOccurrenceAddresses A := by
@@ -162,7 +162,7 @@ private theorem existentialSitesAux_addresses {L : Language}
 
 /-- Erasing occurrence addresses from the paired site traversal recovers
 the exact descriptor traversal, including scope and multiplicity. -/
-private theorem existentialSitesAux_descriptors {L : Language}
+theorem existentialSitesAux_descriptors {L : Language}
     (A : FormulaN L) (scope : List Nat) :
     (existentialSitesAux A scope).map Prod.snd =
       existentialDescriptorsAux A scope := by
@@ -196,7 +196,7 @@ private theorem existentialSitesAux_descriptors {L : Language}
       simp [existentialSitesAux, existentialDescriptorsAux,
         universalScopeAux, List.map_map, Function.comp_def, hA]
 
-private theorem existentialSitesAux_length {L : Language}
+theorem existentialSitesAux_length {L : Language}
     (A : FormulaN L) (scope : List Nat) :
     (existentialSitesAux A scope).length =
       (existentialDescriptorsAux A scope).length := by
@@ -209,7 +209,7 @@ private theorem existentialSitesAux_length {L : Language}
 
 /-- Every paired site's address looks up the formula payload stored in
 that site. -/
-private theorem existentialSitesAux_formulaAt {L : Language}
+theorem existentialSitesAux_formulaAt {L : Language}
     (A : FormulaN L) (scope : List Nat)
     (site :
       FormulaOccurrenceAddress × (FormulaN L × List Nat))
@@ -395,7 +395,7 @@ theorem existentialDescriptorsAux_binders {L : Language}
 /-- Every descriptor cell is headed by an existential constructor; the
 fallback branch of `existentialDescriptorBinder` is therefore unreachable
 on allocation data. -/
-private theorem existentialDescriptor_isExistential {L : Language}
+theorem existentialDescriptor_isExistential {L : Language}
     (A : FormulaN L) (scope : List Nat)
     (descriptor : FormulaN L × List Nat)
     (hDescriptor :
@@ -421,7 +421,7 @@ private theorem existentialDescriptor_isExistential {L : Language}
 
 /-- Every existential binder recorded by the descriptor traversal is a
 bound variable of the ambient formula. -/
-private theorem existentialBinderSequence_mem_formulaBVN
+theorem existentialBinderSequence_mem_formulaBVN
     {L : Language} (A : FormulaN L) {x : Nat}
     (hx : x ∈ existentialBinderSequence A) :
     x ∈ formulaBVN A := by
@@ -490,7 +490,7 @@ theorem existentialBinderSequence_nodup {L : Language}
 
 /-- Substitution changes terms only and therefore preserves the ordered
 existential-binder sequence exactly. -/
-private theorem existentialBinderSequence_formulaSubstN
+theorem existentialBinderSequence_formulaSubstN
     {L : Language} (A : FormulaN L) (t : Term L) (x : Nat) :
     existentialBinderSequence (formulaSubstN A t x) =
       existentialBinderSequence A := by
@@ -512,7 +512,7 @@ private theorem existentialBinderSequence_formulaSubstN
 
 /-- Existential binders of a selected maximal occurrence already occur in
 the ambient formula. -/
-private theorem maxQuantifierOccurrence_selected_exBinders_subset
+theorem maxQuantifierOccurrence_selected_exBinders_subset
     {L : Language} {A : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A) :
     ∀ x, x ∈ existentialBinderSequence occurrence.selected →
@@ -552,7 +552,7 @@ theorem maxQuantifierOccurrence_exBinder_mem
 
 /-- Exact selected replacement can only retain existential binders from
 the ambient formula or introduce binders from the supplied replacement. -/
-private theorem maxQuantifierOccurrence_replace_exBinders_subset
+theorem maxQuantifierOccurrence_replace_exBinders_subset
     {L : Language} {A : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A)
     (replacement : FormulaN L) :
@@ -744,7 +744,7 @@ theorem skolemAllocation_index_unique_of_binder
 /-- Every scope emitted from a distinct-binding formula is duplicate-free,
 provided the incoming scope is duplicate-free and names no binder in the
 current formula. -/
-private theorem existentialScopesAux_all_nodup {L : Language}
+theorem existentialScopesAux_all_nodup {L : Language}
     (A : FormulaN L) (scope : List Nat)
     (hScope : scope.Nodup)
     (hOutside :

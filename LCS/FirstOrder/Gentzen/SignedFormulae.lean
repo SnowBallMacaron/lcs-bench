@@ -257,7 +257,6 @@ structure IsTermAlgebra (L : Language) (H : Set (Term L)) : Prop where
   /-- Every constant symbol is in H -/
   closedConst : ∀ (c : L.constSymbols), Term.const c ∈ H
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- Definition 5.4.5 (companion, generated): A generated term algebra is a term
 algebra H that is additionally closed under sub-terms. -/
 structure IsGeneratedTermAlgebra (L : Language) (H : Set (Term L))
@@ -421,7 +420,6 @@ structure IsTermAlgebraOver (L : Language) (S : Set (SignedFormula L))
   /-- Every constant occurring in S belongs to the algebra. -/
   closedConst : ∀ (c : L.constSymbols), c ∈ signedSetConstSyms S → Term.const c ∈ H
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Constants in a function application occur in one of its arguments. -/
 theorem termConstSyms_func_iff {L : Language} (f : L.funSymbols)
     (ts : Fin (L.funArity f) → Term L) (c : L.constSymbols) :
@@ -434,7 +432,6 @@ theorem termConstSyms_func_iff {L : Language} (f : L.funSymbols)
   · rintro ⟨i, h⟩
     exact ⟨i, ⟨i, rfl⟩, h⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every symbol of an occurring subterm occurs in the containing term. -/
 theorem TermOccursIn.symbols {L : Language} {t u : Term L} (h : TermOccursIn t u) :
     termFunSyms t ⊆ termFunSyms u ∧ termConstSyms t ⊆ termConstSyms u := by

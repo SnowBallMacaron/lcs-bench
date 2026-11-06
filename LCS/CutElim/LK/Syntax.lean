@@ -235,7 +235,6 @@ def isProof {L : Language} {hL : L.withoutEquality} :
   | _, .onePremise _ t => t.isProof
   | _, .twoPremise _ t1 t2 => t1.isProof ∧ t2.isProof
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 6.2.1 (companion): Converts a deduction tree whose leaves
     are all LK-axioms into a `FOLKProofTree` of the same conclusion,
     over a language without equality. -/

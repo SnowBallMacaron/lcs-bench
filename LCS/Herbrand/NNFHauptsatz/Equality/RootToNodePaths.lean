@@ -126,7 +126,6 @@ def RootToNodePath.trans {L : Language}
     .rightPremise rule hAdmit hPrem hSC sub1 sub2
       (path.trans second)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Replace the exact target occurrence of a root-to-node path by another
 tree with the same sequent index.  Every outer application and every
 off-path sibling is reused definitionally. -/

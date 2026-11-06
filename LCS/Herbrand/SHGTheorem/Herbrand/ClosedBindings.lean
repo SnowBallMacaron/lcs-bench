@@ -23,7 +23,7 @@ open LCS.Herbrand.PrenexForm
 open LCS.FirstOrder.SemanticsN
 open LCS.FirstOrder.Semantics.Subformulae
 
-private def ClosedFormulaProvenance.exSubLeftRelevant
+def ClosedFormulaProvenance.exSubLeftRelevant
     {L : Language} {spec : SkolemSpec L}
     {seed : ClosedTerm spec.language}
     {A B : FormulaN L}
@@ -58,7 +58,7 @@ private def ClosedFormulaProvenance.exSubLeftRelevant
       occurrence x (.var y) hSelected prior.universalMap
       prior.scopeAligned prior.frontierReady).2⟩
 
-private def ClosedFormulaProvenance.exSubLeftVacuous
+def ClosedFormulaProvenance.exSubLeftVacuous
     {L : Language} {spec : SkolemSpec L}
     {seed : ClosedTerm spec.language}
     {A B : FormulaN L}
@@ -88,7 +88,7 @@ private def ClosedFormulaProvenance.exSubLeftVacuous
 the supplied provenance.  The explicit coverage argument proves that every
 free variable of the exact allocation is mapped; the seed branch of the
 underlying normalizer is therefore unreachable on that allocation. -/
-private def ClosedFormulaProvenance.closedAllocation
+def ClosedFormulaProvenance.closedAllocation
     {L : Language} {spec : SkolemSpec L}
     {seed : ClosedTerm spec.language} {A : FormulaN L}
     (provenance : ClosedFormulaProvenance spec seed A)
@@ -130,7 +130,7 @@ def matchingClosedFormulaProvenances
 /-- Retain precisely the explicit context cells.  A cell equal to the
 principal is retained when it also belongs to the raw context, so the
 principal and context branches remain intentionally nonexclusive. -/
-private def retainClosedFormulaContext
+def retainClosedFormulaContext
     {L : Language} [DecidableEq (FormulaN L)]
     {spec : SkolemSpec L}
     (seed : ClosedTerm spec.language)
@@ -283,7 +283,7 @@ structure ClosedG2nnfEqBindingData
 
 /-- The certified closed range is computed from the selected G2nnf
 lineage and its explicit scope-coverage proof. -/
-private def ClosedG2nnfBindingData.closedRange
+def ClosedG2nnfBindingData.closedRange
     {L : Language} {hNoEq : L.withoutEquality}
     [DecidableEq (FormulaN L)]
     {spec : SkolemSpec L}
@@ -297,7 +297,7 @@ private def ClosedG2nnfBindingData.closedRange
     data.index data.scopeCovered
 
 /-- Equality-system certified closed range. -/
-private def ClosedG2nnfEqBindingData.closedRange
+def ClosedG2nnfEqBindingData.closedRange
     {L : Language} {hL : L.hasEquality = true}
     [DecidableEq (FormulaN L)]
     {spec : SkolemSpec L}

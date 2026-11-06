@@ -33,7 +33,6 @@ def toGCNF (g : FiniteGraph) (S : ClauseSequent)
     (ClauseSequent.ordinary_subset hOrdinary hSub)
   weakenTo converted.val S hOrdinary hSub
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The actual output is bounded by the number of resolution occurrences in
 the unfolding. No equality with the graph's shared-vertex count is assumed. -/
 theorem toGCNF_leafCount_le_unfold (g : FiniteGraph) (S : ClauseSequent)

@@ -14,7 +14,6 @@ open LCS.CutElim.Hauptsatz
 open LCS.CutElim.Hauptsatz.Completeness
 namespace LCS.CutElim.Hauptsatz
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Rename occurrences of `v` while they are in the scope of a quantifier
 binding `v`.  The Boolean records whether the traversal is below such a
 quantifier.  Free occurrences encountered from the top level are therefore
@@ -52,14 +51,12 @@ def alphaRenameBoundAux {L : Language} (v z : Nat) :
       else
         .ex x (alphaRenameBoundAux v z active A)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Selectively alpha-rename every binder labelled `v`, without changing
 free occurrences of `v`. -/
 def alphaRenameBound {L : Language}
     (A : FormulaN L) (v z : Nat) : FormulaN L :=
   alphaRenameBoundAux v z false A
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The body traversal used after changing an individual rule binder. -/
 def alphaRenameBinderBody {L : Language}
     (A : FormulaN L) (x v z : Nat) : FormulaN L :=
@@ -131,8 +128,7 @@ theorem alphaRenameFormulaFinset_union {L : Language}
     · exact ⟨B, Or.inl hB, rfl⟩
     · exact ⟨B, Or.inr hB, rfl⟩
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBoundAux_isNNF {L : Language}
+theorem alphaRenameBoundAux_isNNF {L : Language}
     (A : FormulaN L) (v z : Nat) (active : Bool)
     (hNNF : A.isNNF) :
     (alphaRenameBoundAux v z active A).isNNF := by
@@ -197,8 +193,7 @@ theorem alphaRenameBound_isAtomic {L : Language}
     simp [FormulaN.isAtomic, alphaRenameBound,
       alphaRenameBoundAux] at hAtom ⊢
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBoundAux_degree {L : Language}
+theorem alphaRenameBoundAux_degree {L : Language}
     (A : FormulaN L) (v z : Nat) (active : Bool) :
     (alphaRenameBoundAux v z active A).degree = A.degree := by
   induction A generalizing active with
@@ -229,8 +224,7 @@ theorem alphaRenameBound_degree {L : Language}
     (alphaRenameBound A v z).degree = A.degree :=
   alphaRenameBoundAux_degree A v z false
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBoundAux_removes_binder {L : Language}
+theorem alphaRenameBoundAux_removes_binder {L : Language}
     (A : FormulaN L) (v z : Nat) (active : Bool)
     (hvz : v ≠ z) :
     v ∉ formulaBVN (alphaRenameBoundAux v z active A) := by
@@ -273,8 +267,7 @@ theorem alphaRenameBound_removes_binder {L : Language}
     v ∉ formulaBVN (alphaRenameBound A v z) :=
   alphaRenameBoundAux_removes_binder A v z false hvz
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBoundAux_preserves_binder_absence
+theorem alphaRenameBoundAux_preserves_binder_absence
     {L : Language} (A : FormulaN L) (v z w : Nat) (active : Bool)
     (hwz : w ≠ z) (hwA : w ∉ formulaBVN A) :
     w ∉ formulaBVN (alphaRenameBoundAux v z active A) := by
@@ -332,8 +325,7 @@ theorem alphaRenameBound_preserves_binder_absence
     w ∉ formulaBVN (alphaRenameBound A v z) :=
   alphaRenameBoundAux_preserves_binder_absence A v z w false hwz hwA
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBound_eq_self_of_not_bound {L : Language}
+theorem alphaRenameBound_eq_self_of_not_bound {L : Language}
     (A : FormulaN L) (v z : Nat) (hvA : v ∉ formulaBVN A) :
     alphaRenameBound A v z = A := by
   unfold alphaRenameBound
@@ -387,12 +379,11 @@ theorem alphaRenameFormulaFinset_eq_self_of_not_bound
     exact ⟨A, hA, alphaRenameBound_eq_self_of_not_bound A v z
       (hS A hA)⟩
 
--- ATTACH-BLOCKER: private declaration
 /-- Free-variable flow for the scope-aware traversal.  In inactive mode
 no new free variable is introduced.  In active mode an occurrence of `v`
 can only become `z`; every other output variable came from the same input
 variable. -/
-private theorem alphaRenameBoundAux_freeVariable {L : Language}
+theorem alphaRenameBoundAux_freeVariable {L : Language}
     (A : FormulaN L) (v z w : Nat) (active : Bool)
     (hw : w ∈ formulaFVN (alphaRenameBoundAux v z active A)) :
     if active then
@@ -517,8 +508,7 @@ private theorem alphaRenameBoundAux_freeVariable {L : Language}
             · exact Or.inl ⟨⟨h.1, hw.2⟩, h.2⟩
             · exact Or.inr h
 
--- ATTACH-BLOCKER: private declaration
-private theorem alphaRenameBound_freeVariable {L : Language}
+theorem alphaRenameBound_freeVariable {L : Language}
     (A : FormulaN L) (v z w : Nat)
     (hw : w ∈ formulaFVN (alphaRenameBound A v z)) :
     w ∈ formulaFVN A := by

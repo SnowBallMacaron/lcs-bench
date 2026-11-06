@@ -103,7 +103,6 @@ def ClauseSequent.ofList (L : List Clause) : ClauseSequent :=
 def clauseWithLiteral (A : Clause) (B : Literal) : Clause :=
   LCS.Finset.insert B A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem Clause.ordinary_of_mem {C : Clause} {L : Literal} (h : L ∈ C) : C.isOrdinary := by
   intro hEmpty
   exact LCS.Finset.not_mem_empty (hEmpty ▸ h)
@@ -280,7 +279,6 @@ def GCNFProvable (S : ClauseSequent) : Prop :=
 
 namespace GCNFProofTree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The alternative rule mentioned after Definition 4.2.3: both premise
     contexts are drawn from Γ alone, recursively at every inference. -/
 def restrictedContexts : {S : ClauseSequent} → GCNFProofTree S → Prop
@@ -335,7 +333,6 @@ def weaken {S : ClauseSequent} (t : GCNFProofTree S)
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem nodeCount_cast {S T : ClauseSequent} (h : S = T) (t : GCNFProofTree S) :
     (h ▸ t).nodeCount = t.nodeCount := by
   cases h
@@ -349,7 +346,6 @@ def weaken {S : ClauseSequent} (t : GCNFProofTree S)
 
 end GCNFProofTree
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- The least finite deduction-tree closure permits arbitrary ordinary sequent leaves. -/
 inductive GCNFDeductionTree : ClauseSequent → Type where
   | leaf (S : ClauseSequent) (hOrdinary : S.isOrdinary) : GCNFDeductionTree S
@@ -493,7 +489,6 @@ def exGCNFProofTree (P Q R : Nat) : GCNFProofTree (exGCNFClauseSet P Q R) := by
 
 -- ========= Lemma 4.2.1: Axiom Validity and Rule Preservation =========
 
--- ATTACH-BLOCKER: used by LCS.SLD.Propositional, LCS.SLD.SLDForm.Completeness, LCS.SLD.SLDForm.Occurrence
 theorem mem_image_iff (f : Clause → Clause) (s : ClauseSequent) (x : Clause) :
     x ∈ LCS.Finset.image f s ↔ ∃ a ∈ s, f a = x :=
 -- BEGIN PROOF
@@ -541,7 +536,6 @@ theorem gcnf_soundness (S : ClauseSequent) (h : GCNFProvable S) :
 -- (isClause or var), and succedent formulas are variables.
 -- This invariant is preserved when decomposing clause sequents via
 -- negLeft (for neg (var n)) and orLeft.
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def isClauseCompatible (s : Sequent) : Prop :=
   (∀ A ∈ s.antecedent, isClauseN A ∨ ∃ n, A = .var n) ∧
   (∀ B ∈ s.succedent, ∃ n, B = .var n)
@@ -654,14 +648,12 @@ open Classical
 
 
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness, LCS.SLD.SLDForm.Occurrence
 /-- Helper: membership in ClauseSequent.single unfolds to equality. -/
 theorem mem_csingle (C D : Clause) : C ∈ ClauseSequent.single D ↔ C = D := by
 -- BEGIN PROOF
   show C ∈ LCS.Finset.singleton D ↔ C = D
   exact LCS.Finset.mem_singleton C D
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: if every clause is a singleton and the sequent is valid,
     then the sequent is trivial. -/
 theorem singletons_valid_imp_trivial (S : ClauseSequent)
@@ -691,7 +683,6 @@ theorem singletons_valid_imp_trivial (S : ClauseSequent)
       decide_eq_false hNotPos
     simp [hdec]
 
--- ATTACH-BLOCKER: used by LCS.Resolution.GCNF (gcnf_left_valid)
 /-- Helper: if v satisfies Gamma ∪ As, then v satisfies
     Gamma ∪ mapSet As (clauseWithLiteral · B) (each clause gets an extra literal). -/
 theorem sat_union_extends (Gamma : ClauseSequent) (As : ClauseSequent)
@@ -709,7 +700,6 @@ theorem sat_union_extends (Gamma : ClauseSequent) (As : ClauseSequent)
     obtain ⟨L, hLmem, hLsat⟩ := hAsat
     exact ⟨L, (LCS.Finset.mem_insert_exp B L A).mpr (Or.inr hLmem), hLsat⟩
 
--- ATTACH-BLOCKER: used by LCS.Resolution.GCNF (ofList_left_valid)
 /-- Helper: the left premise (with As directly) is valid if the
     conclusion is. -/
 theorem gcnf_left_valid (Gamma : ClauseSequent) (As : ClauseSequent)
@@ -721,7 +711,6 @@ theorem gcnf_left_valid (Gamma : ClauseSequent) (As : ClauseSequent)
   intro ⟨v, hSat⟩
   exact hValid ⟨v, sat_union_extends Gamma As B v hSat⟩
 
--- ATTACH-BLOCKER: used by LCS.Resolution.GCNF (ofList_right_valid)
 /-- Helper: the right premise is valid if the conclusion is. -/
 theorem gcnf_right_valid (Gamma : ClauseSequent)
     (As : ClauseSequent) (B : Literal)
@@ -743,17 +732,14 @@ theorem gcnf_right_valid (Gamma : ClauseSequent)
     have hLeqB : L = B := (LCS.Finset.mem_singleton L B).mp hLmem
     exact ⟨L, (LCS.Finset.mem_insert_exp B L A).mpr (Or.inl hLeqB), hLsat⟩
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: convert a list of literal-lists to a ClauseSequent. -/
 def litListsToClauseSeq (ll : List (List Literal)) : ClauseSequent :=
   LCS.Finset.ofList (ll.map Clause.ofList)
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: total number of literals across all clauses in a list-of-lists. -/
 def totalLitCount (ll : List (List Literal)) : Nat :=
   ll.foldl (fun acc ls => acc + ls.length) 0
 
--- ATTACH-BLOCKER: used by LCS.Resolution.GCNF (totalLitCount_cons)
 theorem foldl_shift (a b : Nat) (ll : List (List Literal)) :
     List.foldl (fun acc ls => acc + ls.length) (a + b) ll =
     a + List.foldl (fun acc ls => acc + ls.length) b ll := by
@@ -765,7 +751,6 @@ theorem foldl_shift (a b : Nat) (ll : List (List Literal)) :
     rw [show a + b + hd.length = a + (b + hd.length) from by omega]
     exact ih a (b + hd.length)
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 theorem totalLitCount_cons (ls : List Literal) (rest : List (List Literal)) :
     totalLitCount (ls :: rest) = ls.length + totalLitCount rest := by
 -- BEGIN PROOF
@@ -774,7 +759,6 @@ theorem totalLitCount_cons (ls : List Literal) (rest : List (List Literal)) :
   rw [Nat.zero_add]
   exact foldl_shift ls.length 0 rest
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: replacing one element in ll with a shorter list decreases totalLitCount. -/
 theorem totalLitCount_replace_lt
     (pre : List (List Literal)) (ls : List Literal) (suf : List (List Literal))
@@ -791,7 +775,6 @@ theorem totalLitCount_replace_lt
     rw [totalLitCount_cons, totalLitCount_cons]
     omega
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: clauseWithLiteral (Clause.ofList rest) L = Clause.ofList (L :: rest). -/
 theorem clauseWithLiteral_ofList_cons (L : Literal) (rest : List Literal) :
     clauseWithLiteral (Clause.ofList rest) L = Clause.ofList (L :: rest) := by
@@ -803,7 +786,6 @@ theorem clauseWithLiteral_ofList_cons (L : Literal) (rest : List Literal) :
                           (fun hr => List.mem_cons.mpr (Or.inr hr)),
          fun h => List.mem_cons.mp h |>.elim Or.inl Or.inr⟩
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: Clause.ofList [L] = Clause.single L. -/
 theorem ofList_singleton_eq (L : Literal) :
     Clause.ofList [L] = Clause.single L := by
@@ -862,7 +844,6 @@ theorem ofList_replace_eq_union
 
 -- ========= Theorem 4.2.1: Completeness of GCNF' =========
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: if the sequent from a list is valid, then so is the sequent with
     a clause replaced by a smaller clause (in the "left branch" sense). -/
 theorem ofList_left_valid
@@ -900,7 +881,6 @@ theorem ofList_left_valid
   rw [h1, h3] at hValid
   exact gcnf_left_valid Gamma (ClauseSequent.single A) B hValid
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Helper: if the sequent from a list is valid, then so is the sequent with
     a clause replaced by a singleton (in the "right branch" sense). -/
 theorem ofList_right_valid
@@ -939,7 +919,6 @@ theorem ofList_right_valid
   rw [h1, h3] at hValid
   exact gcnf_right_valid Gamma (ClauseSequent.single A) B hValid
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Occurrence
 /-- Helper: Clause.ofList C.toList = C for any clause. In the LCS.Finset
     representation C.val is a Multiset; `toList` picks (via Classical.choose)
     one list representative, and ofList on that list returns C. -/
@@ -949,7 +928,6 @@ theorem ofList_toList_eq (C : Clause) : Clause.ofList C.toList = C := by
   apply LCS.Finset.ext; intro a
   rw [LCS.Finset.mem_ofList, LCS.Finset.mem_toList]
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Adding literal L to the singleton clause {L} yields {L} again. -/
 theorem clauseWithLiteral_single_self (L : Literal) :
     clauseWithLiteral (Clause.single L) L = Clause.single L := by
@@ -965,12 +943,10 @@ theorem clauseWithLiteral_single_self (L : Literal) :
   · intro h
     exact Or.inr h
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- The exact complementary pair set for a given P. -/
 def pairSet (P : Nat) : ClauseSequent :=
   LCS.Finset.ofList [Clause.single (Literal.pos P), Clause.single (Literal.neg P)]
 
--- ATTACH-BLOCKER: used by LCS.Resolution.GCNF (pairAxiom)
 /-- The pair set is trivial. -/
 theorem pairSet_trivial (P : Nat) : ClauseSequent.isTrivial (pairSet P) :=
 -- BEGIN PROOF
@@ -978,7 +954,6 @@ theorem pairSet_trivial (P : Nat) : ClauseSequent.isTrivial (pairSet P) :=
     (LCS.Finset.mem_ofList_exp _ _).mpr (List.mem_cons.mpr (Or.inl rfl)),
     (LCS.Finset.mem_ofList_exp _ _).mpr (List.mem_cons.mpr (Or.inr (List.mem_cons.mpr (Or.inl rfl))))⟩
 
--- ATTACH-BLOCKER: used by LCS.SLD.SLDForm.Completeness
 /-- Construct an exact-pair axiom proof tree. -/
 def pairAxiom (P : Nat) : GCNFProofTree (pairSet P) :=
   GCNFProofTree.axiom_ (pairSet P) (by
@@ -1033,13 +1008,11 @@ def orLeftOfList (pre suf : List Clause) (A B : Clause)
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem leafCount_cast {S T : ClauseSequent} (h : S = T)
     (t : OrdinaryClauseProof S) : (h ▸ t).leafCount = t.leafCount := by cases h; rfl
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem nodeCount_cast {S T : ClauseSequent} (h : S = T)
     (t : OrdinaryClauseProof S) : (h ▸ t).nodeCount = t.nodeCount := by cases h; rfl
 
@@ -1169,7 +1142,6 @@ theorem exProof_node_comparison (P Q R : Nat) :
 
 namespace OrdinaryClauseProof
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Ordinary disjunction proofs retain the ordinary-clause domain at every root. -/
 theorem ordinary : {S : ClauseSequent} → OrdinaryClauseProof S → S.isOrdinary
   | _, .axiom_ _ h _ => h
@@ -1181,7 +1153,6 @@ theorem ordinary : {S : ClauseSequent} → OrdinaryClauseProof S → S.isOrdinar
       apply Clause.union_ordinary_left
       exact h A (LCS.Finset.mem_union.mpr (Or.inr ((LCS.Finset.mem_singleton _ _).mpr rfl)))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Weakening adds the same ordinary context at every displayed node. -/
 def weaken : {S : ClauseSequent} → OrdinaryClauseProof S →
     (Extra : ClauseSequent) → Extra.isOrdinary →
@@ -1202,7 +1173,6 @@ def weaken : {S : ClauseSequent} → OrdinaryClauseProof S →
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- List presentation of the same context weakening. -/
 def weakenOfList {cs : List Clause} (t : OrdinaryClauseProof (LCS.Finset.ofList cs))
     (extra : List Clause) (hExtra : ∀ C ∈ extra, C.isOrdinary) :
@@ -1215,7 +1185,6 @@ def weakenOfList {cs : List Clause} (t : OrdinaryClauseProof (LCS.Finset.ofList 
 
 
 
--- ATTACH-BLOCKER: termination suffix
 /-- Expand all m separate disjunctions before closing any branch. The all-A
     branch uses `left`; each of the other 2^m−1 branches uses a weakened copy
     of `right`. The shared clause B is an arbitrary ordinary disjunction. -/
@@ -1248,7 +1217,6 @@ termination_by As => As.length
 
 end OrdinaryClauseProof
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- The preliminary shared-context batch system. Unlike GCNF′, the shared
     right disjunct may itself be any ordinary clause. Its rule stores the two
     premise trees once, irrespective of the size of the principal family. -/
@@ -1263,13 +1231,11 @@ inductive BatchedClauseProof : ClauseSequent → Type where
 
 namespace BatchedClauseProof
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A batch counts as one inference with two premise trees. -/
 def leafCount : {S : ClauseSequent} → BatchedClauseProof S → Nat
   | _, .axiom_ _ _ _ => 1
   | _, .rule _ _ _ _ _ _ left right => left.leafCount + right.leafCount
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Expand every batch into the ordinary disjunction-left proof it abbreviates. -/
 def toOrdinary : {S : ClauseSequent} → BatchedClauseProof S → OrdinaryClauseProof S
   | _, .axiom_ S hOrdinary hTrivial => .axiom_ S hOrdinary hTrivial
@@ -1278,7 +1244,6 @@ def toOrdinary : {S : ClauseSequent} → BatchedClauseProof S → OrdinaryClause
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every batch proof concludes an ordinary clause sequent. -/
 theorem ordinary {S : ClauseSequent} (t : BatchedClauseProof S) : S.isOrdinary :=
   t.toOrdinary.ordinary

@@ -160,7 +160,6 @@ def skolemA_forallX1 : SkolemSymbolEntry exampleLang_7_5 where
 def skolemExample_7_5_1 : SkolemAssignment exampleLang_7_5 :=
   [skolemF_forallY, skolemG_forallZ, skolemA_forallX1]
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- A labelled diagram retains the original indexed rule at each edge and all
 transformed sequent boundaries. Stored source rules certify only the source
 proof; the Boolean marks a spoiled rule in the transformed diagram. -/
@@ -173,12 +172,10 @@ inductive LKAlteredDiagram (L K : Language) where
 
 namespace LKAlteredDiagram
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 def mapSequent {L K : Language} (f : FormulaN L → FormulaN K)
     (s : Sequent L) : Sequent K :=
   ⟨s.antecedent.map f, s.succedent.map f⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Map every formula boundary, retaining the source rule labels and branching.
 The supplied marker records newly spoiled source inferences. -/
 def map {L K : Language} (f : FormulaN K → FormulaN K)
@@ -188,7 +185,6 @@ def map {L K : Language} (f : FormulaN K → FormulaN K)
   | .one r s b t => .one r (mapSequent f s) (b || mark r) (map f mark t)
   | .two r s t u => .two r (mapSequent f s) (map f mark t) (map f mark u)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Select a complete labelled subtree, retaining all its boundaries. -/
 def subtreeAt {L K : Language} :
     LKAlteredDiagram L K → List Nat → Option (LKAlteredDiagram L K)

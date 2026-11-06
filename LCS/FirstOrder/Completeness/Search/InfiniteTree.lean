@@ -19,7 +19,6 @@ open LCS.FirstOrder.SyntaxN.Variables
 open LCS.FirstOrder.SyntaxN.Substitution
 open LCS.FirstOrder.Gentzen
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Definition 5.5.1: Tree extension preserves every existing label and
 edge and adds nodes only below leaves. -/
 inductive InfGDeductionTreeExt.Extension {L : Language} :
@@ -33,7 +32,6 @@ inductive InfGDeductionTreeExt.Extension {L : Language} :
   | intro {s} (a b) {t u : InfGDeductionTreeExt (extendSeq s a b)} :
       Extension t u → Extension (.extend a b t) (.extend a b u)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.5.1: Every search-stage tree extends itself. -/
 theorem InfGDeductionTreeExt.Extension.refl {L : Language} {s : Sequent L}
     (t : InfGDeductionTreeExt s) : Extension t t := by
@@ -43,7 +41,6 @@ theorem InfGDeductionTreeExt.Extension.refl {L : Language} {s : Sequent L}
   | twoPremise r _ _ ih₁ ih₂ => exact .two r ih₁ ih₂
   | extend a b _ ih => exact .intro a b ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.5.1: Successive leaf extensions compose. -/
 theorem InfGDeductionTreeExt.Extension.trans {L : Language} {s t u : Sequent L}
     {a : InfGDeductionTreeExt s} {b : InfGDeductionTreeExt t} {c : InfGDeductionTreeExt u}

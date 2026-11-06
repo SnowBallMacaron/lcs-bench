@@ -309,6 +309,23 @@ helper theorem Completeness.ex436_pairOrder (P R : Nat) :
     Clause.ofList [.neg P, .pos R] = Clause.ofList [.pos R, .neg P] := by
   simp [clauseList_eq_iff]
 
+helper @[simp] theorem Completeness.leavesIn_ex436ComputedInner (P Q : Nat) (Γ : ClauseSequent) :
+    leavesIn (ex436ComputedInner P Q) Γ =
+      (decide (Clause.ofList [.neg Q] ∈ Γ) &&
+        (decide (Clause.ofList [.neg P] ∈ Γ) && decide (Clause.ofList [.pos P, .pos Q] ∈ Γ))) := by
+  change (decide (Clause.ofList [.neg Q] ∈ Γ) &&
+    (decide (Clause.ofList [.neg P] ∈ Γ) && (decide (Clause.ofList [.pos P, .pos Q] ∈ Γ) && true))) = _
+  simp
+
+helper @[simp] theorem Completeness.leavesIn_ex436NarratedMiddle (P Q R : Nat) (Γ : ClauseSequent) :
+    leavesIn (ex436NarratedMiddleComputed P Q R) Γ =
+      (decide (Clause.ofList [.neg R] ∈ Γ) && (decide (Clause.ofList [.neg Q] ∈ Γ) &&
+        (decide (Clause.ofList [.neg P, .pos R] ∈ Γ) && decide (Clause.ofList [.pos P, .pos Q] ∈ Γ)))) := by
+  change (decide (Clause.ofList [.neg R] ∈ Γ) && (decide (Clause.ofList [.neg Q] ∈ Γ) &&
+    (decide (Clause.ofList [.neg P, .pos R] ∈ Γ) &&
+      (decide (Clause.ofList [.pos P, .pos Q] ∈ Γ) && true)))) = _
+  simp
+
 proof_of ex436NarratedMiddleConversion_raw := open LCS.Resolution.Method.Completeness.Conversion.Proofs.Completeness LCS.Resolution.Method.Completeness.Example436.Proofs.Completeness in
   by
     have hseq : LCS.Finset.union

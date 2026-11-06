@@ -71,7 +71,6 @@ noncomputable def essentialCutRank {L : Language} {hL : L.hasEquality = true} :
     | none =>
       max (essentialCutRank sub1) (essentialCutRank sub2)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Transport a proof tree across equal conclusion indices. -/
 noncomputable def cast {L : Language} {hL : L.hasEquality = true}
     {Γ Δ Γ' Δ' : Finset (FormulaN L)}
@@ -109,7 +108,6 @@ noncomputable def maxPredRankTree {L : Language} {hL : L.hasEquality = true} :
     max localRank
       (max (maxPredRankTree sub1) (maxPredRankTree sub2))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 6.4.9 (required def): The maximal predicate rank `m` of all
 predicate symbols whose literals are cut formulae in either input tree.
 The legacy principal-formula argument is retained for source compatibility
@@ -122,7 +120,6 @@ noncomputable def maxPredRank {L : Language} {hL : L.hasEquality = true}
   max (maxPredRankTree T1) (maxPredRankTree T2)
 
 /- Permanent contract regressions for the literal and ambient rank bounds. -/
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- A structural classification of the root constructor used by the
 Lemma 6.4.9 case split. Unlike a predicate on the conclusion sequent,
 this records whether the proof itself is an equality leaf, a base-system

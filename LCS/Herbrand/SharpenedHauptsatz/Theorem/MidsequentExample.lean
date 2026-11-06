@@ -336,7 +336,6 @@ def midsequentExampleTree :
       (FOLKStep1.allRight (L := midseqExLang) 4 4 c2 [] [ep, eq] fresh4 (by simp [c2, isFreeForN, midseqExMkP, midseqExMkQ, termFV, Membership.mem, Set.singleton]))
   exact FOLKProofTree.onePremise r7 t6
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 7.3.4 (companion): The actual named upper proof occurs at the
 selected node after all seven quantifier steps and twelve exchanges. -/
 theorem midsequentExampleNode :

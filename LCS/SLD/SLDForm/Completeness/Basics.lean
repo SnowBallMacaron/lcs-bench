@@ -20,13 +20,11 @@ theorem ordinary_of_singletons {S : ClauseSequent}
   obtain ⟨L, rfl⟩ := h C hC
   exact Clause.single_ordinary L
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A premise certifies ordinariness of each half of its context. -/
 theorem ordinary_left {G A : ClauseSequent} (T : GCNFProofTree (Finset.union G A)) :
     G.isOrdinary :=
   ClauseSequent.ordinary_subset T.ordinary (fun _ h => Finset.mem_union.mpr (Or.inl h))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem ordinary_right {G A : ClauseSequent} (T : GCNFProofTree (Finset.union G A)) :
     A.isOrdinary :=
   ClauseSequent.ordinary_subset T.ordinary (fun _ h => Finset.mem_union.mpr (Or.inr h))
@@ -63,7 +61,6 @@ theorem horn_cwl_pos_unique (A : Clause) (Q R : Nat)
     ((Finset.mem_insert_exp (Literal.pos Q) (Literal.pos R) A).mpr (Or.inr hR))
     ((Finset.mem_insert_exp (Literal.pos Q) (Literal.pos Q) A).mpr (Or.inl rfl))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Singleton clause equality implies literal equality. -/
 theorem single_eq_implies_lit_eq (L B : Literal) (h : Clause.single L = Clause.single B) : L = B := by
 -- BEGIN PROOF
@@ -133,7 +130,6 @@ theorem gcnf_provable_erase_empty {S : ClauseSequent} (T : GCNFProofTree S) :
 
 -- ========= Helper lemmas for Lemma 9.2.3 =========
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- If a Finset of literals has card 1, then any two elements are equal. -/
 theorem finset_card_one_eq {S : Finset Literal} (hCard : S.card = 1) (a b : Literal)
     (ha : a ∈ S) (hb : b ∈ S) : a = b := by
@@ -157,7 +153,6 @@ theorem finset_card_one_eq {S : Finset Literal} (hCard : S.card = 1) (a b : Lite
             (by rw [List.mem_cons] at hb'; rcases hb' with rfl | h; rfl
                 exact absurd h List.not_mem_nil : x = b)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A finite set containing an element has positive cardinality. -/
 theorem finset_card_pos_of_mem {α : Type} {S : Finset α} {a : α}
     (ha : a ∈ S) : 0 < S.card := by

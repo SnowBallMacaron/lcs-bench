@@ -81,7 +81,6 @@ theorem methodTree_leavesFrom_mono {L : Language} (hNoEq : L.withoutEquality)
   | resolve T1 T2 resolvedA resolvedB rho rho' sigma ih1 ih2 =>
       exact ⟨ih1 hLeaves.1, ih2 hLeaves.2⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Convert a proof-relevant pivot-based ground-resolution tree into the
     separating-pair tree used by the first-order resolution method.  The
     conversion preserves leaves and root membership extensionally; every
@@ -274,7 +273,6 @@ theorem groundTree_to_method {L : Language} (hNoEq : L.withoutEquality)
 -- Theorem 8.5.1: Completeness of first-order resolution
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Proof of Theorem 8.5.1 (conditional endpoint): an exact midsequent of the
     canonical clause sentence yields a resolution refutation in the original
     language. -/

@@ -56,7 +56,6 @@ inductive Term (L : Language) : Type where
   | const : L.constSymbols → Term L
   | func : (f : L.funSymbols) → (Fin (L.funArity f) → Term L) → Term L
 
--- ATTACH-BLOCKER: unsupported untagged instance
 /-- Definition 5.2.2 (required helper): classical `DecidableEq` for `Term L`,
 used by `LCS.Finset.insert`/`erase` and other tactic-level reasoning on terms. -/
 noncomputable instance instDecidableEqTerm : DecidableEq (Term L) :=

@@ -23,7 +23,6 @@ open LCS.FOResolution.Method.Soundness
 open LCS.SLD.FirstOrder
 open LCS.SLD.LogicProgramming
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- `clauseFV` is invariant under list membership equivalence (specifically
     permutation): if two lists have the same elements, their literal-
     negation clauseFV sets coincide. -/
@@ -44,7 +43,6 @@ theorem clauseFV_neg_congr_of_mem_iff {L : Language} (hNoEq : L.withoutEquality)
     obtain ⟨F, hF, rfl⟩ := hLit
     exact ⟨FOLiteralCore.neg F, List.mem_map.mpr ⟨F, (hMem F).mpr hF, rfl⟩, hV⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Congruence of `IsSeparatingPair` in its first argument under
     clauseFV-equality. Every field of `IsSeparatingPair` uses the first
     clause only through `clauseFV`, so if two clauses have the same
@@ -224,7 +222,6 @@ def ex954_C5 : FOHornClause exCorrectnessLang exCorrectnessLang_noEq :=
 -- together with `IsSeparatingPair_of_clauseFV_eq` /
 -- `hStdApart_of_clauseFV_eq` (congruence in clause-fv).
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A substitution binding one variable is most general when it fixes the
     replacement term and all other variables. -/
 theorem singlePairMGU {L : Language} (x : Nat) (t : Term L)
@@ -249,7 +246,6 @@ theorem singlePairMGU {L : Language} (x : Nat) (t : Term L)
         hOther (Term.var x, t) (by simp)
     · simp [SubstitutionCore.substCompose, hAway y hy, termSubstAll]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem pairMGU_swap {L : Language} (a b : Term L) (sigma : Nat → Term L)
     (h : IsPairwiseMGU sigma [(b, a)]) : IsPairwiseMGU sigma [(a, b)] := by
   refine ⟨?_, ?_, ?_⟩
@@ -266,7 +262,6 @@ theorem pairMGU_swap {L : Language} (a b : Term L) (sigma : Nat → Term L)
     rcases List.mem_singleton.mp hp with rfl
     exact (hOther (a, b) (by simp)).symm
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem corrMGU (p : ExCorrectnessPred) (a b : Term exCorrectnessLang)
     (sigma : Nat → Term exCorrectnessLang)
     (h : IsPairwiseMGU sigma [(a, b)]) :

@@ -499,7 +499,6 @@ def eval (v : Valuation) : PropFormulaExtended → BoolVal
 
 
 
--- ATTACH-BLOCKER: field-notation: helper requires front namespace
 /-- Eliminate primitive truth to reuse established laws of the original syntax. -/
 def toFormula : PropFormulaExtended → PropFormula
   | .var n => .var n
@@ -511,7 +510,6 @@ def toFormula : PropFormulaExtended → PropFormula
   | .impl A B => .impl A.toFormula B.toFormula
   | .equiv_ A B => .equiv_ A.toFormula B.toFormula
 
--- ATTACH-BLOCKER: dependency: retained logEquivIffTranslated references this helper
 /-- Truth elimination preserves interpretation at every occurrence of ⊤. -/
 theorem evalEqToFormula (v : Valuation) (A : PropFormulaExtended) :
     eval v A = evalExt v A.toFormula := by
@@ -526,7 +524,6 @@ def logEquiv (A B : PropFormulaExtended) : Prop :=
 
 
 
--- ATTACH-BLOCKER: namespace: helper requires front logEquiv resolution
 theorem logEquivIffTranslated (A B : PropFormulaExtended) :
     logEquiv A B ↔
       LCS.Propositional.Semantics.TruthFunctions.logEquiv A.toFormula B.toFormula := by

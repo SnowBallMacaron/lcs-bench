@@ -94,7 +94,6 @@ noncomputable def notBoundIn {L : Language} {hL : L.withoutEquality}
     (T : G1nnfProofTree hL Γ Δ) (y : Nat) : Prop :=
   ∀ A, A ∈ T.allFormulae → FormulaN.notBoundIn y A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 6.4.3 (structural helper): every antecedent formula at the root
 occurs in `allFormulae T`. -/
 theorem mem_allFormulae_of_mem_left {L : Language} {hL : L.withoutEquality}
@@ -103,7 +102,6 @@ theorem mem_allFormulae_of_mem_left {L : Language} {hL : L.withoutEquality}
     A ∈ T.allFormulae := by
   cases T <;> simp_all [allFormulae]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 6.4.3 (structural helper): every succedent formula at the root
 occurs in `allFormulae T`. -/
 theorem mem_allFormulae_of_mem_right {L : Language} {hL : L.withoutEquality}
@@ -227,7 +225,6 @@ def freeForAtRoot {L : Language} {hL : L.withoutEquality}
   (∀ A ∈ Γ, isFreeForN t y A) ∧
   (∀ A ∈ Δ, isFreeForN t y A)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- If `y` is not bound in `A` and `t` is free for `y` in `A`, no
 variable occurring in `t` is bound in `A`. This is the root-stability fact
 used when proof-wide binder hygienization avoids `FV(t)`. -/

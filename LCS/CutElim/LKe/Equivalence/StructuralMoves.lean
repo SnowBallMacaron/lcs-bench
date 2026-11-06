@@ -23,7 +23,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.CompletenessBridge
 
--- ATTACH-BLOCKER: termination suffix
 /-- Move a selected antecedent formula left across a finite context using
 adjacent exchanges. The construction preserves both the atomic-cut and
 equational-cut invariants, and requires no decidable equality on formulas. -/
@@ -57,7 +56,6 @@ where
     cases h
     exact ⟨T, Iff.rfl, Iff.rfl⟩
 
--- ATTACH-BLOCKER: termination suffix
 /-- Move a selected succedent formula right across a finite context by
 adjacent exchanges, preserving the atomic-cut and equational-cut invariants. -/
 def lkeMoveRightToEnd {L : Language}
@@ -83,7 +81,6 @@ def lkeMoveRightToEnd {L : Language}
       q5.property.2.trans (q4.property.2.trans (q3.property.2.trans q1.property.2))⟩
 termination_by structural mid
 
--- ATTACH-BLOCKER: termination suffix
 /-- Add an antecedent prefix and a succedent suffix using weakening rules.
 The construction preserves the atomic-cut and equational-cut invariants. -/
 def lkeWeakenContexts {L : Language}

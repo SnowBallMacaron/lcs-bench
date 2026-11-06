@@ -209,7 +209,6 @@ theorem herbrand_termEval_ground {L : Language} (hNoEq : L.withoutEquality)
       rw [hGround] at this; exact this
     · intro h; exact h.elim
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 theorem fo_ground_unsat_implies_prop_valid {L : Language} (hNoEq : L.withoutEquality)
     (encode : FOAtom L hNoEq → Nat)
     (S : List (FOClause L hNoEq))
@@ -329,14 +328,12 @@ theorem fo_ground_unsat_implies_prop_valid {L : Language} (hNoEq : L.withoutEqua
 -- Instead of decoding prop clauses (which would require dealing with
 -- Finset internal ordering), we use Classical.choice to select the
 -- original FO clause from S for each prop tree leaf.
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- Decode a propositional literal to a first-order literal. -/
 def decodePropLiteral {L : Language} (hNoEq : L.withoutEquality)
     (decode : Nat → FOAtom L hNoEq) : Literal → FOLiteral L hNoEq
   | .pos n => FOLiteralCore.pos (decode n)
   | .neg n => FOLiteralCore.neg (decode n)
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- A source-local decoder inverts literal encoding whenever the atom is in
     the finite source list. -/
 theorem decode_groundLiteralToProp {L : Language} (hNoEq : L.withoutEquality)
@@ -349,7 +346,6 @@ theorem decode_groundLiteralToProp {L : Language} (hNoEq : L.withoutEquality)
     simp only [groundLiteralAtom] at hDecode <;>
     simp [decodePropLiteral, groundLiteralToProp, hDecode]
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- Build an FO resolution tree from a propositional resolution tree,
     using Classical.choice to select the original FO clause from S for
     each leaf. For resolve nodes, the pivot is decoded via decode. -/
@@ -368,7 +364,6 @@ noncomputable def propResTreeToFOResTree {L : Language} (hNoEq : L.withoutEquali
              (propResTreeToFOResTree (hNoEq := hNoEq) encode decode S T2)
              (decodePropLiteral (hNoEq := hNoEq) decode pivot)
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- Encoding preserves literal conjugation under decoding. -/
 theorem decodePropLiteral_conjugate {L : Language} (hNoEq : L.withoutEquality)
     (decode : Nat → FOAtom L hNoEq) (lit : Literal) :
@@ -379,7 +374,6 @@ theorem decodePropLiteral_conjugate {L : Language} (hNoEq : L.withoutEquality)
   | pos n => rfl
   | neg n => rfl
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- If the prop tree leaves come from the encoded FO clause set,
     the FO translation's leaves come from S. -/
 theorem propResTree_leaves_from {L : Language} (hNoEq : L.withoutEquality)
@@ -406,7 +400,6 @@ theorem propResTree_leaves_from {L : Language} (hNoEq : L.withoutEquality)
 -- ===================================================================
 -- Label specification: the FO tree tracks the prop tree's label
 -- ===================================================================
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- A structurally valid propositional resolution tree translates to a
     structurally valid ground first-order tree.  Besides the label
     certificate, the result records source provenance and the exact
@@ -604,7 +597,6 @@ theorem propResTree_labelSpec_general {L : Language} (hNoEq : L.withoutEquality)
           rw [hEncEq, decodePropLiteral_conjugate (hNoEq := hNoEq)] at hDecoded
           exact hNe hDecoded.symm
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- If the prop tree has empty label, the FO tree has labelSpec []. -/
 theorem propResTree_empty_label_spec {L : Language} (hNoEq : L.withoutEquality)
     (encode : FOAtom L hNoEq → Nat)
@@ -635,7 +627,6 @@ theorem propResTree_empty_label_spec {L : Language} (hNoEq : L.withoutEquality)
     rw [this] at hmem
     exact (Finset.mem_empty _).mp hmem
 
--- ATTACH-BLOCKER: size baseline: retain the resolution translation helper group
 /-- Propositional completeness with the structural certificate needed to
     translate a refutation into a ground first-order resolution tree. -/
 theorem resolution_tree_completeness_isWellFormed (S : ClauseSequent)

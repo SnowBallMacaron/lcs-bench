@@ -268,7 +268,6 @@ def proofMeasureN {L : Language} :
   | _, .twoPremise _ t1 t2 =>
     proofMeasureN t1 + proofMeasureN t2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): Number of quantifier inference occurrences in an LKₑ proof. Ordinary and equality axiom leaves contribute zero; binary premises are counted separately. -/
 def numQuantifierRulesInTreeLKe {L : Language} :
     {s : Sequent L} → LKeProofTree s → Nat
@@ -284,7 +283,6 @@ def numQuantifierRulesInTreeLKe {L : Language} :
   | _, .twoPremise _ t1 t2 =>
     numQuantifierRulesInTreeLKe t1 + numQuantifierRulesInTreeLKe t2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The sum of local m over all quantifier occurrences of an LKₑ proof. Only propositional-logical ancestors contribute; atomic cuts contribute zero, as in the source measure. -/
 def proofMeasureMLKe {L : Language} :
     {s : Sequent L} → LKeProofTree s → Nat
@@ -324,7 +322,6 @@ def proofMeasureMLKe {L : Language} :
     | _ =>
       proofMeasureMLKe t1 + proofMeasureMLKe t2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The sum of local n over all quantifier occurrences of an LKₑ proof. Only weakening ancestors contribute; ordinary and equality axiom leaves contribute zero. -/
 def proofMeasureNLKe {L : Language} :
     {s : Sequent L} → LKeProofTree s → Nat
@@ -361,7 +358,6 @@ def noEssentialCuts {L : Language} :
 -- Theorem 7.3.1: prescribed permutation phases
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The source-prepared LK proof domain:
 prenex end sequent with the end/input free-bound convention, pure-variable
 proof, cut-freeness, and atomic axiom leaves. -/
@@ -369,7 +365,6 @@ def PhasePreparedLK {L : Language} {s : Sequent L} (T : FOLKProofTree s) : Prop 
   L.withoutEquality ∧ allSequentFormulaeArePrenex s ∧ Hintikka.crossNoFreeBound s ∧
   IsPureVariableProofLK T ∧ T.isCutFree ∧ hasOnlyAtomicAxioms T
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): An actual selected local replacement and
 its output proof, with the original ordered premise proofs and outside
 continuation fixed. The m phase permits structural additions. The n phase
@@ -397,7 +392,6 @@ def PhaseReplacementLK {L : Language} {s : Sequent L} {T : FOLKProofTree s}
             rule.isContraction ∨ rule.isExchange)
       | _ => False
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): Positive-m phase: a selected quantifier
 inference above a propositional inference with only structural intermediates
 is locally permuted. The output is the certified replacement in the same
@@ -408,7 +402,6 @@ def MPhaseStepLK {L : Language} {s : Sequent L} (T T' : FOLKProofTree s) : Prop 
     upper.rule.isQuantifier ∧ lower.rule.isLogical ∧ ¬ lower.rule.isQuantifier ∧
     principalNotSideOf upper.rule lower.rule ∧ PhaseReplacementLK upper lower T' true
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): With m=0 and n positive, select a quantifier
 above a weakening with only contractions/exchanges between them, and move the
 weakening above the quantifier through a certified local replacement. -/
@@ -422,13 +415,11 @@ def NPhaseStepLK {L : Language} {s : Sequent L} (T T' : FOLKProofTree s) : Prop 
       middle.rule.isContraction ∨ middle.rule.isExchange) ∧
     PhaseReplacementLK upper lower T' false
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The two prescribed phases, with the
 positive-m phase preceding the m=0 positive-n phase. -/
 def PhaseStepLK {L : Language} {s : Sequent L} (T T' : FOLKProofTree s) : Prop :=
   MPhaseStepLK T T' ∨ NPhaseStepLK T T'
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Theorem 7.3.1 (companion relation): Finite reachability by the prescribed
 phase steps. Both endpoints and every intermediate proof have the same indexed
 end sequent. This relation specifies finite existence, not a normalizer. -/
@@ -437,7 +428,6 @@ inductive PhaseReachableLK {L : Language} {s : Sequent L} :
   | refl (T) : PhaseReachableLK T T
   | step {T U V} : PhaseStepLK T U → PhaseReachableLK U V → PhaseReachableLK T V
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The source-prepared LKe proof domain:
 prenex end sequent with the end/input free-bound convention, pure-variable
 proof, only atomic cuts, and atomic or equality axiom leaves. -/
@@ -445,7 +435,6 @@ def PhasePreparedLKe {L : Language} {s : Sequent L} (T : LKeProofTree s) : Prop 
   L.hasEquality = true ∧ allSequentFormulaeArePrenex s ∧ Hintikka.crossNoFreeBound s ∧
   IsPureVariableProofLKe T ∧ noEssentialCuts T ∧ hasOnlyAtomicOrEqAxioms T
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): An actual selected local replacement and
 its output proof, with the original ordered premise proofs and outside
 continuation fixed. The m phase permits structural additions. The n phase
@@ -473,7 +462,6 @@ def PhaseReplacementLKe {L : Language} {s : Sequent L} {T : LKeProofTree s}
             rule.isContraction ∨ rule.isExchange)
       | _ => False
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): Positive-m phase: a selected quantifier
 inference above a propositional inference with only structural intermediates
 is locally permuted. The output is the certified replacement in the same
@@ -484,7 +472,6 @@ def MPhaseStepLKe {L : Language} {s : Sequent L} (T T' : LKeProofTree s) : Prop 
     upper.rule.isQuantifier ∧ lower.rule.isLogical ∧ ¬ lower.rule.isQuantifier ∧
     principalNotSideOf upper.rule lower.rule ∧ PhaseReplacementLKe upper lower T' true
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): With m=0 and n positive, select a quantifier
 above a weakening with only contractions/exchanges between them, and move the
 weakening above the quantifier through a certified local replacement. -/
@@ -498,13 +485,11 @@ def NPhaseStepLKe {L : Language} {s : Sequent L} (T T' : LKeProofTree s) : Prop 
       middle.rule.isContraction ∨ middle.rule.isExchange) ∧
     PhaseReplacementLKe upper lower T' false
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 7.3.1 (companion def): The two prescribed phases, with the
 positive-m phase preceding the m=0 positive-n phase. -/
 def PhaseStepLKe {L : Language} {s : Sequent L} (T T' : LKeProofTree s) : Prop :=
   MPhaseStepLKe T T' ∨ NPhaseStepLKe T T'
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Theorem 7.3.1 (companion relation): Finite reachability by the prescribed
 phase steps. Both endpoints and every intermediate proof have the same indexed
 end sequent. This relation specifies finite existence, not a normalizer. -/

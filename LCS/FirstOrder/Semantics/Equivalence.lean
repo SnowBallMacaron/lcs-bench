@@ -544,81 +544,62 @@ def one {L : Language} : BL L := ofFormula .top
 /- Proof of Lemma 5.3.8: Quotient induction transfers the nineteen
    formula identities to all classes in B_L. -/
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addAssoc {L : Language} (a b c : BL L) : add (add a b) c = add a (add b c) :=
   Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (foLogEquivT_disj_assoc A B C))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulAssoc {L : Language} (a b c : BL L) : mul (mul a b) c = mul a (mul b c) :=
   Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (foLogEquivT_conj_assoc A B C))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addComm {L : Language} (a b : BL L) : add a b = add b a :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_disj_comm A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulComm {L : Language} (a b : BL L) : mul a b = mul b a :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_conj_comm A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addMulDistrib {L : Language} (a b c : BL L) : add a (mul b c) = mul (add a b) (add a c) :=
   Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (foLogEquivT_disj_distrib A B C))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulAddDistrib {L : Language} (a b c : BL L) : mul a (add b c) = add (mul a b) (mul a c) :=
   Quotient.inductionOn₃ a b c (fun A B C => Quotient.sound (foLogEquivT_conj_distrib A B C))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem negAdd {L : Language} (a b : BL L) : neg (add a b) = mul (neg a) (neg b) :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_deMorgan_disj A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem negMul {L : Language} (a b : BL L) : neg (mul a b) = add (neg a) (neg b) :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_deMorgan_conj A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addIdempotent {L : Language} (a : BL L) : add a a = a :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_disj_idem A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulIdempotent {L : Language} (a : BL L) : mul a a = a :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_conj_idem A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem negNeg {L : Language} (a : BL L) : neg (neg a) = a :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_double_neg A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addAbsorption {L : Language} (a b : BL L) : add a (mul a b) = a :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_absorb_disj A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulAbsorption {L : Language} (a b : BL L) : mul a (add a b) = a :=
   Quotient.inductionOn₂ a b (fun A B => Quotient.sound (foLogEquivT_absorb_conj A B))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addZero {L : Language} (a : BL L)
     (P : L.predSymbols) (hP : L.predArity P = 0) : add a (zero P hP) = a :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_disj_identity A P hP))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulZero {L : Language} (a : BL L)
     (P : L.predSymbols) (hP : L.predArity P = 0) : mul a (zero P hP) = (zero P hP) :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_conj_annihilation A P hP))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addOne {L : Language} (a : BL L) : add a one = one :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_disj_top A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulOne {L : Language} (a : BL L) : mul a one = a :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_conj_identity_top A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem addNeg {L : Language} (a : BL L) : add a (neg a) = one :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_excluded_middle A))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem mulNeg {L : Language} (a : BL L)
     (P : L.predSymbols) (hP : L.predArity P = 0) : mul a (neg a) = (zero P hP) :=
   Quotient.inductionOn a (fun A => Quotient.sound (foLogEquivT_contradiction A P hP))

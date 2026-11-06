@@ -60,7 +60,6 @@ end Formula
 
 namespace FOClauseForm
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Convert a proof-certified disjunction of literals into a clause.
     Invalid formula shapes have no fallback branch: their certification
     hypotheses are contradictory. -/
@@ -86,7 +85,6 @@ noncomputable def clauseOfDisj {L : Language} (hNoEq : L.withoutEquality) (A : F
       simp [LCS.FOResolution.ClauseForm.Formula.isDisjunctionOfLiterals,
         LCS.FOResolution.ClauseForm.Formula.isClauseLiteral] at hDisj
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Flatten a proof-certified CNF matrix into its clauses. -/
 noncomputable def ofCNFMatrix {L : Language} (hNoEq : L.withoutEquality) :
     (A : FormulaN L) →

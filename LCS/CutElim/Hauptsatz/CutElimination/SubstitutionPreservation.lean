@@ -37,7 +37,6 @@ noncomputable def substRuleRename {L : Language} (z y : Nat) :
       (if ev = y then z else ev)
   | rule => substRule (.var z) y rule
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Renaming eigenvariable labels leaves the substituted conclusion intact. -/
 theorem substRuleRename_conclusion_eq {L : Language}
     (rule : G1nnfRule L) (Γ Δ : LCS.Finset (FormulaN L)) (z y : Nat) :
@@ -49,7 +48,6 @@ theorem substRuleRename_conclusion_eq {L : Language}
   cases rule <;> simp [substRuleRename, substRule, G1nnfRule.conclusion]
   all_goals split <;> rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Variable renaming preserves the number of rule premises. -/
 theorem substRuleRename_premises_length {L : Language}
     (rule : G1nnfRule L) (Γ Δ : LCS.Finset (FormulaN L)) (z y : Nat) :
@@ -62,16 +60,14 @@ theorem substRuleRename_premises_length {L : Language}
   case exRight x A t =>
     exact substRule_premises_length (.exRight x A t) Γ Δ (.var z) y
 
--- ATTACH-BLOCKER: private declaration
-private theorem substRuleRename_eq_substRule_of_not_eigen {L : Language}
+theorem substRuleRename_eq_substRule_of_not_eigen {L : Language}
     (rule : G1nnfRule L) (z y : Nat)
     (h : G1nnfProofTree.ruleEigenlabel rule ≠ some y) :
     substRuleRename z y rule = substRule (.var z) y rule := by
   cases rule <;> simp_all [G1nnfProofTree.ruleEigenlabel, substRuleRename, substRule]
   all_goals split <;> rfl
 
--- ATTACH-BLOCKER: private declaration
-private theorem ruleSubstOk_var_of_not_eigen {L : Language}
+theorem ruleSubstOk_var_of_not_eigen {L : Language}
     (rule : G1nnfRule L) (Γ Δ : LCS.Finset (FormulaN L)) (z y : Nat)
     (hyRoot :
       (∀ A ∈ (rule.conclusion Γ Δ).1, FormulaN.notBoundIn y A) ∧
@@ -98,7 +94,6 @@ private theorem ruleSubstOk_var_of_not_eigen {L : Language}
     apply G1nnfProofTree.ruleEigenvariable_mem_variableSupport rule z
     cases rule <;> simp_all [G1nnfProofTree.ruleEigenlabel]
 
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Variable renaming preserves rule side conditions when `y` is not bound
 in the conclusion and `z` is fresh for its formulae and stored rule data.
 The old eigenvariable is allowed to equal `y`. -/
@@ -178,7 +173,6 @@ theorem substRuleRename_sideConditions {L : Language}
     exact substRule_sideConditions rule Γ Δ (.var z) y hSC
       (ruleSubstOk_var_of_not_eigen rule Γ Δ z y hyRoot hzRoot hzRule h)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Variable renaming preserves the complete rule-application contract. -/
 theorem substRuleRename_applicationConditions {L : Language}
     (rule : G1nnfRule L) (Γ Δ : LCS.Finset (FormulaN L)) (z y : Nat)
@@ -197,7 +191,6 @@ theorem substRuleRename_applicationConditions {L : Language}
   exact ⟨substFormulaFinset_isNNF _ (.var z) y hAC.2.1,
     substFormulaFinset_isNNF _ (.var z) y hAC.2.2⟩
 
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Rule premises commute with variable renaming, including the case in
 which the eigenvariable label itself is renamed. -/
 theorem substRuleRename_premises_eq {L : Language}
@@ -263,7 +256,6 @@ theorem substRuleRename_premises_eq {L : Language}
     exact substRule_premises_eq rule Γ Δ (.var z) y
       (ruleSubstOk_var_of_not_eigen rule Γ Δ z y hyRoot hzRoot hzRule h)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Pointwise premise transport for variable renaming. -/
 theorem substRuleRename_premises_nth_eq {L : Language}
     (rule : G1nnfRule L) (Γ Δ : LCS.Finset (FormulaN L)) (z y n : Nat)
@@ -305,7 +297,6 @@ noncomputable def variableSupport {L : Language} {hL : L.withoutEquality} :
       (LCS.Finset.union rule.variableSupport
         (LCS.Finset.union sub1.variableSupport sub2.variableSupport))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Non-binding throughout a deduction tree implies non-binding at its root. -/
 theorem notBoundIn_atRoot {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfDeductionTree hL Γ Δ)
@@ -322,7 +313,6 @@ theorem notBoundIn_atRoot {L : Language} {hL : L.withoutEquality}
   exact ⟨fun A hA => hy A (hRoot A (LCS.Finset.mem_union.mpr (Or.inl hA))),
     fun A hA => hy A (hRoot A (LCS.Finset.mem_union.mpr (Or.inr hA)))⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Tree-wide freshness implies absence from every formula at the root. -/
 theorem fresh_atRoot {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfDeductionTree hL Γ Δ)
@@ -341,14 +331,12 @@ theorem fresh_atRoot {L : Language} {hL : L.withoutEquality}
     fun A hA hv => hRoot (formulaVariableSupport_subset_finsetSupport _ A z
       (LCS.Finset.mem_union.mpr (Or.inr hA)) hv)⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Transport a deduction tree across equal conclusion indices. -/
 noncomputable def castTree {L : Language} {hL : L.withoutEquality}
     {Γ Δ Γ' Δ' : LCS.Finset (FormulaN L)}
     (T : G1nnfDeductionTree hL Γ Δ) (hΓ : Γ = Γ') (hΔ : Δ = Δ') :
     G1nnfDeductionTree hL Γ' Δ' := hΓ ▸ hΔ ▸ T
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Transporting root indices preserves whether a deduction tree is a proof. -/
 theorem isProof_castTree {L : Language} {hL : L.withoutEquality}
     {Γ Δ Γ' Δ' : LCS.Finset (FormulaN L)}
@@ -429,7 +417,6 @@ noncomputable def substituteVar {L : Language} {hL : L.withoutEquality}
     have hConc := substRuleRename_conclusion_eq rule Γ Δ z y
     exact core.castTree (congrArg Prod.fst hConc) (congrArg Prod.snd hConc)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Variable renaming under Definition 6.4.5 preserves proof trees:
 all axiom leaves remain axiom leaves. -/
 theorem substituteVar_isProof {L : Language} {hL : L.withoutEquality}
@@ -529,7 +516,6 @@ noncomputable def freeForOccurrences {L : Language} {hL : L.withoutEquality}
     (t : Term L) (y : Nat) : Prop :=
   ∀ A ∈ T.allFormulae, formulaFVN A y → isFreeForN t y A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every formula at the root of a deduction tree occurs in the tree. -/
 theorem mem_allFormulae_atRoot {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfDeductionTree hL Γ Δ)
@@ -651,7 +637,6 @@ noncomputable def substTerm {L : Language} {hL : L.withoutEquality}
 
 end G1nnfDeductionTree
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A proof tree's underlying deduction tree has only axiom leaves. -/
 theorem G1nnfProofTree.forgetProofTree_isProof {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)} (T : G1nnfProofTree hL Γ Δ) :
@@ -664,7 +649,6 @@ theorem G1nnfProofTree.forgetProofTree_isProof {L : Language} {hL : L.withoutEqu
   | onePremise rule Γ Δ hPrem hAC sub ih => exact ih
   | twoPremise rule Γ Δ hPrem hAC sub1 sub2 ih1 ih2 => exact ⟨ih1, ih2⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lemma 6.4.3(ii): term substitution under the source provisos preserves
 axiom leaves, hence takes proofs to proofs. -/
 theorem G1nnfDeductionTree.substTerm_isProof {L : Language} {hL : L.withoutEquality}

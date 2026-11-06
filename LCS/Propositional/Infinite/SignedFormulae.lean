@@ -218,7 +218,6 @@ noncomputable def hintikkaCanonicalValuation (S : Set SignedFormula) : Valuation
 
 -- ========= Lemma 3.5.3: Hintikka Set Satisfiability =========
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Core induction step for the proof of Lemma 3.5.3: the canonical
     valuation makes every signed formula in S true. This is the
     internal inductive argument; the lemma statement itself is
@@ -310,7 +309,6 @@ def occurs (s : Sequent) : SignedFormula → Prop
   | .trueF A => A ∈ s.antecedent
   | .falseF A => A ∈ s.succedent
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The components required when a non-atomic signed formula is expanded.
     Atomic formulae cannot be expanded. -/
 def expanded (S : Set SignedFormula) : SignedFormula → Prop
@@ -324,7 +322,6 @@ def expanded (S : Set SignedFormula) : SignedFormula → Prop
   | .trueF (.disj A B) => S (.trueF A) ∨ S (.trueF B)
   | .trueF (.impl A B) => S (.falseF A) ∨ S (.trueF B)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem expanded_mono {S T : Set SignedFormula}
     (h : ∀ sf, S sf → T sf) (sf : SignedFormula) :
     expanded S sf → expanded T sf := by
@@ -332,7 +329,6 @@ theorem expanded_mono {S T : Set SignedFormula}
   | trueF A => cases A <;> simp only [expanded] <;> grind
   | falseF A => cases A <;> simp only [expanded] <;> grind
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem step1_support {prem conc : Sequent} (r : GentzenStep1 prem conc)
     (sf : SignedFormula) (h : occurs conc sf) :
     occurs prem sf ∨ expanded (occurs prem) sf := by
@@ -340,7 +336,6 @@ theorem step1_support {prem conc : Sequent} (r : GentzenStep1 prem conc)
   | trueF A => cases A <;> simp_all [occurs, expanded] <;> grind
   | falseF A => cases A <;> simp_all [occurs, expanded] <;> grind
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem step2_support_left {p q conc : Sequent} (r : GentzenStep2 p q conc)
     (sf : SignedFormula) (h : occurs conc sf) :
     occurs p sf ∨ expanded (occurs p) sf := by
@@ -348,7 +343,6 @@ theorem step2_support_left {p q conc : Sequent} (r : GentzenStep2 p q conc)
   | trueF A => cases A <;> simp_all [occurs, expanded] <;> grind
   | falseF A => cases A <;> simp_all [occurs, expanded] <;> grind
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem step2_support_right {p q conc : Sequent} (r : GentzenStep2 p q conc)
     (sf : SignedFormula) (h : occurs conc sf) :
     occurs q sf ∨ expanded (occurs q) sf := by
@@ -356,13 +350,11 @@ theorem step2_support_right {p q conc : Sequent} (r : GentzenStep2 p q conc)
   | trueF A => cases A <;> simp_all [occurs, expanded] <;> grind
   | falseF A => cases A <;> simp_all [occurs, expanded] <;> grind
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem support_lift {S T : Set SignedFormula} {s : Sequent}
     (hsub : ∀ sf, S sf → T sf) {sf : SignedFormula}
     (h : occurs s sf ∨ expanded S sf) : occurs s sf ∨ expanded T sf :=
   h.imp id (expanded_mono hsub sf)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The formula actually selected by a one-premise rule. -/
 def principal1 {p s : Sequent} : GentzenStep1 p s → SignedFormula
   | .andLeft _ _ _ A B => .trueF (.conj A B)
@@ -371,14 +363,12 @@ def principal1 {p s : Sequent} : GentzenStep1 p s → SignedFormula
   | .negLeft _ _ _ A => .trueF (.neg A)
   | .negRight _ _ _ A => .falseF (.neg A)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The formula actually selected by a two-premise rule. -/
 def principal2 {p q s : Sequent} : GentzenStep2 p q s → SignedFormula
   | .andRight _ _ _ A B => .falseF (.conj A B)
   | .orLeft _ _ _ A B => .trueF (.disj A B)
   | .implLeft _ _ _ A B => .trueF (.impl A B)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Context introduction and a stationary endpoint do not select a connective. -/
 def branchPrincipal {s t : Sequent} : InfBranchStep s t → Option SignedFormula
   | .onePremise r => some (principal1 r)
@@ -386,7 +376,6 @@ def branchPrincipal {s t : Sequent} : InfBranchStep s t → Option SignedFormula
   | .rightPremise r => some (principal2 r)
   | .extend _ _ _ | .idle _ => none
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem branchStep_support {s t : Sequent} (step : InfBranchStep s t)
     (sf : SignedFormula) (h : occurs s sf) :
     occurs t sf ∨ expanded (occurs t) sf := by
@@ -438,12 +427,10 @@ inductive SearchTreePath : {s : Sequent} → InfDeductionTree s →
 def sequentListSignedSet (labels : List Sequent) : Set SignedFormula :=
   fun sf => ∃ s ∈ labels, occurs s sf
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.root_mem {s leaf labels} {t : InfDeductionTree s}
     (hp : SearchTreePath t leaf labels) : s ∈ labels := by
   cases hp <;> exact List.Mem.head _
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.terminal_mem {s terminal labels} {t : InfDeductionTree s}
     (hp : SearchTreePath t terminal labels) : terminal ∈ labels := by
   induction hp with
@@ -453,7 +440,6 @@ theorem SearchTreePath.terminal_mem {s terminal labels} {t : InfDeductionTree s}
   | rightPremise _ _ ih => exact List.Mem.tail _ ih
   | extend _ ih => exact List.Mem.tail _ ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.leaf_mem {s terminal labels} {t : InfDeductionTree s}
     (hp : SearchTreePath t terminal labels) : terminal ∈ t.leaves := by
   induction hp with
@@ -463,7 +449,6 @@ theorem SearchTreePath.leaf_mem {s terminal labels} {t : InfDeductionTree s}
   | rightPremise _ _ ih => exact List.mem_append_right _ ih
   | extend _ ih => exact ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.canonical_falsifies_terminal {s terminal labels}
     {t : InfDeductionTree s} (hp : SearchTreePath t terminal labels)
     (hS : IsHintikkaSet (sequentListSignedSet labels)) :
@@ -474,7 +459,6 @@ theorem SearchTreePath.canonical_falsifies_terminal {s terminal labels}
   · intro A hA
     exact (canonical_satisfies_combined _ hS A).2 ⟨terminal, hp.terminal_mem, hA⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.exists_of_leaf {s : Sequent} (t : InfDeductionTree s)
     (leaf : Sequent) (h : leaf ∈ t.leaves) :
     ∃ labels, SearchTreePath t leaf labels := by
@@ -496,13 +480,11 @@ theorem SearchTreePath.exists_of_leaf {s : Sequent} (t : InfDeductionTree s)
     obtain ⟨labels, hp⟩ := ih h
     exact ⟨_, .extend hp⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem sequentListSignedSet_tail (s : Sequent) (labels : List Sequent) :
     ∀ sf, sequentListSignedSet labels sf → sequentListSignedSet (s :: labels) sf := by
   intro sf ⟨t, ht, hm⟩
   exact ⟨t, List.Mem.tail s ht, hm⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem support_prepend {s p terminal : Sequent} {labels : List Sequent}
     (step : InfBranchStep s p) (hp : p ∈ labels) (sf : SignedFormula)
     (ih : occurs p sf → occurs terminal sf ∨ expanded (sequentListSignedSet labels) sf)
@@ -512,7 +494,6 @@ theorem support_prepend {s p terminal : Sequent} {labels : List Sequent}
   · exact support_lift (sequentListSignedSet_tail s labels) (ih h)
   · exact Or.inr (expanded_mono (fun sf hm => ⟨p, List.Mem.tail s hp, hm⟩) sf h)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.support_from_root {s terminal labels} {t : InfDeductionTree s}
     (hp : SearchTreePath t terminal labels) (sf : SignedFormula) (h : occurs s sf) :
     occurs terminal sf ∨ expanded (sequentListSignedSet labels) sf := by
@@ -523,7 +504,6 @@ theorem SearchTreePath.support_from_root {s terminal labels} {t : InfDeductionTr
   | rightPremise r hp ih => exact support_prepend (.rightPremise r) hp.root_mem sf ih h
   | extend hp ih => exact support_prepend (.extend _ _ _) hp.root_mem sf ih h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem support_any_prepend {s terminal : Sequent} {labels : List Sequent}
     (sf : SignedFormula)
     (root : occurs s sf → occurs terminal sf ∨ expanded (sequentListSignedSet (s :: labels)) sf)
@@ -536,7 +516,6 @@ theorem support_any_prepend {s terminal : Sequent} {labels : List Sequent}
   · exact root hm
   · exact support_lift (sequentListSignedSet_tail s labels) (tail ⟨t, ht, hm⟩)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem SearchTreePath.support {s terminal labels} {t : InfDeductionTree s}
     (hp : SearchTreePath t terminal labels) (sf : SignedFormula)
     (h : sequentListSignedSet labels sf) :
@@ -581,7 +560,6 @@ theorem finished_search_hintikka_set_extraction (seq : InfSequent) (k : Nat)
 
 
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A possibly infinite branch, or a finite branch continued at its endpoint.
     Fairness requires each compound occurrence to be selected as an actual
     inference-rule principal at a later step. All edges are Gentzen inferences,

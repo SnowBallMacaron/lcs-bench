@@ -74,7 +74,6 @@ def toSymbolList {L : Language} : Term L → List (TermSymbol L)
   | .const c    => [TermSymbol.constSym c]
   | .func f ts  => TermFormationFn.c_f f (fun i => toSymbolList (ts i))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The symbol string of a function application is its function symbol
 followed by the concatenated symbol strings of its arguments. -/
 @[simp]

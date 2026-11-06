@@ -301,7 +301,6 @@ def languageAmalgam {L L1 L2 : Language}
 -- Theorem 6.7.1 (helpers): injectivity projections for amalgam
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation for the amalgamated function symbols: maps an
 `Sum.inr f2` back to its L1 representative `Sum.inl (expand1 s)`
 whenever `f2 = expand2 s`; otherwise leaves it on the right. Used to
@@ -316,7 +315,6 @@ noncomputable def canonFun {L L1 L2 : Language}
       else
         .inr f2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation for amalgamated predicate symbols. -/
 noncomputable def canonPred {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2) :
@@ -328,7 +326,6 @@ noncomputable def canonPred {L L1 L2 : Language}
       else
         .inr P2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation for amalgamated constant symbols. -/
 noncomputable def canonConst {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2) :
@@ -340,7 +337,6 @@ noncomputable def canonConst {L L1 L2 : Language}
       else
         .inr c2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation respects the function-symbol relation. -/
 theorem canonFun_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -370,7 +366,6 @@ theorem canonFun_respects {L L1 L2 : Language}
     rw [hchoose, hs1]
   · subst h; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation respects the predicate-symbol relation. -/
 theorem canonPred_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -400,7 +395,6 @@ theorem canonPred_respects {L L1 L2 : Language}
     rw [hchoose, hQ1]
   · subst h; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Canonicalisation respects the constant-symbol relation. -/
 theorem canonConst_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -457,7 +451,6 @@ def amalgamExpansionLeft_constEmbed {L L1 L2 : Language}
     (c1 : L1.constSymbols) : (languageAmalgam hI).constSymbols :=
   Quot.mk _ (.inl c1)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The left predicate embedding preserves
 arities by construction of `languageAmalgam.predArity`. -/
 theorem amalgamExpansionLeft_predArityPreserve {L L1 L2 : Language}
@@ -467,7 +460,6 @@ theorem amalgamExpansionLeft_predArityPreserve {L L1 L2 : Language}
 -- BEGIN PROOF
   fun _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The left function embedding preserves
 arities by construction of `languageAmalgam.funArity`. -/
 theorem amalgamExpansionLeft_funArityPreserve {L L1 L2 : Language}
@@ -477,7 +469,6 @@ theorem amalgamExpansionLeft_funArityPreserve {L L1 L2 : Language}
 -- BEGIN PROOF
   fun _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inl` is injective as a map
 from `L1.predSymbols` into the amalgamated predicate-symbol quotient. -/
 theorem amalgamExpansionLeft_predInj {L L1 L2 : Language}
@@ -491,7 +482,6 @@ theorem amalgamExpansionLeft_predInj {L L1 L2 : Language}
       (Quot.mk _ (.inl P1')) := congrArg _ h
   simpa [canonPred, amalgamExpansionLeft_predEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inl` is injective as a map
 from `L1.funSymbols` into the amalgamated function-symbol quotient. -/
 theorem amalgamExpansionLeft_funInj {L L1 L2 : Language}
@@ -505,7 +495,6 @@ theorem amalgamExpansionLeft_funInj {L L1 L2 : Language}
       (Quot.mk _ (.inl f1')) := congrArg _ h
   simpa [canonFun, amalgamExpansionLeft_funEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inl` is injective as a map
 from `L1.constSymbols` into the amalgamated constant-symbol quotient. -/
 theorem amalgamExpansionLeft_constInj {L L1 L2 : Language}
@@ -519,7 +508,6 @@ theorem amalgamExpansionLeft_constInj {L L1 L2 : Language}
       (Quot.mk _ (.inl c1')) := congrArg _ h
   simpa [canonConst, amalgamExpansionLeft_constEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The amalgamated language has equality if
 the L1 side does (inherited through the left disjunct of
 `L1.hasEquality || L2.hasEquality`). -/
@@ -551,7 +539,6 @@ def amalgamExpansionLeft {L L1 L2 : Language}
 -- Theorem 6.7.1 (companion def): amalgamExpansionRight
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation for the amalgamated function symbols,
 mapping everything to the L2-side representative when possible. Used
 to prove that `Sum.inr` injects into the quotient. -/
@@ -565,7 +552,6 @@ noncomputable def canonFunR {L L1 L2 : Language}
       else
         .inl f1
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation for amalgamated predicate symbols. -/
 noncomputable def canonPredR {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2) :
@@ -577,7 +563,6 @@ noncomputable def canonPredR {L L1 L2 : Language}
       else
         .inl P1
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation for amalgamated constant symbols. -/
 noncomputable def canonConstR {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2) :
@@ -589,7 +574,6 @@ noncomputable def canonConstR {L L1 L2 : Language}
       else
         .inl c1
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation respects the function-symbol relation. -/
 theorem canonFunR_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -619,7 +603,6 @@ theorem canonFunR_respects {L L1 L2 : Language}
     rw [hchoose, hs2]
   · subst h; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation respects the predicate-symbol relation. -/
 theorem canonPredR_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -649,7 +632,6 @@ theorem canonPredR_respects {L L1 L2 : Language}
     rw [hchoose, hQ2]
   · subst h; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Symmetric canonicalisation respects the constant-symbol relation. -/
 theorem canonConstR_respects {L L1 L2 : Language}
     (hI : LanguageIntersection L L1 L2)
@@ -700,7 +682,6 @@ def amalgamExpansionRight_constEmbed {L L1 L2 : Language}
     (c2 : L2.constSymbols) : (languageAmalgam hI).constSymbols :=
   Quot.mk _ (.inr c2)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The right predicate embedding preserves
 arities by construction of `languageAmalgam.predArity`. -/
 theorem amalgamExpansionRight_predArityPreserve {L L1 L2 : Language}
@@ -710,7 +691,6 @@ theorem amalgamExpansionRight_predArityPreserve {L L1 L2 : Language}
 -- BEGIN PROOF
   fun _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The right function embedding preserves
 arities by construction of `languageAmalgam.funArity`. -/
 theorem amalgamExpansionRight_funArityPreserve {L L1 L2 : Language}
@@ -720,7 +700,6 @@ theorem amalgamExpansionRight_funArityPreserve {L L1 L2 : Language}
 -- BEGIN PROOF
   fun _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inr` is injective as a map
 from `L2.predSymbols` into the amalgamated predicate-symbol quotient. -/
 theorem amalgamExpansionRight_predInj {L L1 L2 : Language}
@@ -734,7 +713,6 @@ theorem amalgamExpansionRight_predInj {L L1 L2 : Language}
       (Quot.mk _ (.inr P2')) := congrArg _ h
   simpa [canonPredR, amalgamExpansionRight_predEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inr` is injective as a map
 from `L2.funSymbols` into the amalgamated function-symbol quotient. -/
 theorem amalgamExpansionRight_funInj {L L1 L2 : Language}
@@ -748,7 +726,6 @@ theorem amalgamExpansionRight_funInj {L L1 L2 : Language}
       (Quot.mk _ (.inr f2')) := congrArg _ h
   simpa [canonFunR, amalgamExpansionRight_funEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): `Quot.mk _ ∘ .inr` is injective as a map
 from `L2.constSymbols` into the amalgamated constant-symbol quotient. -/
 theorem amalgamExpansionRight_constInj {L L1 L2 : Language}
@@ -762,7 +739,6 @@ theorem amalgamExpansionRight_constInj {L L1 L2 : Language}
       (Quot.mk _ (.inr c2')) := congrArg _ h
   simpa [canonConstR, amalgamExpansionRight_constEmbed] using hlift
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.7.1 (companion): The amalgamated language has equality if
 the L2 side does (inherited through the right disjunct of
 `L1.hasEquality || L2.hasEquality`). -/

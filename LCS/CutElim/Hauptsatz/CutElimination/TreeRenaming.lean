@@ -20,7 +20,7 @@ open LCS.CutElim.Hauptsatz
 open LCS.CutElim.Hauptsatz.Completeness
 namespace LCS.CutElim.Hauptsatz
 
-private theorem termSubst_commutes_with_active_alpha {L : Language}
+theorem termSubst_commutes_with_active_alpha {L : Language}
     (r t : Term L) (x v z : Nat)
     (hxv : x ≠ v) (hxz : x ≠ z) (hvt : v ∉ termFV t) :
     termSubst (termSubst r t x) (.var z) v =
@@ -38,7 +38,7 @@ private theorem termSubst_commutes_with_active_alpha {L : Language}
 /-- Away from the renamed target, substitution commutes with the
 scope-aware alpha traversal.  When the traversal is active, the original
 free-for condition at the surrounding `v`-binder supplies `v ∉ FV(t)`. -/
-private theorem alphaRenameBoundAux_formulaSubstN_of_ne {L : Language}
+theorem alphaRenameBoundAux_formulaSubstN_of_ne {L : Language}
     (A : FormulaN L) (t : Term L) (x v z : Nat) (active : Bool)
     (hxv : x ≠ v) (hxz : x ≠ z)
     (hActive : active = true → v ∉ termFV t)
@@ -135,7 +135,7 @@ private theorem alphaRenameBoundAux_formulaSubstN_of_ne {L : Language}
 
 /-- Factoring substitution for `v` through a fresh intermediate `z`
 matches selective alpha-renaming of the resulting formula. -/
-private theorem alphaRenameBound_formulaSubstN_self {L : Language}
+theorem alphaRenameBound_formulaSubstN_self {L : Language}
     (A : FormulaN L) (t : Term L) (v z : Nat)
     (hzv : z ≠ v)
     (hzFV : z ∉ formulaFVN A)
@@ -237,7 +237,7 @@ private theorem alphaRenameBound_formulaSubstN_self {L : Language}
           alphaRenameBound, alphaRenameBoundAux, if_neg hqv]
         exact congrArg (FormulaN.ex q) hRec
 
-private theorem alphaRenameBinderBody_formulaSubstN {L : Language}
+theorem alphaRenameBinderBody_formulaSubstN {L : Language}
     (A : FormulaN L) (t : Term L) (x v z : Nat)
     (hFree : isFreeForN t x A)
     (hzA : z ∉ formulaVariableSupport A)
@@ -263,7 +263,7 @@ private theorem alphaRenameBinderBody_formulaSubstN {L : Language}
         A t x v z false hxv (Ne.symm hzx)
           (by simp) hFree).symm
 
-private theorem alphaRenameBoundAux_true_isFreeForN {L : Language}
+theorem alphaRenameBoundAux_true_isFreeForN {L : Language}
     (A : FormulaN L) (t : Term L) (x v z : Nat)
     (hFree : isFreeForN t x A)
     (hzt : z ∉ termFV t)
@@ -362,7 +362,7 @@ private theorem alphaRenameBoundAux_true_isFreeForN {L : Language}
           exact Or.inr
             ⟨hFreshQ, ih x hFreeBody hzBody⟩
 
-private theorem alphaRenameBoundAux_false_isFreeForN_of_ne
+theorem alphaRenameBoundAux_false_isFreeForN_of_ne
     {L : Language} (A : FormulaN L) (t : Term L) (x v z : Nat)
     (hxv : x ≠ v)
     (hFree : isFreeForN t x A)
@@ -455,7 +455,7 @@ private theorem alphaRenameBoundAux_false_isFreeForN_of_ne
           exact Or.inr
             ⟨hFreshQ, ih hFreeBody hzBody⟩
 
-private theorem alphaRenameBinderBody_isFreeForN {L : Language}
+theorem alphaRenameBinderBody_isFreeForN {L : Language}
     (A : FormulaN L) (t : Term L) (x v z : Nat)
     (hFree : isFreeForN t x A)
     (hzA : z ∉ formulaVariableSupport A)
@@ -477,7 +477,7 @@ private theorem alphaRenameBinderBody_isFreeForN {L : Language}
 -- ===================================================================
 -- Private substitution preparation: rule-level bound renaming
 -- ===================================================================
-private noncomputable def alphaRenameBoundRule {L : Language}
+noncomputable def alphaRenameBoundRule {L : Language}
     (v z : Nat) : G1nnfRule L → G1nnfRule L
   | .axiomPosAtomic A hAtom Γ Δ =>
       .axiomPosAtomic (alphaRenameBound A v z)
@@ -544,7 +544,7 @@ theorem alphaRenameBoundRule_conclusion_eq {L : Language}
       alphaRenameBinderIndex, alphaRenameBinderBody] <;>
     split <;> rfl
 
-private theorem alphaRenameBoundRule_premises_length {L : Language}
+theorem alphaRenameBoundRule_premises_length {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L)) (v z : Nat) :
     ((alphaRenameBoundRule v z rule).premises
@@ -560,7 +560,7 @@ theorem alphaRenameBoundRule_cutFormula {L : Language}
   cases rule <;>
     simp [alphaRenameBoundRule, G1nnfRule.cutFormula, Option.map]
 
-private theorem alphaRenameBoundRule_sideConditions {L : Language}
+theorem alphaRenameBoundRule_sideConditions {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L)) (v z : Nat)
     (hSC : rule.SideConditions Γ Δ)
@@ -667,7 +667,7 @@ private theorem alphaRenameBoundRule_sideConditions {L : Language}
       exact alphaRenameBinderBody_isFreeForN
         A t x v z hSC hzA hzt hzx
 
-private theorem alphaRenameBoundRule_applicationConditions {L : Language}
+theorem alphaRenameBoundRule_applicationConditions {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L)) (v z : Nat)
     (hAC : rule.ApplicationConditions Γ Δ)
@@ -685,7 +685,7 @@ private theorem alphaRenameBoundRule_applicationConditions {L : Language}
      alphaRenameFormulaFinset_isNNF
         (rule.conclusion Γ Δ).2 v z hAC.2.2⟩
 
-private theorem alphaRenameBoundRule_premises_eq {L : Language}
+theorem alphaRenameBoundRule_premises_eq {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L)) (v z : Nat)
     (hSC : rule.SideConditions Γ Δ)
@@ -805,7 +805,7 @@ private theorem alphaRenameBoundRule_premises_eq {L : Language}
       simp [alphaRenameBoundRule, G1nnfRule.premises,
         alphaRenameFormulaFinset_insert, hComm]
 
-private theorem alphaRenameBoundRule_premises_nth_eq {L : Language}
+theorem alphaRenameBoundRule_premises_nth_eq {L : Language}
     (rule : G1nnfRule L)
     (Γ Δ : LCS.Finset (FormulaN L)) (v z n : Nat)
     (hn : n < (rule.premises Γ Δ).length)
@@ -1075,7 +1075,7 @@ noncomputable def alphaRenameBoundTree {L : Language} {hL : L.withoutEquality} :
           hPremLen hAC' sub1Cast sub2Cast
       hEq1 ▸ hEq2 ▸ core
 
-private theorem alphaRenameBoundTree_depth {L : Language} {hL : L.withoutEquality}
+theorem alphaRenameBoundTree_depth {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
@@ -1097,7 +1097,7 @@ private theorem alphaRenameBoundTree_depth {L : Language} {hL : L.withoutEqualit
       rw [G1nnfProofTree.depth_cast, G1nnfProofTree.depth_cast,
         ih1, ih2]
 
-private theorem alphaRenameBoundTree_cutRank {L : Language} {hL : L.withoutEquality}
+theorem alphaRenameBoundTree_cutRank {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
@@ -1124,7 +1124,7 @@ private theorem alphaRenameBoundTree_cutRank {L : Language} {hL : L.withoutEqual
       | some A =>
           simp only [Option.map, alphaRenameBound_degree]
 
-private theorem allFormulae_alphaRenameBoundTree {L : Language} {hL : L.withoutEquality}
+theorem allFormulae_alphaRenameBoundTree {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
@@ -1155,7 +1155,7 @@ private theorem allFormulae_alphaRenameBoundTree {L : Language} {hL : L.withoutE
         alphaRenameFormulaFinset_union,
         alphaRenameFormulaFinset_union]
 
-private theorem alphaRenameBoundTree_notBound_target {L : Language} {hL : L.withoutEquality}
+theorem alphaRenameBoundTree_notBound_target {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport) :
@@ -1165,7 +1165,7 @@ private theorem alphaRenameBoundTree_notBound_target {L : Language} {hL : L.with
   obtain ⟨B, _, rfl⟩ := LCS.Finset.mem_image.mp hA
   exact alphaRenameBound_removes_binder B v z hvz
 
-private theorem alphaRenameBoundTree_preserves_notBound {L : Language} {hL : L.withoutEquality}
+theorem alphaRenameBoundTree_preserves_notBound {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z w : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport)
@@ -1255,7 +1255,7 @@ theorem alphaRenameBoundAtRoot_preserves_notBound {L : Language} {hL : L.without
     T.alphaRenameBoundTree_preserves_notBound
       v z w hvz hz hwz hw
 
-private theorem alphaRenameBoundTree_eigenvariables_eq {L : Language} {hL : L.withoutEquality}
+theorem alphaRenameBoundTree_eigenvariables_eq {L : Language} {hL : L.withoutEquality}
     {Γ Δ : LCS.Finset (FormulaN L)}
     (T : G1nnfProofTree hL Γ Δ) (v z : Nat)
     (hvz : v ≠ z) (hz : z ∉ T.variableSupport) (w : Nat) :

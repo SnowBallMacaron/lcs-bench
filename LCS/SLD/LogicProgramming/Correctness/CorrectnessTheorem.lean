@@ -64,7 +64,6 @@ noncomputable def negativeClauseSubsequence {L : Language} (hNoEq : L.withoutEqu
 -- Helper: extract the initial goal from a derivation.
 -- Under the indexed API, goals is a type parameter, but the specific
 -- goal clause used at init is recoverable from the init constructor.
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[blueprint "chap9__theorem_9_5_1"]
 def getInitGoal {L : Language} (hNoEq : L.withoutEquality) {D goals : List (FOHornClause L hNoEq)} :
     {cg : LCS.Finset (FOAtom L hNoEq)} →

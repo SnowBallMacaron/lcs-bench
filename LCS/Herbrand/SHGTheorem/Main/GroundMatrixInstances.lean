@@ -272,7 +272,6 @@ inductive ConjunctionFlattening {L : Language} :
 
 namespace ConjunctionFlattening
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Evaluation of a represented conjunction is equivalent to evaluation
 of every leaf in its ordered list. -/
 theorem formulaEvalN_iff_all_leaves {L : Language}
@@ -324,11 +323,11 @@ def isFiniteGroundConjunctionOfMatrix {L : Language}
 
 namespace GroundMatrixCarrierRegression
 
-private inductive Pred : Type where
-  | unary /- ATTACH-BLOCKER: private declaration -/
+inductive Pred : Type where
+  | unary
 
-private inductive Const : Type where
-  | c /- ATTACH-BLOCKER: private declaration -/
+inductive Const : Type where
+  | c
 
 def language : Language where
   funSymbols := Empty
@@ -336,16 +335,16 @@ def language : Language where
   constSymbols := Const
   predSymbols := Pred
   predArity := fun _ => 1
-  hasEquality := false /- ATTACH-BLOCKER: private name in relocated declaration -/
+  hasEquality := false
 
-private def constant : Term language :=
-  .const .c /- ATTACH-BLOCKER: private declaration -/
+def constant : Term language :=
+  .const .c
 
-private def unaryAtom (t : Term language) : FormulaN language :=
-  .predN .unary (fun _ => t) /- ATTACH-BLOCKER: private declaration -/
+def unaryAtom (t : Term language) : FormulaN language :=
+  .predN .unary (fun _ => t)
 
 def atom : FormulaN language :=
-  unaryAtom constant /- ATTACH-BLOCKER: private name in relocated declaration -/
+  unaryAtom constant
 
 end GroundMatrixCarrierRegression
 end LCS.Herbrand.SHGTheorem.Main

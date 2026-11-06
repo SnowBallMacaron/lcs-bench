@@ -67,7 +67,7 @@ inductive QuantifierSourceScope {L : Language} :
 
 /-- Any binder named by a source-scope derivation really occurs bound in
 the formula indexing that derivation. -/
-private theorem quantifierSourceScope_binder_mem
+theorem quantifierSourceScope_binder_mem
     {L : Language} {A : FormulaN L} {pfx : List Nat}
     {x : Nat} {scope : List Nat}
     (hScope : QuantifierSourceScope A pfx x scope) :
@@ -179,13 +179,13 @@ def ClosedEigenvarMap.Covers
   ∀ x, x ∈ scope →
     ∃ choice, eigenMap.lookup x = some choice
 
-private theorem ClosedEigenvarMap.covers_nil
+theorem ClosedEigenvarMap.covers_nil
     {L : Language} (eigenMap : ClosedEigenvarMap L) :
     eigenMap.Covers [] := by
   intro x hx
   cases hx
 
-private theorem ClosedEigenvarMap.covers_insert
+theorem ClosedEigenvarMap.covers_insert
     {L : Language} (eigenMap : ClosedEigenvarMap L)
     (x : Nat) (choice : ClosedTerm L) {scope : List Nat}
     (hCovers : eigenMap.Covers scope) :
@@ -203,7 +203,7 @@ private theorem ClosedEigenvarMap.covers_insert
           eigenMap x y choice hyx]
         exact hPriorChoice⟩
 
-private theorem ClosedEigenvarMap.covers_append_insert
+theorem ClosedEigenvarMap.covers_append_insert
     {L : Language} (eigenMap : ClosedEigenvarMap L)
     (x : Nat) (choice : ClosedTerm L) {scope : List Nat}
     (hCovers : eigenMap.Covers scope) :
@@ -218,7 +218,7 @@ private theorem ClosedEigenvarMap.covers_append_insert
 
 /-- Exact source scopes of the quantifiers currently exposed through
 only conjunction/disjunction nodes. -/
-private def ClosedFormulaFrontierScopes
+def ClosedFormulaFrontierScopes
     {L : Language} (spec : SkolemSpec L) :
     FormulaN L → List Nat → Prop
   | .conj A B, scope =>
@@ -235,7 +235,7 @@ private def ClosedFormulaFrontierScopes
 
 /-- Every quantifier node retains its exact source-scope relationship to
 the quantifiers exposed immediately inside its body. -/
-private def ClosedFormulaScopeAligned
+def ClosedFormulaScopeAligned
     {L : Language} (spec : SkolemSpec L) : FormulaN L → Prop
   | .conj A B =>
       ClosedFormulaScopeAligned spec A ∧
@@ -257,7 +257,7 @@ private def ClosedFormulaScopeAligned
 
 /-- Every currently exposed quantifier has all of its already-eliminated
 source universal pfx explicitly represented in the provenance map. -/
-private def ClosedFormulaFrontierReady
+def ClosedFormulaFrontierReady
     {L : Language} (spec : SkolemSpec L)
     (eigenMap : ClosedEigenvarMap spec.language) :
     FormulaN L → Prop
@@ -277,7 +277,7 @@ private def ClosedFormulaFrontierReady
           eigenMap.Covers scope
   | _ => True
 
-private theorem closedFormulaFrontierScopes_of_local
+theorem closedFormulaFrontierScopes_of_local
     {L : Language} (spec : SkolemSpec L)
     (A : FormulaN L) (pfx : List Nat)
     (hEmbed :
@@ -307,7 +307,7 @@ private theorem closedFormulaFrontierScopes_of_local
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaScopeAligned_of_local
+theorem closedFormulaScopeAligned_of_local
     {L : Language} (spec : SkolemSpec L)
     (A : FormulaN L) (pfx : List Nat)
     (hEmbed :
@@ -355,13 +355,13 @@ private theorem closedFormulaScopeAligned_of_local
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaScopeAligned_source
+theorem closedFormulaScopeAligned_source
     {L : Language} (spec : SkolemSpec L) :
     ClosedFormulaScopeAligned spec spec.source :=
   closedFormulaScopeAligned_of_local
     spec spec.source [] (fun h => h)
 
-private theorem closedFormulaFrontierReady_source
+theorem closedFormulaFrontierReady_source
     {L : Language} (spec : SkolemSpec L) :
     ClosedFormulaFrontierReady spec
       (ClosedEigenvarMap.empty : ClosedEigenvarMap spec.language)
@@ -398,7 +398,7 @@ private theorem closedFormulaFrontierReady_source
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaFrontierScopes_subst
+theorem closedFormulaFrontierScopes_subst
     {L : Language} (spec : SkolemSpec L)
     (A : FormulaN L) (t : Term L) (x : Nat)
     (scope : List Nat)
@@ -425,7 +425,7 @@ private theorem closedFormulaFrontierScopes_subst
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaScopeAligned_subst
+theorem closedFormulaScopeAligned_subst
     {L : Language} (spec : SkolemSpec L)
     (A : FormulaN L) (t : Term L) (x : Nat)
     (hAligned : ClosedFormulaScopeAligned spec A) :
@@ -474,7 +474,7 @@ private theorem closedFormulaScopeAligned_subst
   | impl B C ihB ihC =>
       trivial
 
-private theorem closedFormulaScopeAligned_replace
+theorem closedFormulaScopeAligned_replace
     {L : Language} {spec : SkolemSpec L}
     {A : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A)
@@ -498,7 +498,7 @@ private theorem closedFormulaScopeAligned_replace
   | disjRight C inner ih =>
       exact ⟨hAligned.1, ih hAligned.2⟩
 
-private theorem closedFormulaFrontierReady_of_scopes
+theorem closedFormulaFrontierReady_of_scopes
     {L : Language} (spec : SkolemSpec L)
     (eigenMap : ClosedEigenvarMap spec.language)
     (A : FormulaN L) (scope : List Nat)
@@ -525,7 +525,7 @@ private theorem closedFormulaFrontierReady_of_scopes
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaFrontierReady_insert
+theorem closedFormulaFrontierReady_insert
     {L : Language} (spec : SkolemSpec L)
     (eigenMap : ClosedEigenvarMap spec.language)
     (x : Nat) (choice : ClosedTerm spec.language)
@@ -558,7 +558,7 @@ private theorem closedFormulaFrontierReady_insert
   | impl _ _ _ _ =>
       trivial
 
-private theorem closedFormulaFrontierReady_replace
+theorem closedFormulaFrontierReady_replace
     {L : Language} {spec : SkolemSpec L}
     {eigenMap : ClosedEigenvarMap spec.language}
     {A : FormulaN L}
@@ -583,7 +583,7 @@ private theorem closedFormulaFrontierReady_replace
   | disjRight C inner ih =>
       exact ⟨hReady.1, ih hReady.2⟩
 
-private theorem closedFormulaScopeAligned_selected_all
+theorem closedFormulaScopeAligned_selected_all
     {L : Language} {spec : SkolemSpec L}
     {A B : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A)
@@ -610,7 +610,7 @@ private theorem closedFormulaScopeAligned_selected_all
   | disjRight C inner ih =>
       exact ih hSelected hAligned.2
 
-private theorem closedFormulaScopeAligned_selected_ex
+theorem closedFormulaScopeAligned_selected_ex
     {L : Language} {spec : SkolemSpec L}
     {A B : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A)
@@ -637,7 +637,7 @@ private theorem closedFormulaScopeAligned_selected_ex
   | disjRight C inner ih =>
       exact ih hSelected hAligned.2
 
-private theorem closedFormulaFrontierReady_selected_all
+theorem closedFormulaFrontierReady_selected_all
     {L : Language} {spec : SkolemSpec L}
     {eigenMap : ClosedEigenvarMap spec.language}
     {A B : FormulaN L}
@@ -691,7 +691,7 @@ theorem closedFormulaFrontierReady_selected_ex
   | disjRight C inner ih =>
       exact ih hSelected hReady.2
 
-private theorem closedFormulaAllSubLeft_invariants
+theorem closedFormulaAllSubLeft_invariants
     {L : Language} {spec : SkolemSpec L}
     {A B : FormulaN L}
     (occurrence : MaxQuantifierOccurrence A)

@@ -22,13 +22,11 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 -- ===================================================================
 -- VarFresh infrastructure
 -- ===================================================================
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem foldl_max_init_le (init : Nat) (l : List Nat) :
     init ≤ l.foldl Nat.max init := by
 -- BEGIN PROOF
@@ -36,7 +34,6 @@ theorem foldl_max_init_le (init : Nat) (l : List Nat) :
   | nil => exact Nat.le_refl _
   | cons hd t ih => exact Nat.le_trans (Nat.le_max_left init hd) (ih _)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem foldl_max_mem_le (l : List Nat) (init : Nat) (x : Nat) (hx : x ∈ l) :
     x ≤ l.foldl Nat.max init := by
 -- BEGIN PROOF
@@ -47,13 +44,11 @@ theorem foldl_max_mem_le (l : List Nat) (init : Nat) (x : Nat) (hx : x ∈ l) :
     · exact Nat.le_trans (Nat.le_max_right init x) (foldl_max_init_le _ _)
     · exact ih (Nat.max init hd) ht
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def termMaxVar {L : Language} : Term L → Nat
   | .var i => i
   | .const _ => 0
   | .func _ ts => (List.ofFn fun i => termMaxVar (ts i)).foldl Nat.max 0
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem termFV_bounded {L : Language} (t : Term L) (v : Nat) (hv : termFV t v) :
     v ≤ termMaxVar t := by
 -- BEGIN PROOF
@@ -64,7 +59,6 @@ theorem termFV_bounded {L : Language} (t : Term L) (v : Nat) (hv : termFV t v) :
     change ∃ i, termFV (ts i) v at hv; obtain ⟨i, hi⟩ := hv
     exact Nat.le_trans (ih i hi) (foldl_max_mem_le _ 0 _ (List.mem_ofFn.mpr ⟨i, rfl⟩))
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem termFV_gt_maxVar {L : Language} (t : Term L) (v : Nat) (hv : v > termMaxVar t) :
     v ∉ termFV t :=
 -- BEGIN PROOF
@@ -73,7 +67,6 @@ theorem termFV_gt_maxVar {L : Language} (t : Term L) (v : Nat) (hv : v > termMax
 -- ===================================================================
 -- Max var in tree
 -- ===================================================================
--- ATTACH-BLOCKER: section variables: helper requires front context
 def formulaAllMaxVar {L : Language} : FormulaN L → Nat
   | .predN _ ts => (List.ofFn fun i => termMaxVar (ts i)).foldl Nat.max 0
   | .eq_ _ t1 t2 => Nat.max (termMaxVar t1) (termMaxVar t2)
@@ -84,7 +77,6 @@ def formulaAllMaxVar {L : Language} : FormulaN L → Nat
   | .all x A => Nat.max x (formulaAllMaxVar A)
   | .ex x A => Nat.max x (formulaAllMaxVar A)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem formulaAllMaxVar_gt_no_fv {L : Language} (A : FormulaN L) (v : Nat)
     (hv : v > formulaAllMaxVar A) : v ∉ formulaFVN A := by
 -- BEGIN PROOF
@@ -117,7 +109,6 @@ theorem formulaAllMaxVar_gt_no_fv {L : Language} (A : FormulaN L) (v : Nat)
   | ex x A ih =>
     intro ⟨hA, _⟩; exact ih (Nat.lt_of_le_of_lt (Nat.le_max_right _ _) hv) hA
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem formulaAllMaxVar_gt_no_bv {L : Language} (A : FormulaN L) (v : Nat)
     (hv : v > formulaAllMaxVar A) : v ∉ formulaBVN A := by
 -- BEGIN PROOF
@@ -146,11 +137,9 @@ theorem formulaAllMaxVar_gt_no_bv {L : Language} (A : FormulaN L) (v : Nat)
     · exact ih (Nat.lt_of_le_of_lt (Nat.le_max_right _ _) hv) hA
     · subst hx; exact Nat.not_lt.mpr (Nat.le_max_left _ _) hv
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def listFormulaAllMaxVar {L : Language} (fs : List (FormulaN L)) : Nat :=
   (fs.map formulaAllMaxVar).foldl Nat.max 0
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 def sequentAllMaxVar {L : Language} (s : Sequent L) : Nat :=
   Nat.max (listFormulaAllMaxVar s.antecedent) (listFormulaAllMaxVar s.succedent)
 

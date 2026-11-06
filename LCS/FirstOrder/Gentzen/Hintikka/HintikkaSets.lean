@@ -112,7 +112,6 @@ structure IsHintikkaSet (L : Language) (hL : L.withoutEquality) (H : Set (Term L
      SignedFormula.falseF (.ex x A) ∈ S) →
     isFreeForN t x A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Equality atoms cannot be formed in the language of a Hintikka set. -/
 theorem IsHintikkaSet.hNoEq {L : Language} {hL : L.withoutEquality}
     {H : Set (Term L)} {S : Set (SignedFormula L)}
@@ -126,7 +125,6 @@ theorem IsHintikkaSet.hNoEq {L : Language} {hL : L.withoutEquality}
 -- Lemma 5.4.5 (normalized companion): hintikkaStructure
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.4.5 (companion): The term-algebra carrier of a Hintikka set is nonempty. -/
 theorem hintikkaStructure_carrierNonempty {L : Language} {hL : L.withoutEquality}
     {H : Set (Term L)} {S : Set (SignedFormula L)}

@@ -39,7 +39,6 @@ structure TermStream (L : Language) where
 noncomputable def TermStream.varAt {L : Language} (supply : TermStream L) (n : Nat)
     (h : ∃ i, supply.entries n = some (.var i)) : Nat := h.choose
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem TermStream.varAt_spec {L : Language} (supply : TermStream L) (n : Nat)
     (h : ∃ i, supply.entries n = some (.var i)) :
     supply.entries n = some (.var (supply.varAt n h)) := h.choose_spec
@@ -50,12 +49,10 @@ theorem TermStream.varAt_spec {L : Language} (supply : TermStream L) (n : Nat)
 def BeforeCursor {L : Language} (supply : TermStream L) (cursor i : Nat) : Prop :=
   ∀ n, cursor ≤ n → supply.entries n ≠ some (.var i)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem BeforeCursor.mono {L : Language} {supply : TermStream L} {a b i : Nat}
     (h : BeforeCursor supply a i) (hab : a ≤ b) : BeforeCursor supply b i :=
   fun n hn => h n (Nat.le_trans hab hn)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The selected variable cannot occur later in an injective stream. -/
 theorem TermStream.varAt_beforeSucc {L : Language} (supply : TermStream L) (n : Nat)
     (h : ∃ i, supply.entries n = some (.var i)) :
@@ -149,7 +146,6 @@ theorem toDeductionTree_commitRound {L : Language} {s : Sequent L}
   | twoPremise rule t1 t2 ih1 ih2 =>
       simp only [commitRound, toDeductionTree, ih1, ih2]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Committing the new leaf records preserves an extension. -/
 theorem Extends.commitRound {L : Language} {s : Sequent L}
     {t t' : SearchTree s} (h : t.Extends t') (termCount : Nat) :

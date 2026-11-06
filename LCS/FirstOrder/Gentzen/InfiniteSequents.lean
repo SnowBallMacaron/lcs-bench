@@ -69,7 +69,6 @@ at some finite position. -/
 def InfSequentN.memSuccedent {L : Language} (q : InfSequentN L) (A : FormulaN L) : Prop :=
   ∃ n, q.succedent n = some A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Finite embedding preserves antecedent membership. -/
 theorem InfSequentN.memAntecedent_ofSequent {L : Language} (s : Sequent L) (A : FormulaN L) :
     (ofSequent s).memAntecedent A ↔ A ∈ s.antecedent := by
@@ -81,7 +80,6 @@ theorem InfSequentN.memAntecedent_ofSequent {L : Language} (s : Sequent L) (A : 
     obtain ⟨n, hlt, heq⟩ := List.mem_iff_getElem.mp hA
     exact ⟨n, List.getElem?_eq_some_iff.mpr ⟨hlt, heq⟩⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Finite embedding preserves succedent membership. -/
 theorem InfSequentN.memSuccedent_ofSequent {L : Language} (s : Sequent L) (A : FormulaN L) :
     (ofSequent s).memSuccedent A ↔ A ∈ s.succedent := by

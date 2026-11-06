@@ -22,10 +22,8 @@ open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (z : Nat) (c : L.constSymbols)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_termComm
     (u : Term L) (t : Term L) (x : Nat) (hzx : z ≠ x)
     : termSubstConst (termSubst u t x) z c = termSubst (termSubstConst u z c) (termSubstConst t z c) x := by
@@ -45,7 +43,6 @@ theorem folkConst_termComm
     ext i
     exact ih i
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_formulaComm
     (termComm : ∀ (u t : Term L) (x : Nat), z ≠ x → termSubstConst (termSubst u t x) z c = termSubst
       (termSubstConst u z c) (termSubstConst t z c) x) (A : FormulaN L) (t : Term L) (x : Nat) (hzx : z ≠ x)
@@ -74,7 +71,6 @@ theorem folkConst_formulaComm
     simp [formulaSubstN, formulaSubstConst]
     split <;> simp [formulaSubstConst, ih]
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_termFreshAfterConst
     (t : Term L) (v : Nat) (hvz : v ≠ z) (h : ¬v ∈ termFV t)
     : ¬v ∈ termFV (termSubstConst t z c) := by
@@ -91,7 +87,6 @@ theorem folkConst_termFreshAfterConst
     intro ⟨i, hi⟩
     exact h ⟨i, (ih i (fun hc => h ⟨i, hc⟩)).elim hi⟩
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_freeAfterConst
     (termFreshAfterConst : ∀ (t : Term L) (v : Nat), v ≠ z → ¬v ∈ termFV t → ¬v ∈ termFV (termSubstConst t z
       c)) (A : FormulaN L) (t : Term L) (x : Nat) (hfree : isFreeForN t x A) (hNoZ : ¬z ∈ formulaBVN A)
@@ -126,7 +121,6 @@ theorem folkConst_freeAfterConst
       right
       exact ⟨termFreshAfterConst t w (Ne.symm hzw) hwtv, ih hff (fun h => hNoZ (Or.inl h))⟩
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_formulaFreshAfterConst
     (termFreshAfterConst : ∀ (t : Term L) (v : Nat), v ≠ z → ¬v ∈ termFV t → ¬v ∈ termFV (termSubstConst t z
       c)) (A : FormulaN L) (v : Nat) (hvz : v ≠ z) (h : ¬v ∈ formulaFVN A)
@@ -172,7 +166,6 @@ theorem folkConst_formulaFreshAfterConst
     intro ⟨hm, hne⟩
     exact ih (fun hm' => h ⟨hm', hne⟩) hm
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem folkConst_sequentFreshAfterConst
     (formulaFreshAfterConst : ∀ (A : FormulaN L) (v : Nat), v ≠ z → ¬v ∈ formulaFVN A → ¬v ∈ formulaFVN
       (formulaSubstConst A z c)) (q : Sequent L) (e : Nat) (he : ∀ (F : FormulaN L), F ∈ q.antecedent ++
@@ -190,7 +183,6 @@ theorem folkConst_sequentFreshAfterConst
     have hmem : G ∈ q.antecedent ++ q.succedent := List.mem_append.mpr (Or.inr hG)
     exact formulaFreshAfterConst G e hez (he G hmem)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_allLeft
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -216,7 +208,6 @@ noncomputable def folkConst_allLeft
         (Δ.map (fun F => formulaSubstConst F z c)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_allRight
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -255,7 +246,6 @@ noncomputable def folkConst_allRight
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_exLeft
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -294,7 +284,6 @@ noncomputable def folkConst_exLeft
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_exRight
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -320,7 +309,6 @@ noncomputable def folkConst_exRight
         (Δ.map (fun F => formulaSubstConst F z c)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_oneRule
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -422,7 +410,6 @@ noncomputable def folkConst_oneRule
   | exRight t₀ x A Γ Δ hfree =>
     exact folkConst_exRight L z c formulaComm freeAfterConst t₀ x A Γ Δ hfree transformedTree hRuleNO
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def folkConst_twoRule
     (q : Sequent L) (prem1 : Sequent L) (prem2 : Sequent L) (rule : FOLKStep2 prem1 prem2 q) (transformedTree₁
       : FOLKProofTree (sequentSubstConst prem1 z c)) (transformedTree₂ : FOLKProofTree (sequentSubstConst
@@ -545,10 +532,8 @@ where
   termination_by structural U
 
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (hL : L.withoutEquality) (z : Nat) (c : L.constSymbols)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_allLeft
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -575,7 +560,6 @@ noncomputable def dedConst_allLeft
         (Δ.map (fun F => formulaSubstConst F z c)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_allRight
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -614,7 +598,6 @@ noncomputable def dedConst_allRight
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_exLeft
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -653,7 +636,6 @@ noncomputable def dedConst_exLeft
         hfresh' hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_exRight
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -679,7 +661,6 @@ noncomputable def dedConst_exRight
         (Δ.map (fun F => formulaSubstConst F z c)) hfree')
       sub
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_oneRule
     (formulaComm : ∀ (A : FormulaN L) (t : Term L) (x : Nat), z ≠ x → formulaSubstConst (formulaSubstN A t x)
       z c = formulaSubstN (formulaSubstConst A z c) (termSubstConst t z c) x) (freeAfterConst : ∀ (A :
@@ -781,7 +762,6 @@ noncomputable def dedConst_oneRule
   | exRight t₀ x A Γ Δ hfree =>
     exact dedConst_exRight L hL z c formulaComm freeAfterConst t₀ x A Γ Δ hfree transformedTree hRuleNO
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def dedConst_twoRule
     (q : Sequent L) (prem1 : Sequent L) (prem2 : Sequent L) (rule : FOLKStep2 prem1 prem2 q) (transformedTree₁
       : FOLKDeductionTree hL (sequentSubstConst prem1 z c)) (transformedTree₂ : FOLKDeductionTree hL
@@ -898,7 +878,6 @@ where
       exact dedConst_twoRule L hL z c _ _ _ rule transformedTree₁ transformedTree₂
   termination_by structural U
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Deduction-tree constant substitution preserves proof trees, and its
 proof-tree image is `folkProofSubstConst`. -/
 theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.substConst_proof_image
@@ -912,13 +891,10 @@ theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.substConst_proof_image
   -- REPAIR(T6-41b): proof pending
   sorry
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 section
--- ATTACH-BLOCKER: variable
 variable (L : Language) (z : Nat) (c : L.constSymbols)
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def stepConst_allLeft
     (t : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t x A) (hNotOccurs : (FOLKStep1.allLeft t x A Γ Δ hfree).varNotOccurs z)
@@ -934,7 +910,6 @@ noncomputable def stepConst_allLeft
         (Γ.map (fun F => formulaSubstConst F z c))
         (Δ.map (fun F => formulaSubstConst F z c)) hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def stepConst_allRight
     (sequentFreshAfterConst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → e ≠ z → ∀ (F : FormulaN L), F ∈ (sequentSubstConst q z c).antecedent
@@ -965,7 +940,6 @@ noncomputable def stepConst_allRight
         (Δ.map (fun F => formulaSubstConst F z c))
         hfresh' hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def stepConst_exLeft
     (sequentFreshAfterConst : ∀ (q : Sequent L) (e : Nat), (∀ (F : FormulaN L), F ∈ q.antecedent ++
       q.succedent → ¬e ∈ formulaFVN F) → e ≠ z → ∀ (F : FormulaN L), F ∈ (sequentSubstConst q z c).antecedent
@@ -996,7 +970,6 @@ noncomputable def stepConst_exLeft
         (Δ.map (fun F => formulaSubstConst F z c))
         hfresh' hfree'
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 noncomputable def stepConst_exRight
     (t : Term L) (x : Nat) (A : FormulaN L) (Γ : List (FormulaN L)) (Δ : List (FormulaN L)) (hfree :
       isFreeForN t x A) (hNotOccurs : (FOLKStep1.exRight t x A Γ Δ hfree).varNotOccurs z)

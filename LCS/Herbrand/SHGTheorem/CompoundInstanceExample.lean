@@ -139,7 +139,6 @@ def cInstExCInstance : FormulaN cInstExLang :=
 -- Example 7.6.4 (companion def): cInstExDerivation
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 7.6.4 (companion def): The derivation tree witnessing that cInstExCInstance is a c-instance of cInstExSkolemForm. Constructed using: - connective true (outer conjunction) - forallInst 0 _ [a] [outer disjunction c-instance] - connective false (disjunction: P(a) or ...) - atom P(a) - forallInst 1 _ [a, b] [atom Q(a,f(a)), atom Q(b,f(a))] - connective true (inner conjunction) - negAtom P(a) - connective false (inner disjunction) - negAtom Q(a, f(a)) - negAtom Q(b, f(a)) -/
 def cInstExDerivation : CInstance cInstExLang :=
   let fa := Term.func CInstExFunc.f
@@ -211,7 +210,6 @@ def cInstExDerivation : CInstance cInstExLang :=
   -- Outer conjunction
   CInstance.connective true outerForall innerConj outerForallInst rightConj
 
--- ATTACH-BLOCKER: scoped helper requires manual relocation
 set_option backward.isDefEq.respectTransparency false in
 /-- Example 7.6.4: the witness produces exactly the displayed c-instance,
 with the ordered pair Q(a,f(a)), Q(b,f(a)) as its inner conjunction. -/
@@ -219,7 +217,6 @@ theorem cInstExDerivation_toFormula :
     cInstExDerivation.toFormula = cInstExCInstance := by
   simp! [cInstExDerivation, CInstance.toFormula, cInstExCInstance]
 
--- ATTACH-BLOCKER: scoped helper requires manual relocation
 set_option backward.isDefEq.respectTransparency false in
 /-- Example 7.6.4: every stored connective operand matches its child source,
 and every universal child has the complete prescribed substitution source. -/

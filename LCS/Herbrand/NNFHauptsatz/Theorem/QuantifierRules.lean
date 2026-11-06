@@ -62,7 +62,6 @@ def G2nnfSequentSide.context {L : Language}
   | .left => Gamma
   | .right => Delta
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The weakening rule which adds a formula on the selected sequent side. -/
 def G2nnfSequentSide.weakeningRule {L : Language}
     (side : G2nnfSequentSide) (A : FormulaN L)
@@ -138,7 +137,6 @@ def occurrence {L : Language} {rule : G2nnfRuleCore L}
   | .exSubLeft _ occurrence _ _ _ _ _ _ => occurrence
   | .exSubRight _ occurrence _ _ _ _ _ _ => occurrence
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The substitution result inserted at the exact selected occurrence. -/
 @[blueprint "chap7__lemma_7_4_2"]
 def replacement {L : Language} {rule : G2nnfRuleCore L}
@@ -149,7 +147,6 @@ def replacement {L : Language} {rule : G2nnfRuleCore L}
   | .exSubLeft _ _ x B y _ _ _ => formulaSubstN B (.var y) x
   | .exSubRight _ _ x B t _ _ _ => formulaSubstN B t x
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The principal formula in the premise of the viewed quantifier rule. -/
 @[blueprint "chap7__lemma_7_4_2"]
 def premisePrincipal {L : Language}

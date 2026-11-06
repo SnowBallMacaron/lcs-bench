@@ -157,7 +157,6 @@ theorem openExample_properSubformula_7_1_1 :
 -- Example 7.3.1 (companion type): ExViolationPred
 -- ===================================================================
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Example 7.3.1 (companion type): Predicate symbols for the eigenvariable violation example. P is a unary predicate, Q is a unary predicate (standing in for the propositional symbol Q in the textbook, since FormulaN lacks zero-arity pred0 constructors), and R is a unary predicate. These are used to construct the proof tree Gamma -> P(y), Q(z0) by forall-right yielding Gamma -> forall x P(x), Q(z0), combined with and-right to produce Gamma -> forall x P(x), Q(z0) /\ R(y), which demonstrates the eigenvariable condition violation when one attempts to permute and-right above forall-right. -/
 inductive ExViolationPred : Type where
   /-- Unary predicate P -/
@@ -1091,8 +1090,7 @@ theorem pureVariableConversion_GEq {L : Language} (hL : L.hasEquality = true)
 -- Lemma 7.3.2: atomicAxiomReduction_LK
 -- ===================================================================
 
--- ATTACH-BLOCKER: private declaration
-private theorem isFreeForN_var_self_local {L : Language}
+theorem isFreeForN_var_self_local {L : Language}
     (A : FormulaN L) (x : Nat) :
     isFreeForN (.var x) x A := by
   induction A with

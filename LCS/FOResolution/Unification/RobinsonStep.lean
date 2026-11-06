@@ -43,7 +43,6 @@ def TermHeadsCompatible {L : Language} : Term L → Term L → Prop
   | .func f _, .func g _ => f = g
   | _, _ => False
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- The four successful transformations performed by one Robinson step. -/
 inductive RobinsonStepKind : Type where
   | delete
@@ -51,13 +50,11 @@ inductive RobinsonStepKind : Type where
   | eliminate
   | decompose
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Visible failure reasons for one Robinson step. -/
 inductive RobinsonFailure : Type where
   | occursCheck
   | symbolClash
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Result of one deterministic Robinson transformation. A successful
     transformation records its elementary substitution and the next equation
     system; it does not claim that repeated stepping terminates. -/
@@ -591,10 +588,9 @@ theorem isPairwiseUnifier_eliminate_iff {L : Language}
       exact (isPairwiseUnifier_substEquationSystem_iff
         pairs (elementarySubst x t) theta).mp hNext
 
--- ATTACH-BLOCKER: private declaration
 /-- Factoring through the identity substitution does not change a
     substitution property. -/
-private theorem exists_factor_identity_iff {L : Language}
+theorem exists_factor_identity_iff {L : Language}
     (P : (Nat → Term L) → Prop) (sigma : Nat → Term L) :
     (∃ theta : Nat → Term L,
         P theta ∧
@@ -611,8 +607,7 @@ private theorem exists_factor_identity_iff {L : Language}
   · intro hSigma
     exact ⟨sigma, hSigma, fun _ => rfl⟩
 
--- ATTACH-BLOCKER: private declaration
-private def RobinsonStepSound {L : Language}
+def RobinsonStepSound {L : Language}
     (equations : List (Term L × Term L)) :
     RobinsonStepResult L → Prop
   | .solved => equations = []
@@ -627,8 +622,7 @@ private def RobinsonStepSound {L : Language}
   | .failure _ =>
       ¬ ∃ sigma : Nat → Term L, IsPairwiseUnifier sigma equations
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonDelete_sound {L : Language}
+theorem robinsonDelete_sound {L : Language}
     (t : Term L) (rest : List (Term L × Term L)) :
     RobinsonStepSound ((t, t) :: rest)
       (.next .delete identitySubst rest) := by
@@ -642,8 +636,7 @@ private theorem robinsonDelete_sound {L : Language}
   · intro x hx
     exact (termPairSetVars_cons_iff (t, t) rest x).mpr (Or.inr hx)
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonOrient_sound {L : Language}
+theorem robinsonOrient_sound {L : Language}
     (x : Nat) (t : Term L) (rest : List (Term L × Term L)) :
     RobinsonStepSound ((t, Term.var x) :: rest)
       (.next .orient identitySubst ((Term.var x, t) :: rest)) := by
@@ -661,8 +654,7 @@ private theorem robinsonOrient_sound {L : Language}
     · exact Or.inl (hHead.elim Or.inr Or.inl)
     · exact Or.inr hRest
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonEliminate_sound {L : Language}
+theorem robinsonEliminate_sound {L : Language}
     (x : Nat) (t : Term L) (rest : List (Term L × Term L))
     (hNot : ¬ termFV t x) :
     RobinsonStepSound ((Term.var x, t) :: rest)
@@ -678,8 +670,7 @@ private theorem robinsonEliminate_sound {L : Language}
     exact ⟨(Term.var x, t), List.mem_cons_self, Or.inl rfl⟩
   · exact elementarySubst_system_vars_subset x t rest
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonDecompose_sound {L : Language}
+theorem robinsonDecompose_sound {L : Language}
     {f g : L.funSymbols} (hfg : f = g)
     (ss : Fin (L.funArity f) → Term L)
     (ts : Fin (L.funArity g) → Term L)
@@ -705,8 +696,7 @@ private theorem robinsonDecompose_sound {L : Language}
           hfg ss ts x).mp hHead)
     · exact Or.inr hRest
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonOccursFailure_sound {L : Language}
+theorem robinsonOccursFailure_sound {L : Language}
     (x : Nat) (t : Term L) (rest : List (Term L × Term L))
     (hNe : t ≠ Term.var x) (hOccurs : termOccurs x t = true) :
     RobinsonStepSound ((Term.var x, t) :: rest)
@@ -716,15 +706,13 @@ private theorem robinsonOccursFailure_sound {L : Language}
   exact var_occurs_not_unifiable x t hNe hOccurs
     ⟨sigma, hUnifier (Term.var x, t) List.mem_cons_self⟩
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonClashFailure_sound {L : Language}
+theorem robinsonClashFailure_sound {L : Language}
     (s t : Term L) (rest : List (Term L × Term L))
     (hIncompatible : ¬ TermHeadsCompatible s t) :
     RobinsonStepSound ((s, t) :: rest) (.failure .symbolClash) :=
   incompatible_head_not_pairwise_unifiable s t rest hIncompatible
 
--- ATTACH-BLOCKER: private declaration
-private theorem robinsonStep_sound {L : Language}
+theorem robinsonStep_sound {L : Language}
     (equations : List (Term L × Term L)) :
     RobinsonStepSound equations (robinsonStep equations) := by
 -- BEGIN PROOF
@@ -782,7 +770,6 @@ private theorem robinsonStep_sound {L : Language}
                     robinsonClashFailure_sound
                       (Term.func f args) (Term.func g args') rest hfg
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every successful Robinson step preserves all solutions, with the old
     solution factoring through the substitution recorded by the step. -/
 theorem robinsonStep_next_solutions {L : Language}
@@ -800,7 +787,6 @@ theorem robinsonStep_next_solutions {L : Language}
   rw [hStep] at hSound
   exact hSound.1 sigma
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The substitution recorded by a successful step only changes variables
     already present in the current equation system. -/
 theorem robinsonStep_next_delta_support {L : Language}
@@ -815,7 +801,6 @@ theorem robinsonStep_next_delta_support {L : Language}
   rw [hStep] at hSound
   exact hSound.2.1
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A successful Robinson step cannot introduce an equation variable that was
     absent from the current system. -/
 theorem robinsonStep_next_vars_subset {L : Language}
@@ -830,7 +815,6 @@ theorem robinsonStep_next_vars_subset {L : Language}
   rw [hStep] at hSound
   exact hSound.2.2
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- An MGU of the next equation system composes with the substitution recorded
     by a successful Robinson step to give an MGU of the current system. This
     simultaneously propagates unification, support, and universal
@@ -870,7 +854,6 @@ theorem robinsonStep_next_isPairwiseMGU {L : Language}
       _ = SubstitutionCore.substCompose eta (SubstitutionCore.substCompose theta delta) x :=
         congrFun (SubstitutionCore.substCompose_assoc eta theta delta).symm x
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every failure reported by a Robinson step is genuine: the current equation
     system has no pairwise unifier. -/
 theorem robinsonStep_failure_not_unifiable {L : Language}
@@ -884,7 +867,6 @@ theorem robinsonStep_failure_not_unifiable {L : Language}
   rw [hStep] at hSound
   exact hSound
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A one-step result is solved exactly for the empty equation system. -/
 theorem robinsonStep_solved_iff {L : Language}
     (equations : List (Term L × Term L)) :

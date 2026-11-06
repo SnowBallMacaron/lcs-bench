@@ -34,6 +34,12 @@ end IsNNF
 
 end G1nnfFinsetSequent
 
+helper /-- Definition 6.4.2 (helper): Convert a list of formulae to a set.
+Used to bridge between the list-based proof tree representation
+and the set-based sequent type from Definition 6.4.2. -/
+def CutElim.Hauptsatz.listAsSet {L : Language} (l : List (FormulaN L)) : Set (FormulaN L) :=
+  fun x => x ∈ l
+
 proof_of nnfEx_subNnf1_spec := open LCS.CutElim.Hauptsatz.Proofs.CutElim.Hauptsatz in
   rfl
 

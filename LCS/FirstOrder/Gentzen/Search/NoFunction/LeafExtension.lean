@@ -46,7 +46,6 @@ theorem list_split_mem {α : Type} (l : List α) (a : α) (h : a ∈ l) :
         obtain ⟨pre, post, heq⟩ := ih h'
         exact ⟨x :: pre, post, by simp [heq]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): Classical extraction of the
     split witness from `list_split_mem`. Uses `Classical.choose` — pure
     existential extraction, not a search-procedure oracle. Returned as a
@@ -114,7 +113,6 @@ def LeafBVSubsetSeq {L : Language} (leaf seq : Sequent L) : Prop :=
     ∀ y ∈ formulaBVN F,
       ∃ G ∈ seq.antecedent ++ seq.succedent, y ∈ formulaBVN G
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.4.9 (companion, tree-level invariant): Reflexivity —
     a sequent trivially has its own BVs as a subset of its own BVs. -/
 theorem LeafBVSubsetSeq.refl {L : Language} (seq : Sequent L) :
@@ -123,7 +121,6 @@ theorem LeafBVSubsetSeq.refl {L : Language} (seq : Sequent L) :
   intro F hF y hy
   exact ⟨F, hF, hy⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion, discharge): If `LeafBVSubsetSeq leaf seq`
     and `i ∉ BV(G)` for every `G ∈ seq`, then `i ∉ BV(F)` for every
     `F ∈ leaf`. This is how the leaf-level free-for discharge descends

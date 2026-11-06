@@ -17,7 +17,6 @@ open LCS.Resolution.GCNF
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.Unfold (unfoldAt_leaf)
 theorem node_get (g : FiniteGraph) (i : Nat) (hi : i < g.table.length) :
     g.node i = some g.table[i] := by simp [node, hi]
 
@@ -49,7 +48,6 @@ def unfold (g : FiniteGraph) (hg : g.WellFormed) : ResolutionTree :=
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth, LCS.Resolution.Method.UnfoldBounds
 theorem unfoldAt_leaf (g : FiniteGraph) (ht : g.Topological)
     (i : Nat) (hi : i < g.table.length) (n : Node)
     (hn : g.node i = some n) (hr : n.inference = none) :
@@ -63,7 +61,6 @@ theorem unfoldAt_leaf (g : FiniteGraph) (ht : g.Topological)
     have : (none : Option Inference) = some r := hr'.symm.trans h
     contradiction
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.ReverseGrowth, LCS.Resolution.Method.UnfoldBounds
 theorem unfoldAt_step (g : FiniteGraph) (ht : g.Topological)
     (i : Nat) (hi : i < g.table.length) (n : Node)
     (hn : g.node i = some n) (r : Inference) (hr : n.inference = some r) :
@@ -95,7 +92,6 @@ theorem unfold_rootLabel (g : FiniteGraph) (hg : g.WellFormed) :
 
 
 
--- ATTACH-BLOCKER: used by LCS.Resolution.Method.Unfold (unfold_leavesFrom)
 /-- The leaf condition of the unfolded tree is exactly the path-based leaf
 condition of its source vertex. Repeated visits to a shared leaf do not change
 which input clauses are permitted. -/
@@ -159,7 +155,6 @@ theorem unfoldAt_leavesFrom (g : FiniteGraph) (ht : g.Topological)
           apply h (1 :: a) j m _ hm hmleaf
           simpa [followFrom, next, hn, hr] using hpath
 
--- ATTACH-BLOCKER: used by LCS.FOResolution.GroundResolution
 /-- Unfolding preserves exactly the allowable input clauses. -/
 theorem unfold_leavesFrom (g : FiniteGraph) (hg : g.WellFormed)
     (S : ClauseSequent) : (g.unfold hg).leavesFrom S ↔ g.LeavesFrom S := by

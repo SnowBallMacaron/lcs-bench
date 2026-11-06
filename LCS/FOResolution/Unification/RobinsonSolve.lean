@@ -13,10 +13,9 @@ open LCS.FirstOrder.Basic
 open LCS.FirstOrder.Syntax.FreeGeneration
 open LCS.FirstOrder.SyntaxN.Variables
 
--- ATTACH-BLOCKER: private declaration
 /-- Membership in the variable-index accumulator used by
     `termVarIndicesList`. -/
-private theorem mem_foldl_append_termVarIndices {L : Language} (x : Nat)
+theorem mem_foldl_append_termVarIndices {L : Language} (x : Nat)
     {β : Type} (f : β → Term L) :
     ∀ (indices : List β) (acc : List Nat),
       x ∈ indices.foldl
@@ -43,7 +42,6 @@ private theorem mem_foldl_append_termVarIndices {L : Language} (x : Nat)
         · exact Or.inl (Or.inr hx)
         · exact Or.inr ⟨j, hj, hx⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The computable variable-index list of a term enumerates exactly its free
     variables. -/
 theorem mem_termVarIndicesList_iff {L : Language}
@@ -70,7 +68,6 @@ theorem mem_termVarIndicesList_iff {L : Language}
         exact Or.inr
           ⟨i, List.mem_ofFn.mpr ⟨i, rfl⟩, (ih i).mpr hi⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Variable indices occurring in a finite equation system, before duplicate
     removal. -/
 def equationVarIndicesList {L : Language} :
@@ -80,20 +77,17 @@ def equationVarIndicesList {L : Language} :
       (termVarIndicesList s ++ termVarIndicesList t) ++
         equationVarIndicesList rest
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The duplicate-free list of variables occurring in a finite equation
     system. -/
 def equationVariables {L : Language}
     (equations : List (Term L × Term L)) : List Nat :=
   (equationVarIndicesList equations).eraseDups
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The number of distinct variables occurring in an equation system. -/
 def equationVariableCount {L : Language}
     (equations : List (Term L × Term L)) : Nat :=
   (equationVariables equations).length
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Total structural term complexity on both sides of an equation system. -/
 def equationComplexity {L : Language} :
     List (Term L × Term L) → Nat
@@ -101,7 +95,6 @@ def equationComplexity {L : Language} :
   | (s, t) :: rest =>
       termSize s + termSize t + equationComplexity rest
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The final component of the Robinson measure. It is one exactly when the
     head equation has a non-variable on the left and a variable on the right,
     so an orientation step changes it to zero. -/
@@ -111,7 +104,6 @@ def robinsonOrientationPenalty {L : Language} :
   | (Term.func _ _, Term.var _) :: _ => 1
   | _ => 0
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lexicographic termination measure for Robinson simplification:
     distinct variables, then total term complexity, then orientation. -/
 def robinsonMeasure {L : Language}
@@ -119,7 +111,6 @@ def robinsonMeasure {L : Language}
   (equationVariableCount equations, equationComplexity equations,
     robinsonOrientationPenalty equations)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The explicit lexicographic decrease relation induced by
     `robinsonMeasure`. -/
 def RobinsonMeasureDecreases {L : Language}
@@ -127,8 +118,7 @@ def RobinsonMeasureDecreases {L : Language}
   Prod.Lex Nat.lt (Prod.Lex Nat.lt Nat.lt)
     (robinsonMeasure next) (robinsonMeasure current)
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationVarIndicesList_mem_iff {L : Language}
+theorem equationVarIndicesList_mem_iff {L : Language}
     (equations : List (Term L × Term L)) (x : Nat) :
     x ∈ equationVarIndicesList equations ↔
       termPairSetVars equations x := by
@@ -141,8 +131,7 @@ private theorem equationVarIndicesList_mem_iff {L : Language}
       simp only [equationVarIndicesList, List.mem_append,
         mem_termVarIndicesList_iff, ih, termPairSetVars_cons_iff]
 
--- ATTACH-BLOCKER: private declaration
-private theorem eraseDups_nodup_nat (l : List Nat) :
+theorem eraseDups_nodup_nat (l : List Nat) :
     l.eraseDups.Nodup := by
 -- BEGIN PROOF
   suffices h : ∀ (n : Nat) (l : List Nat),
@@ -172,13 +161,11 @@ private theorem eraseDups_nodup_nat (l : List Nat) :
                 simp only [List.length_cons] at hLen
                 omega)
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationVariables_nodup {L : Language}
+theorem equationVariables_nodup {L : Language}
     (equations : List (Term L × Term L)) :
     (equationVariables equations).Nodup :=
   eraseDups_nodup_nat _
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The finite variable list represents exactly `termPairSetVars`. -/
 theorem equationVariables_mem_iff {L : Language}
     (equations : List (Term L × Term L)) (x : Nat) :
@@ -188,8 +175,7 @@ theorem equationVariables_mem_iff {L : Language}
   rw [equationVariables, List.mem_eraseDups,
     equationVarIndicesList_mem_iff]
 
--- ATTACH-BLOCKER: private declaration
-private theorem nodup_length_le_of_subset
+theorem nodup_length_le_of_subset
     {xs ys : List Nat} (hNodup : xs.Nodup)
     (hSubset : ∀ x, x ∈ xs → x ∈ ys) :
     xs.length ≤ ys.length := by
@@ -212,8 +198,7 @@ private theorem nodup_length_le_of_subset
       simp only [List.length_cons] at hLength ⊢
       omega
 
--- ATTACH-BLOCKER: private declaration
-private theorem nodup_length_lt_of_subset_of_missing
+theorem nodup_length_lt_of_subset_of_missing
     {xs ys : List Nat} (hNodup : xs.Nodup)
     (hSubset : ∀ x, x ∈ xs → x ∈ ys)
     (missing : Nat) (hMissingMem : missing ∈ ys)
@@ -232,7 +217,6 @@ private theorem nodup_length_lt_of_subset_of_missing
   simp only [List.length_cons] at hLength
   omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Inclusion of equation-variable sets gives monotonicity of their finite
     distinct-variable counts. -/
 theorem equationVariableCount_le_of_subset {L : Language}
@@ -245,7 +229,6 @@ theorem equationVariableCount_le_of_subset {L : Language}
   apply (equationVariables_mem_iff current x).mpr
   exact hSubset x ((equationVariables_mem_iff next x).mp hx)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A missing variable makes inclusion of finite equation-variable sets
     strictly decrease their distinct-variable counts. -/
 theorem equationVariableCount_lt_of_missing {L : Language}
@@ -262,8 +245,7 @@ theorem equationVariableCount_lt_of_missing {L : Language}
     ((equationVariables_mem_iff current x).mpr hCurrent)
     (fun hx => hNext ((equationVariables_mem_iff next x).mp hx))
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationVariableCount_eq_of_iff {L : Language}
+theorem equationVariableCount_eq_of_iff {L : Language}
     (left right : List (Term L × Term L))
     (hVars :
       ∀ x, termPairSetVars left x ↔ termPairSetVars right x) :
@@ -277,14 +259,12 @@ private theorem equationVariableCount_eq_of_iff {L : Language}
     intro x hx
     exact (hVars x).mpr hx
 
--- ATTACH-BLOCKER: private declaration
-private theorem termSize_pos {L : Language} (t : Term L) :
+theorem termSize_pos {L : Language} (t : Term L) :
     0 < termSize t := by
 -- BEGIN PROOF
   cases t <;> simp only [termSize] <;> omega
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationComplexity_append {L : Language}
+theorem equationComplexity_append {L : Language}
     (left right : List (Term L × Term L)) :
     equationComplexity (left ++ right) =
       equationComplexity left + equationComplexity right := by
@@ -297,8 +277,7 @@ private theorem equationComplexity_append {L : Language}
       simp only [List.cons_append, equationComplexity, ih]
       omega
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationComplexity_ofFn {L : Language} {n : Nat}
+theorem equationComplexity_ofFn {L : Language} {n : Nat}
     (ss ts : Fin n → Term L) :
     equationComplexity (List.ofFn fun i => (ss i, ts i)) =
       (List.ofFn fun i => termSize (ss i)).sum +
@@ -312,8 +291,7 @@ private theorem equationComplexity_ofFn {L : Language} {n : Nat}
         ih (fun i => ss i.succ) (fun i => ts i.succ)]
       omega
 
--- ATTACH-BLOCKER: private declaration
-private theorem equationComplexity_functionEquationPairs_add_two
+theorem equationComplexity_functionEquationPairs_add_two
     {L : Language} {f g : L.funSymbols} (hfg : f = g)
     (ss : Fin (L.funArity f) → Term L)
     (ts : Fin (L.funArity g) → Term L) :
@@ -325,7 +303,6 @@ private theorem equationComplexity_functionEquationPairs_add_two
   rw [← List.sum_eq_foldl, ← List.sum_eq_foldl]
   omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Deleting a reflexive equation decreases the Robinson measure. -/
 theorem robinsonDelete_measure_decreases {L : Language}
     (t : Term L) (rest : List (Term L × Term L)) :
@@ -351,7 +328,6 @@ theorem robinsonDelete_measure_decreases {L : Language}
     exact Prod.Lex.right _
       (Prod.Lex.left _ _ hComplexity)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Orienting a non-variable/variable equation decreases the final component
     of the Robinson measure. -/
 theorem robinsonOrient_measure_decreases {L : Language}
@@ -394,7 +370,6 @@ theorem robinsonOrient_measure_decreases {L : Language}
   | func f args =>
       simp [robinsonOrientationPenalty]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Eliminating a variable that does not occur in its right-hand term
     strictly decreases the distinct-variable component. -/
 theorem robinsonEliminate_measure_decreases {L : Language}
@@ -413,7 +388,6 @@ theorem robinsonEliminate_measure_decreases {L : Language}
       (Or.inl (Or.inl rfl))
   · exact elementarySubst_removed_var x t rest hNot
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Decomposing equal function heads decreases total term complexity by two
     while preserving the equation-variable set. -/
 theorem robinsonDecompose_measure_decreases {L : Language}
@@ -449,7 +423,6 @@ theorem robinsonDecompose_measure_decreases {L : Language}
   exact Prod.Lex.right _
     (Prod.Lex.left _ _ hComplexity)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every successful deterministic Robinson step strictly decreases the
     lexicographic termination measure. -/
 theorem robinsonStep_next_measure_decreases {L : Language}
@@ -511,14 +484,12 @@ theorem robinsonStep_next_measure_decreases {L : Language}
                     hfg args args' rest
                 · simp [robinsonStep, hEq, hfg] at hStep
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Result of the terminating Robinson solver. Success returns the composed
     substitution; failure retains the first genuine failure reason. -/
 inductive RobinsonSolveResult (L : Language) : Type where
   | solved (substitution : Nat → Term L)
   | failure (reason : RobinsonFailure)
 
--- ATTACH-BLOCKER: termination suffix
 /-- Fuel-free Robinson equation simplification. Recursive calls are justified
     by the proved lexicographic decrease of every successful one-step
     transformation. -/
@@ -540,7 +511,6 @@ decreasing_by
   exact robinsonStep_next_measure_decreases
     equations nextEquations _kind delta _hStep
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Operational equation for a solver call whose first step is solved. -/
 theorem robinsonSolve_of_step_solved {L : Language}
     (equations : List (Term L × Term L))
@@ -549,7 +519,6 @@ theorem robinsonSolve_of_step_solved {L : Language}
 -- BEGIN PROOF
   rw [robinsonSolve.eq_def, hStep]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Operational equation for a solver call whose first step fails. -/
 theorem robinsonSolve_of_step_failure {L : Language}
     (equations : List (Term L × Term L))
@@ -560,7 +529,6 @@ theorem robinsonSolve_of_step_failure {L : Language}
 -- BEGIN PROOF
   rw [robinsonSolve.eq_def, hStep]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Operational equation for a solver call whose first step succeeds. -/
 theorem robinsonSolve_of_step_next {L : Language}
     (equations nextEquations : List (Term L × Term L))
@@ -577,7 +545,6 @@ theorem robinsonSolve_of_step_next {L : Language}
 -- BEGIN PROOF
   rw [robinsonSolve.eq_def, hStep]
 
--- ATTACH-BLOCKER: termination suffix
 /-- The terminating solver's complete semantic invariant: a returned
     substitution unifies the original system, while a returned failure means
     that no substitution unifies it. -/
@@ -670,7 +637,6 @@ theorem robinsonSolve_complete {L : Language}
       exact (robinsonSolve_failure_not_unifiable
         equations reason hSolve ⟨sigma, hUnif⟩).elim
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The empty equation system has the identity substitution as an MGU. This
     is the base case required by a later terminating Robinson iteration. -/
 theorem identitySubst_isPairwiseMGU_nil {L : Language} :
@@ -685,7 +651,6 @@ theorem identitySubst_isPairwiseMGU_nil {L : Language} :
     exact ⟨sigma,
       congrFun (SubstitutionCore.substCompose_identity_right sigma).symm⟩
 
--- ATTACH-BLOCKER: termination suffix
 /-- Every successful call to the terminating Robinson solver returns an MGU
     of its original equation system. In particular, the returned substitution
     solves the system, changes only variables occurring in that system, and

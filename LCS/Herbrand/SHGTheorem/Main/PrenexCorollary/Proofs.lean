@@ -60,7 +60,7 @@ proof_of shgCorollary_prenex := by
     obtain ⟨g, _, rfl⟩ := List.mem_map.mp hf
     exact universalPrenex_eval_groundSubstitution
       (SK spec) hSKUniversal hSKClosed M s hSKEval
-      g.substitution g.termsClosed /- ATTACH-BLOCKER: private name in relocated declaration -/
+      g.substitution g.termsClosed
 
 end LCS.Herbrand.SHGTheorem.Main
 end

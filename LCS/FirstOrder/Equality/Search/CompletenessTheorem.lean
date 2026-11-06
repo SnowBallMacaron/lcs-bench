@@ -130,7 +130,6 @@ theorem searchCompletenessEqFalsifiable {L : FirstOrderLanguage}
         (∀ A, q.memAntecedent A → LCS.FirstOrder.SemanticsN.formulaEvalN M A s) ∧
         (∀ B, q.memSuccedent B → ¬ LCS.FirstOrder.SemanticsN.formulaEvalN M B s) 
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Definition 5.6.3, descendant remark: Reflexive closure of repeated signed
 component descent. Quantified components use terms free for the bound variable. -/
 inductive SignedDescendant {L : Language} : SignedFormula L → SignedFormula L → Prop where

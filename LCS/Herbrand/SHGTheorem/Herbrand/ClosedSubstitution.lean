@@ -21,44 +21,37 @@ open LCS.Herbrand.PrenexForm
 open LCS.FirstOrder.SemanticsN
 open LCS.FirstOrder.Semantics.Subformulae
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- A term paired with evidence that it has no free variables. -/
 abbrev ClosedTerm (L : Language) :=
   {t : Term L // Term.isClosed t}
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A partial map from proof eigenvariables to already-closed terms.
 The chronological lower-path fold extends this map only after the
 corresponding exact existential-left occurrence is crossed. -/
 structure ClosedEigenvarMap (L : Language) where
   lookup : Nat → Option (ClosedTerm L)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def ClosedEigenvarMap.empty {L : Language} :
     ClosedEigenvarMap L :=
   ⟨fun _ => none⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def ClosedEigenvarMap.insert {L : Language}
     (eigenMap : ClosedEigenvarMap L) (x : Nat)
     (t : ClosedTerm L) : ClosedEigenvarMap L :=
   ⟨fun y => if y = x then some t else eigenMap.lookup y⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem ClosedEigenvarMap.lookup_insert_self
     {L : Language} (eigenMap : ClosedEigenvarMap L)
     (x : Nat) (t : ClosedTerm L) :
     (eigenMap.insert x t).lookup x = some t := by
   simp [ClosedEigenvarMap.insert]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem ClosedEigenvarMap.lookup_insert_of_ne
     {L : Language} (eigenMap : ClosedEigenvarMap L)
     (x y : Nat) (t : ClosedTerm L) (hyx : y ≠ x) :
     (eigenMap.insert x t).lookup y = eigenMap.lookup y := by
   simp [ClosedEigenvarMap.insert, hyx]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Close every unprotected variable using the current eigenvariable
 map, with the supplied seed as the explicit fallback.  Variables in
 `bound` are binder-protected and remain variables. -/

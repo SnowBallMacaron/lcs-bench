@@ -40,7 +40,7 @@ theorem g1nnf_substitution_of_treeSubstOk {L : Language} {hL : L.withoutEquality
     exact hDisjoint.1
   · intro v hv
     rw [T.substTerm_eigenvariables_eq y t hOk v]
-    exact hDisjoint.2 v hv /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    exact hDisjoint.2 v hv
 
 /-- Lemma 6.4.4 (Substitution lemma): if `y` is not bound in T and
 `t` is free for `y` in its root sequent, there is a proof of the substituted

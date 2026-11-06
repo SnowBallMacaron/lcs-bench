@@ -207,12 +207,10 @@ open Classical
 
 
 -- Helper: classically filter a list by a predicate
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 noncomputable def classicalFilter (p : α → Prop) : List α → List α
   | [] => []
   | a :: as => if p a then a :: classicalFilter p as else classicalFilter p as
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem mem_classicalFilter (p : α → Prop) (L : List α) (a : α) :
     a ∈ classicalFilter p L ↔ a ∈ L ∧ p a := by
 -- BEGIN PROOF
@@ -243,7 +241,6 @@ theorem mem_classicalFilter (p : α → Prop) (L : List α) (a : α) :
         · exact ih.mpr ⟨h1, h2⟩
 
 -- Helper: classically filterMap a list
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 noncomputable def classicalFilterMap (f : α → Option β) : List α → List β
   | [] => []
   | a :: as =>
@@ -251,7 +248,6 @@ noncomputable def classicalFilterMap (f : α → Option β) : List α → List �
     | some b => b :: classicalFilterMap f as
     | none => classicalFilterMap f as
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem mem_classicalFilterMap (f : α → Option β) (L : List α) (b : β) :
     b ∈ classicalFilterMap f L ↔ ∃ a ∈ L, f a = some b := by
 -- BEGIN PROOF

@@ -410,6 +410,11 @@ proof_of resolution_completeness := open LCS.Resolution.Method.Completeness.Conv
 
 open LCS.Resolution.GCNF
 
+helper theorem Completeness.transportGCNF_leafCount {S T : ClauseSequent} (h : S = T)
+    (t : GCNFProofTree S) : (h ▸ t : GCNFProofTree T).leafCount = t.leafCount := by
+  cases h
+  rfl
+
 end LCS.Resolution.Method.Completeness
 section
 namespace LCS.Resolution.Method.Completeness
@@ -453,6 +458,16 @@ helper @[simp] theorem Completeness.leavesIn_complementaryGraph (L : Literal) (�
       (decide (Clause.single L ∈ Γ) && decide (Clause.single L.conjugate ∈ Γ)) := by
   change (decide (Clause.single L ∈ Γ) && (decide (Clause.single L.conjugate ∈ Γ) && true)) = _
   simp
+
+helper theorem Completeness.coalesceInputLeaves_compute (g : FiniteGraph) :
+    g.coalesceInputLeaves =
+      ⟨g.table.map (fun n => { n with inference := n.inference.map fun r =>
+        { r with left := g.canonicalInput r.left, right := g.canonicalInput r.right } }),
+        g.canonicalInput g.root⟩ := rfl
+
+helper theorem Completeness.empty_clauseList : GCNF.Clause.empty = Clause.ofList [] := rfl
+
+helper theorem Completeness.methodEmpty_clauseList : Clause.empty = Clause.ofList [] := rfl
 
 helper theorem Completeness.clauseList_eq_iff (xs ys : List Literal) :
     Clause.ofList xs = Clause.ofList ys ↔

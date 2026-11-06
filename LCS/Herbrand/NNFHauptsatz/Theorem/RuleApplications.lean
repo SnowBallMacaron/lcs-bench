@@ -129,7 +129,6 @@ inductive G2nnfOnePremiseFrontier {L : Language} {hL : L.withoutEquality}
 
 namespace G2nnfOnePremiseFrontier
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact one-step path from an application to the premise frontier exposed
 by its witness. -/
 def path {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
@@ -264,7 +263,6 @@ inductive G2nnfOtherPremiseFrontier {L : Language} {hL : L.withoutEquality}
 
 namespace G2nnfOtherPremiseFrontier
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact ambient path to the non-selected binary frontier.  The constructor
 choice is complementary to the selected premise and remains
 occurrence-sensitive even when both subtree values are equal. -/
@@ -287,7 +285,6 @@ def path {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
       applicationPath.trans
         (.leftPremise R₂ hAdmit hPrem hSC sub1 sub2 (.root sub1))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Exact node occurrence of the non-selected binary frontier. -/
 def occurrence {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
     {GammaRoot DeltaRoot GammaSelected DeltaSelected Gamma Delta :

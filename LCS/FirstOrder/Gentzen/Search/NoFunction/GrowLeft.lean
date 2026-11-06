@@ -130,7 +130,6 @@ noncomputable def growLeftOneProp {L : Language} {supply : TermStream L}
   | .all _ _ => (SearchTree.leaf leaf records, st)
   | .ex _ _ => (SearchTree.leaf leaf records, st)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.4.9 (companion, discharge — leaf-level): Every term
     `u ∈ tTERM0 st` is free for substitution for `y` in a formula `A`
     that occurs as the body of a `∀z A` at some leaf formula,

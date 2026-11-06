@@ -30,11 +30,9 @@ open LCS.FOResolution.Method.Completeness
 -- Hash-language infrastructure for the §9.4 semantic reduction
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The sole fresh hash symbol has rank zero and is represented as a constant. -/
 def hashSkolemRank (_ : Fin 1) : Nat := 0
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- The language obtained by adding one fresh nullary hash symbol to `L`.
     This is the existing §7.6 Skolem-language extension specialized to
     one rank-zero symbol, not a second language-extension mechanism. -/
@@ -42,7 +40,6 @@ def hashSkolemRank (_ : Fin 1) : Nat := 0
 abbrev HashLanguage (L : Language) : Language :=
   LCS.Herbrand.SHGTheorem.SkolemLanguage (L := L) 1 hashSkolemRank
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- Exact embedding of base-language terms into the hash language. -/
 abbrev hashLiftTerm {L : Language} : Term L → Term (HashLanguage L) :=
   LCS.Herbrand.SHGTheorem.liftTermSkolem

@@ -24,7 +24,6 @@ terms S. The set of variables is the union of termFV(t) for all t in S. -/
 def termSetVars {L : Language} (ts : List (Term L)) : Set Nat :=
   fun x => ∃ t, t ∈ ts ∧ termFV t x
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A general variable map sigma unifies a possibly empty finite term set S
     iff sigma-hat(t_1) = ... = sigma-hat(t_n) for all t_i in S. -/
 @[blueprint "chap8__definition_8_4_2"]

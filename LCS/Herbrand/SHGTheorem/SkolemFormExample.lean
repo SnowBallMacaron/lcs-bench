@@ -10,7 +10,6 @@ section
 namespace LCS.Herbrand.SHGTheorem
 open LCS.FirstOrder.Basic LCS.FirstOrder.SyntaxN LCS.FirstOrder.SyntaxN.Substitution
 section SkExComputation
--- ATTACH-BLOCKER: global set_option
 set_option backward.isDefEq.respectTransparency false
 
 /-- Example 7.6.3: the fixed original-root environment for all four

@@ -38,10 +38,9 @@ def AllRectified {L : Language}
 
 namespace AllRectified
 
--- ATTACH-BLOCKER: private declaration
 /-- The local set identity needed by the structural quantifier-free
 rectification proof. -/
-private theorem empty_union_empty :
+theorem empty_union_empty :
     (∅ : Set Nat) ∪ ∅ = ∅ := by
   funext x
   apply propext
@@ -49,7 +48,6 @@ private theorem empty_union_empty :
   · rintro (hx | hx) <;> exact hx
   · exact False.elim
 
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Quantifier-free normalized formulae are rectified because they contain no
 bound-variable occurrences. -/
 theorem formulaBVN_eq_empty_of_isQuantifierFree {L : Language}
@@ -128,7 +126,6 @@ theorem isRectified_of_isAtomic {L : Language}
   isRectified_of_isQuantifierFree A
     (isQuantifierFree_of_isAtomic A hAtomic)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem empty {L : Language} :
     AllRectified
       ((LCS.Finset.empty, LCS.Finset.empty) :
@@ -178,7 +175,6 @@ theorem of_insert_right {L : Language} [DecidableEq (FormulaN L)]
   ⟨hSeq.1,
    fun F hF => hSeq.2 F (LCS.Finset.mem_insert.mpr (Or.inr hF))⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Rectification is preserved when independently rectified sequent
 contexts are combined. -/
 theorem union {L : Language} [DecidableEq (FormulaN L)]

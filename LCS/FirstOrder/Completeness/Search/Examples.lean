@@ -26,7 +26,6 @@ the beginning of an admissible stream. -/
 def TermStream.HasPrefix {L : Language} (stream : TermStream L) (xs : List (Term L)) : Prop :=
   ∀ i : Fin xs.length, stream.entries i.val = some xs[i]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Removing the first displayed entry corresponds to taking the stream's tail. -/
 theorem TermStream.HasPrefix.tail {L : Language} {stream : TermStream L}
     {t : Term L} {ts : List (Term L)} (h : stream.HasPrefix (t :: ts)) :
@@ -66,7 +65,6 @@ x-supply indices 0, 2, 4, 6. -/
 def exProofInput : InfSequentN exLangPQf2 :=
   InfSequentN.ofSequent (Sequent.mk [] [evenFormula exFormulaPQf2])
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.5.2: The input uses only the x-variable supply. -/
 theorem exProofInput_builtFromX : exProofInput.builtFromX := by
   intro A h
@@ -76,7 +74,6 @@ theorem exProofInput_builtFromX : exProofInput.builtFromX := by
   subst A
   exact FormulaN.builtFromX_evenFormula _
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.5.2: The input's only free variable v is distinct from
 its bound variables x, y, and z. -/
 theorem exProofInput_crossNoFreeBound : crossNoFreeBoundInf exProofInput := by
@@ -402,7 +399,6 @@ variables x and y at indices 0 and 2. -/
 def exCounterInput : InfSequentN exLangPQa :=
   InfSequentN.ofSequent (Sequent.mk [] [evenFormula exFormulaPQa])
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.5.3: The input is built entirely from x-variables. -/
 theorem exCounterInput_builtFromX : exCounterInput.builtFromX := by
   intro A h
@@ -412,7 +408,6 @@ theorem exCounterInput_builtFromX : exCounterInput.builtFromX := by
   subst A
   exact FormulaN.builtFromX_evenFormula _
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 5.5.3: The closed input satisfies the free/bound convention. -/
 theorem exCounterInput_crossNoFreeBound : crossNoFreeBoundInf exCounterInput := by
   rw [exCounterInput, crossNoFreeBoundInf_ofSequent_iff]

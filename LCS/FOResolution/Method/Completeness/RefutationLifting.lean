@@ -162,7 +162,6 @@ def FOResolutionTree.allLabelsGround {L : Language} (hNoEq : L.withoutEquality)
       ((FOResolutionTree.label (hNoEq := by all_goals exact hNoEq))
         (.resolve T1 T2 rA rB rho rho' sigma))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- allLabelsGround implies the root label is ground. -/
 theorem FOResolutionTree.allLabelsGround_label
     {L : Language} (hNoEq : L.withoutEquality) [DecidableEq (FOLiteral L hNoEq)]

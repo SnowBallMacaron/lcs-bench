@@ -72,6 +72,11 @@ proof_of GCNFProofTree.ordinary := @fun
 
 namespace GCNFProofTree
 
+helper @[simp] theorem GCNFProofTree.leafCount_cast_reverse {S T : ClauseSequent} (h : S = T)
+    (t : GCNFProofTree T) : (leafCount (h ▸ t : GCNFProofTree S)) = t.leafCount := by
+  cases h
+  rfl
+
 proof_of leafCount_cast := open LCS.Resolution.GCNF.Proofs.GCNFProofTree in
   by
     cases h

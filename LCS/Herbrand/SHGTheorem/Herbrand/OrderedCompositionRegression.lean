@@ -37,7 +37,7 @@ def universalBody : FormulaN language :=
 def nestedSource : FormulaN language :=
   .ex 0 universalBody
 
-private theorem nestedSource_rectified :
+theorem nestedSource_rectified :
     LCS.FirstOrder.Semantics.Subformulae.isRectified nestedSource := by
   simp [nestedSource, universalBody, innerExistential, atom,
     LCS.FirstOrder.Semantics.Subformulae.isRectified,
@@ -60,12 +60,12 @@ def leafAtom : FormulaN language :=
 def leafFormula : FormulaN language :=
   formulaSubstN (.eq_ rfl (.var 7) (.var 2)) (.var 8) 2
 
-private theorem afterOuter_eq :
+theorem afterOuter_eq :
     afterOuter = universalBody := by
   simp [afterOuter, nestedSource, universalBody, innerExistential,
     atom, formulaSubstN, termSubst]
 
-private theorem afterUniversal_eq :
+theorem afterUniversal_eq :
     afterUniversal = afterUniversalShown := by
   simp [universalBody, innerExistential, atom,
     afterUniversal, afterUniversalShown, formulaSubstN, termSubst]
@@ -81,14 +81,14 @@ theorem leafFormula_rectified :
     rw [leafFormula_eq]
     simp [leafAtom, isQuantifierFree])
 
-private theorem afterOuter_rectified :
+theorem afterOuter_rectified :
     isRectified afterOuter := by
   rw [afterOuter_eq]
   simp [universalBody, innerExistential, atom, isRectified,
     boundVarsFresh, distinctQuantifierBindings, formulaFVN, formulaBVN,
     termFV]
 
-private theorem afterUniversal_rectified :
+theorem afterUniversal_rectified :
     isRectified afterUniversal := by
   rw [afterUniversal_eq]
   simp [afterUniversalShown, isRectified, boundVarsFresh,
@@ -106,7 +106,7 @@ def innerMaxOccurrence : MaxQuantifierOccurrence afterUniversal :=
 def closingAtom : FormulaN language :=
   .eq_ rfl (.var 3) (.var 3)
 
-private theorem closingAtom_rectified :
+theorem closingAtom_rectified :
     isRectified closingAtom :=
   AllRectified.isRectified_of_isQuantifierFree closingAtom (by
     simp [closingAtom, isQuantifierFree])
@@ -146,10 +146,10 @@ def universalRule : G2nnfRuleCore language :=
   .allSubLeft afterOuter universalMaxOccurrence 1
     innerExistential (.var 7) rfl gamma delta
 
-private theorem universalRule_onePremise :
+theorem universalRule_onePremise :
     universalRule.premises.length = 1 := rfl
 
-private theorem universalRule_sideConditions :
+theorem universalRule_sideConditions :
     G2nnfRuleCore.SideConditions universalRule := by
   constructor
   ·
@@ -194,7 +194,7 @@ theorem innerRule_sideConditions :
   · exact AllRectified.insert_left afterUniversal_rectified
       (allRectified_singletons closingAtom_rectified closingAtom_rectified)
 
-private theorem leafIndex :
+theorem leafIndex :
     LCS.Finset.insert closingAtom
         (LCS.Finset.singleton leafFormula) =
       LCS.Finset.insert leafFormula
@@ -218,7 +218,7 @@ def transportTreeAntecedent
     G2nnfEqProofTree rfl Γ' Δ :=
   h ▸ T
 
-private theorem rawLeaf_sideConditions
+theorem rawLeaf_sideConditions
     (hAtom : closingAtom.isAtomic = true) :
     G2nnfRuleCore.SideConditions
       (.axiomPosId closingAtom hAtom

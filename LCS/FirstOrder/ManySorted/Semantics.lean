@@ -389,12 +389,10 @@ noncomputable def msFormulaEval {L : MSLanguage} (M : MSStructure L) :
 -- Definition 10.3.6: Rectified formulae
 -- ===================================================================
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- A structural formula address: 0 selects a unary body or a binary
 left operand; 1 selects a binary right operand. The root address is `[]`. -/
 abbrev MSFormulaPosition := List Nat
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Look up the actual syntax subtree at a formula address. -/
 def msSubformulaAt {L : MSLanguage} :
     MSFormula L → MSFormulaPosition → Option (MSFormula L)
@@ -407,7 +405,6 @@ def msSubformulaAt {L : MSLanguage} :
       msSubformulaAt B pos
   | _, _ => none
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- A variable occurrence is either a quantifier's binder position or a
 variable inside an atomic argument. Atomic and function arguments use
 zero-based indices; equality has arguments 0 and 1. -/
@@ -415,13 +412,11 @@ inductive MSVariableOccurrence where
   | atom (formulaPos : MSFormulaPosition) (argument : Nat) (termPos : List Nat)
   | binder (formulaPos : MSFormulaPosition)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The formula address containing a variable occurrence. -/
 def MSVariableOccurrence.formulaPos : MSVariableOccurrence → MSFormulaPosition
   | .atom p _ _ => p
   | .binder p => p
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Look up a variable's sort and index at a term address. Constants and
 invalid paths return `none`; function paths select an actual argument. -/
 def msTermVariableAt {L : MSLanguage} :
@@ -433,7 +428,6 @@ def msTermVariableAt {L : MSLanguage} :
       else none
   | _, _, _ => none
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Look up the sort/index pair of an atomic-term or binder occurrence.
 Binder positions include vacuous quantifiers. Invalid addresses return `none`. -/
 def msVariableAt {L : MSLanguage} (A : MSFormula L)

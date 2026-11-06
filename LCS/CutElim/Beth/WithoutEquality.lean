@@ -85,17 +85,15 @@ def ExplicitDefinabilityWitness {L : Language}
 /- Semantic and finite-support helpers used in the common-predicate
 branch of Beth's theorem. -/
 
--- ATTACH-BLOCKER: private declaration
 /-- The left side of the Craig implication in L⁺: A(P,Q) ∧ Q(x̄). -/
-private def bethCraigAntecedent {L : Language}
+def bethCraigAntecedent {L : Language}
     (implDef : ImplicitDefinability L) :
     FormulaN (L.addPred (L.predArity implDef.predQ)) :=
   .conj (implDef.axiomFormula.liftAddPred (L.predArity implDef.predQ))
     (bethPredApplied (some implDef.predQ))
 
--- ATTACH-BLOCKER: private declaration
 /-- The right side in L⁺: A(P,Q′) ⊃ Q′(x̄), where Q′ is the fresh predicate none. -/
-private noncomputable def bethCraigConsequent {L : Language}
+noncomputable def bethCraigConsequent {L : Language}
     (implDef : ImplicitDefinability L) :
     FormulaN (L.addPred (L.predArity implDef.predQ)) :=
   .impl
@@ -105,7 +103,7 @@ private noncomputable def bethCraigConsequent {L : Language}
 
 /-- The implicit-definability condition yields the Craig implication
 as an LK-provable sequent in the fresh-predicate expansion. -/
-private theorem bethCraigImplication_provable {L : Language}
+theorem bethCraigImplication_provable {L : Language}
     (hNoEq : L.withoutEquality) (implDef : ImplicitDefinability L) :
     folkProvable
       ⟨[bethCraigAntecedent implDef], [bethCraigConsequent implDef]⟩ := by
@@ -117,7 +115,7 @@ private theorem bethCraigImplication_provable {L : Language}
 /-- If no listed predicate occurs in A, the two sides of the L⁺ Craig
 implication have no common predicate: only some Q can occur on the left,
 and only the fresh none can occur on the right. -/
-private theorem bethCraig_no_common_pred {L : Language}
+theorem bethCraig_no_common_pred {L : Language}
     (implDef : ImplicitDefinability L)
     (hNone : NoPredOccurs implDef.axiomFormula implDef.preds) :
     ∀ P : (L.addPred (L.predArity implDef.predQ)).predSymbols,
@@ -128,7 +126,7 @@ private theorem bethCraig_no_common_pred {L : Language}
 
 /-- Interpret the fresh predicate as Q to lower Craig's disjunction
 from L⁺ to the original language, then universally quantify Q's arguments. -/
-private theorem bethCraig_dichotomy_lower {L : Language}
+theorem bethCraig_dichotomy_lower {L : Language}
     (implDef : ImplicitDefinability L)
     (hCraig :
       folkProvable ⟨[bethCraigAntecedent implDef], []⟩ ∨
@@ -139,7 +137,7 @@ private theorem bethCraig_dichotomy_lower {L : Language}
   -- REPAIR(T6-57b): proof pending
   sorry
 
-private theorem beth_explicit_definer_exists
+theorem beth_explicit_definer_exists
     (L : Language)
     (hNoEq : L.withoutEquality)
     (implDef : ImplicitDefinability L)
@@ -154,7 +152,6 @@ private theorem beth_explicit_definer_exists
 -- ===================================================================
 -- Theorem 6.6.1 (part a, required helper): beth_explicit_definer
 -- ===================================================================
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Theorem 6.6.1 (part a, required helper): Given an implicit
 definability witness for Q together with a proof that at least one
 P_i occurs in the axiom formula, constructs an explicit definability
@@ -174,7 +171,6 @@ noncomputable def beth_explicit_definer
   Classical.choose
     (beth_explicit_definer_exists L hNoEq implDef hOccurs)
 
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- The formula produced by `beth_explicit_definer` satisfies the
 four conditions bundled in `ExplicitDefinabilityWitness`: its free
 variables are among {x_0,...,x_{n-1}}, its predicate symbols are
@@ -198,7 +194,6 @@ by
 -- ===================================================================
 -- Theorem 6.6.1 (companion, part b): beth_without_equality_part_b
 -- ===================================================================
--- ATTACH-BLOCKER: private name in relocated declaration
 /-- Theorem 6.6.1 (companion, part b): If no predicate symbol
 occurs in the axiom formula, Q is universally true or false.
 

@@ -245,16 +245,16 @@ symbol indices. The exact traversal consumes this list from left to
 right. -/
 def SkolemSpec.indices {L : Language}
     (S : SkolemSpec L) : List (Fin S.n) :=
-  List.ofFn (fun i : Fin S.n => i) /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  List.ofFn (fun i : Fin S.n => i)
 
-private theorem list_ofFn_get {α : Type} (xs : List α) :
+theorem list_ofFn_get {α : Type} (xs : List α) :
     List.ofFn (fun i : Fin xs.length => xs.get i) = xs := by
   induction xs with
   | nil => rfl
   | cons x xs ih =>
     rw [List.ofFn_succ]
     simp only [List.get_cons_zero]
-    congr 1 /- ATTACH-BLOCKER: private declaration -/
+    congr 1
 
 /-- The index enumeration visits every allocation exactly once and in
 list order. -/
@@ -266,7 +266,7 @@ theorem SkolemSpec.indices_allocations {L : Language}
     List.ofFn
       (fun i : Fin S.allocations.length => S.allocations.get i) =
         S.allocations
-  exact list_ofFn_get S.allocations /- ATTACH-BLOCKER: private name in relocated declaration -/
+  exact list_ofFn_get S.allocations
 
 /-- The index enumeration therefore carries exactly the descriptor
 scope sequence, including repeated ranks and empty scopes. -/
@@ -282,14 +282,14 @@ theorem SkolemSpec.indices_scopes {L : Language}
     _ = S.allocations.map Prod.snd := by
           rw [S.indices_allocations]
     _ = existentialScopesAux S.source [] := by
-          exact existentialDescriptorsAux_scopes S.source [] /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+          exact existentialDescriptorsAux_scopes S.source []
 
 /-- The computed symbol count is exactly the descriptor traversal
 count. -/
 theorem SkolemSpec.n_eq_descriptorCount {L : Language}
     (S : SkolemSpec L) :
     S.n = skolemDescriptorCount S.source := by
-  exact existentialDescriptorsAux_length S.source [] /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  exact existentialDescriptorsAux_length S.source []
 
 namespace SkolemAllocationRegression
 
@@ -297,17 +297,17 @@ namespace SkolemAllocationRegression
 quantifier occurrence, order, and scope. -/
 inductive Pred : Type where
   | p
-  | q /- ATTACH-BLOCKER: unsupported untagged inductive -/
+  | q
 
 def language : Language where
   funSymbols := Empty
   funArity := Empty.elim
   constSymbols := Empty
   predSymbols := Pred
-  predArity := fun _ => 0 /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  predArity := fun _ => 0
 
 def atom (P : Pred) : FormulaN language :=
-  .predN P fun i => i.elim0 /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  .predN P fun i => i.elim0
 
 end SkolemAllocationRegression
 
@@ -364,7 +364,7 @@ theorem formulaSubstN_descriptorCount {L : Language}
     split <;> simp [skolemDescriptorCount, ih]
   | ex y B ih =>
     simp [formulaSubstN, skolemDescriptorCount]
-    split <;> simp [skolemDescriptorCount, ih] /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    split <;> simp [skolemDescriptorCount, ih]
 
 /-- Term substitution also preserves the ordered existential-scope
 traversal. -/
@@ -406,7 +406,7 @@ theorem liftFormulaSkolem_descriptorCount {L : Language}
   | all _ _ ih =>
     simp [liftFormulaSkolem, skolemDescriptorCount, ih]
   | ex _ _ ih =>
-    simp [liftFormulaSkolem, skolemDescriptorCount, ih] /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    simp [liftFormulaSkolem, skolemDescriptorCount, ih]
 
 /-- Lifting also preserves the ordered existential-scope traversal. -/
 theorem liftFormulaSkolem_existentialScopesAux {L : Language}
@@ -427,7 +427,7 @@ theorem liftFormulaSkolem_existentialScopesAux {L : Language}
   | all _ _ ih =>
     simp [liftFormulaSkolem, existentialScopesAux, ih]
   | ex _ _ ih =>
-    simp [liftFormulaSkolem, existentialScopesAux, ih] /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    simp [liftFormulaSkolem, existentialScopesAux, ih]
 
 /-- Definition 7.6.2 (helper): Argument `k` of the Skolem symbol
 allocated to descriptor index `i`. This is literally position `k` of
@@ -437,7 +437,7 @@ def exactSkolemArgument {L : Language} (S : SkolemSpec L)
     Term.var ((S.skolemScope i).get
       ⟨k.val, by
         simp [SkolemSpec.skolemRank] at k
-        exact k.isLt⟩) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+        exact k.isLt⟩)
 
 /-- Definition 7.6.2: The exact term for an original-root allocation.
 An empty scope produces `Term.const` with that occurrence's fresh constant.
@@ -485,7 +485,7 @@ def formulaQuantCount {L : Language} : FormulaN L → Nat
   | .disj A B => 1 + formulaQuantCount A + formulaQuantCount B
   | .impl A B => 1 + formulaQuantCount A + formulaQuantCount B
   | .all _ B => 1 + formulaQuantCount B
-  | .ex _ B => 1 + formulaQuantCount B /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  | .ex _ B => 1 + formulaQuantCount B
 
 /-- Definition 7.6.2 (helper): formulaSubstN preserves formulaQuantCount
 because substitution replaces variables (no quantifiers) with terms
@@ -506,7 +506,7 @@ theorem formulaSubst_quantCount {L : Language}
     try split <;> simp [formulaQuantCount, ih]
   | ex y B ih =>
     simp [formulaSubstN, formulaQuantCount]
-    try split <;> simp [formulaQuantCount, ih] /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    try split <;> simp [formulaQuantCount, ih]
 
 /-- Definition 7.6.2 (helper): skolemSubst preserves formulaQuantCount
 since it is just a formulaSubstN with a specific term. -/
@@ -514,7 +514,7 @@ theorem skolemSubst_quantCount {L : Language} (S : SkolemSpec L)
     (B : FormulaN S.language) (x : Nat) (i : Fin S.n) :
     formulaQuantCount (skolemSubst S B x i) = formulaQuantCount B :=
 -- BEGIN PROOF
-  formulaSubst_quantCount B _ x /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  formulaSubst_quantCount B _ x
 
 -- ===================================================================
 -- Definition 7.6.2: skolemForm
@@ -581,7 +581,7 @@ def skolemFormExactAux {L : Language} (S : SkolemSpec L) :
       try (rw [skolemSubst_quantCount])
       try (rw [formulaSubst_quantCount])
       try (simp [formulaQuantCount]; done)
-      try (simp [formulaQuantCount]; omega) /- ATTACH-BLOCKER: termination suffix -/
+      try (simp [formulaQuantCount]; omega)
 
 /-- Exact traversal succeeds on, and consumes, precisely a descriptor-
 count-sized index list. The returned counter is that exact count. -/
@@ -711,7 +711,7 @@ theorem skolemFormExactAux_result {L : Language} (S : SkolemSpec L) :
         refine ⟨B', ?_⟩
         simp [skolemFormExactAux, skolemSubst, hB',
           skolemDescriptorCount, formulaSubstN_descriptorCount,
-          Nat.add_comm] /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+          Nat.add_comm]
 
 /-- A successful exact traversal has a unique formula component. -/
 theorem skolemFormExactAux_formula_unique {L : Language}
@@ -774,7 +774,7 @@ theorem SkolemSpec.indices_length_eq_lifted_descriptorCount
         (liftFormulaSkolem (skolemRank := S.skolemRank) S.source) := by
   unfold SkolemSpec.indices
   rw [List.length_ofFn, liftFormulaSkolem_descriptorCount,
-    S.n_eq_descriptorCount] /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+    S.n_eq_descriptorCount]
 
 /-- Top-level index scopes align position-for-position with the
 lifted source traversal. -/
@@ -784,7 +784,7 @@ theorem SkolemSpec.indices_scopes_lifted {L : Language}
       existentialScopesAux
         (liftFormulaSkolem (skolemRank := S.skolemRank) S.source) [] := by
   rw [liftFormulaSkolem_existentialScopesAux]
-  exact S.indices_scopes /- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace -/
+  exact S.indices_scopes
 
 /-- Top-level exact traversal succeeds and returns final counter
 `S.n`; hence every allocation is consumed and no extra allocation is
@@ -804,7 +804,7 @@ theorem skolemFormExactAux_top_result {L : Language}
         S.n := by
     rw [liftFormulaSkolem_descriptorCount]
     exact S.n_eq_descriptorCount.symm
-  exact ⟨B, hB.trans (congrArg (fun k => some (B, k)) hCounter)⟩ /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  exact ⟨B, hB.trans (congrArg (fun k => some (B, k)) hCounter)⟩
 
 /-- Boolean proof used by `Option.get` in `skolemFormTraversal`. -/
 theorem skolemFormExactAux_top_isSome {L : Language}
@@ -813,7 +813,7 @@ theorem skolemFormExactAux_top_isSome {L : Language}
       (liftFormulaSkolem (skolemRank := S.skolemRank) S.source)
       [] S.indices).isSome = true := by
   obtain ⟨B, hB⟩ := skolemFormExactAux_top_result S
-  exact Option.isSome_iff_exists.mpr ⟨(B, S.n), hB⟩ /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+  exact Option.isSome_iff_exists.mpr ⟨(B, S.n), hB⟩
 
 /-- The top-level traversal embeds `S.source` into the split Skolem
 language and consumes `S.indices` in preorder. All recursive substitutions
@@ -823,7 +823,7 @@ def skolemFormTraversal {L : Language} (S : SkolemSpec L) :
     FormulaN S.language × Nat :=
   (skolemFormExactAux S
     (liftFormulaSkolem (skolemRank := S.skolemRank) S.source)
-    [] S.indices).get (skolemFormExactAux_top_isSome S) /- ATTACH-BLOCKER: dependency: retained front declaration references this helper -/
+    [] S.indices).get (skolemFormExactAux_top_isSome S)
 
 /-- Definition 7.6.2: Skolem form of the rectified NNF sentence `S.source`
 in its extended language. Literals retain their embedded terms; conjunction

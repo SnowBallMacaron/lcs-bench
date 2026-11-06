@@ -167,7 +167,6 @@ end SearchState
 -- Side-condition discharge lemmas (isFreeForN, freshness)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion, discharge): `isFreeForN (Term.var i) x B`
     holds whenever `i ∉ formulaBVN B`, i.e. `i` is not a bound variable
     anywhere in B. Structural induction on B unfolds both `isFreeForN`
@@ -224,7 +223,6 @@ theorem isFreeForN_var_of_notBV {L : Language} (i x : Nat) (B : FormulaN L)
         exact Or.inr (by show i ∈ Set.singleton y; rw [hyi]; rfl)
       exact h hiyIn
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion, discharge): `isFreeForN (Term.const c) x B`
     holds unconditionally, because `termFV (Term.const c) = ∅` means
     no variable of B can be captured by substituting `c`. -/
@@ -253,7 +251,6 @@ theorem isFreeForN_const {L : Language} (c : L.constSymbols) (x : Nat)
       intro hy
       exact hy
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion, discharge): An index `i ∈ FV(seq)`
     (i.e. appears free in some formula of `seq`), under the §5.4.7
     standing assumption `crossNoFreeBound seq` ("the set of all
@@ -276,7 +273,6 @@ theorem notBV_of_FV_of_crossNFB {L : Language} {seq : Sequent L}
 -- BEGIN PROOF
   hCNFB i hFV G hG
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion, discharge): Combined "allowed index"
     discharge — if `i` is `VarAllowed` (free in seq OR ≥ bound), then
     `i` is not bound in any formula of `seq` under the §5.4.7 standing
@@ -294,7 +290,6 @@ theorem notBV_of_allowed {L : Language} {seq : Sequent L} {bound : Nat}
   | inl hFV => exact notBV_of_FV_of_crossNFB hCNFB hFV G hG
   | inr hFresh => exact hFresh G hG
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): If `i ∉ formulaBVN (∀x A)`,
     then `i ∉ formulaBVN A`. This is the "descend into binder body"
     direction of the subformula-bound invariant: binding `x` can only
@@ -308,7 +303,6 @@ theorem notBV_body_of_all {L : Language} {i x : Nat} {A : FormulaN L}
   intro hBV
   exact h (Or.inl hBV)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): Mirror of `notBV_body_of_all`
     for the existential binder. -/
 theorem notBV_body_of_ex {L : Language} {i x : Nat} {A : FormulaN L}
@@ -317,7 +311,6 @@ theorem notBV_body_of_ex {L : Language} {i x : Nat} {A : FormulaN L}
   intro hBV
   exact h (Or.inl hBV)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Advancing AVAIL₀ and appending its former head to TERM₁ preserves
     the state invariant. Stream injectivity excludes that variable from
     every later position. -/

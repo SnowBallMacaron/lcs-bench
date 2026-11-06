@@ -85,7 +85,7 @@ theorem freshLowerFormula_isFreeFor {L : Language}
   | ex y A ih =>
     simp only [freshLowerFormula, isFreeForN, freshLowerTerm_fv, ih]
 
-private theorem replacementOccurrence_or
+theorem replacementOccurrence_or
     {a b freshA freshB replacement : Prop} :
     (a ∨ freshA ∧ replacement) ∨ (b ∨ freshB ∧ replacement) ↔
       (a ∨ b) ∨ (freshA ∨ freshB) ∧ replacement := by
@@ -646,11 +646,9 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 namespace CraigFreshBot
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Lower every indexed one-premise LK rule from the fresh-bottom language.
 The proof-wide freshness fact is used only for the instantiating terms of
 quantifier rules; the replacement formula is closed, so eigenvariable
@@ -773,7 +771,6 @@ def freshLower_folkStep1_sharedPredFalse {L : Language}
   | exRight t x A Γ Δ hfree =>
     exact freshLower_exRight L P v t x A Γ Δ hfree hvar
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Lower every indexed two-premise LK rule from the fresh-bottom language.
 No extra freshness premise is needed because these rules carry no
 instantiating terms or eigenvariable side conditions. -/
@@ -837,7 +834,6 @@ def freshLower_folkStep2_sharedPredFalse {L : Language}
       (by simp only [freshLowerSequent, freshLowerList, freshLowerFormula,
         List.map_append, List.map_cons])
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Structural lowering of an indexed LK⊥ proof tree in the fresh-bottom
 language. Ordinary axiom leaves remain exact axioms, the distinguished
 bottom leaf becomes `sharedPredFalseRefutation`, and every internal rule is
@@ -878,7 +874,6 @@ noncomputable def freshLower_folkBotProofTree_sharedPredFalse {L : Language}
         (transform t₁ hU.2.1) (transform t₂ hU.2.2)
   exact transform T hvar
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Choose one variable absent from both LK⊥ proof trees and lower both
 trees using the same shared contradiction. This synchronization is what
 keeps the two proof obligations about one and the same lowered interpolant. -/
@@ -912,7 +907,6 @@ theorem freshLower_folkBotProofTree_pair_sharedPredFalse
       ⟨freshLower_folkBotProofTree_sharedPredFalse P v T₁ hvar₁⟩,
       ⟨freshLower_folkBotProofTree_sharedPredFalse P v T₂ hvar₂⟩⟩
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Provability-level synchronized wrapper: unpack two fresh-bottom LK⊥
 derivations, choose one proof-wide fresh variable for the pair, and lower
 both derivations with the same shared contradiction. -/

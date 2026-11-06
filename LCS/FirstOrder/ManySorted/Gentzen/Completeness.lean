@@ -182,7 +182,6 @@ structure MSIsGeneratedTermAlgebra (L : MSLanguage)
     MSTerm.func f ts ∈ H (L.funRank f).2 →
     ∀ i, ts i ∈ H ((L.funRank f).1.get i)
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- Lemma 10.4.1 (companion): if every free variable `(s', i)` of a
 sort-`s` term `t` has its variable term `var s' i ∈ H s'`, then `t ∈ H s`.
 Many-sorted analogue of one-sorted `termInH`. Proved by induction on `t`:
@@ -236,7 +235,6 @@ noncomputable def msHintikkaStructure {L : MSLanguage}
     if MSSignedFormula.trueF (MSFormula.pred P (fun i => (ts i).val)) ∈ S
     then BoolVal.T else BoolVal.F
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 10.4.1 (companion): the identity assignment for the Herbrand
 structure. The sort-`s` variable `x_i` is sent to itself `⟨var s i, _⟩`
 when `var s i ∈ H s`, otherwise to the chosen nonempty witness. Many-sorted
@@ -251,7 +249,6 @@ noncomputable def msIdentityAssignment {L : MSLanguage}
     if h : MSTerm.var s i ∈ H s then ⟨MSTerm.var s i, h⟩
     else ⟨(hTA.nonempty s).choose, (hTA.nonempty s).choose_spec⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 10.4.1 (companion): evaluating a sort-`s` term `t ∈ H s` in the
 Herbrand structure under the identity assignment yields `⟨t, ht⟩` — i.e.
 `t` itself. Many-sorted analogue of one-sorted `termEvalIdentity`. Proved
@@ -286,7 +283,6 @@ theorem msTermEvalIdentity {L : MSLanguage}
 -- Lemma 10.4.1 (companion): formula depth, for the satisfaction induction
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 10.4.1 (companion): the connective/quantifier depth of a
 many-sorted formula; atomic formulae (falsum, pred, eq_) have depth 0.
 Used for the well-founded induction in the Hintikka satisfiability
@@ -304,7 +300,6 @@ def msFormulaDepth {L : MSLanguage} : MSFormula L → Nat
   | .all _ _ A    => 1 + msFormulaDepth A
   | .ex _ _ A     => 1 + msFormulaDepth A
 
--- ATTACH-BLOCKER: size gate: retain original helper span in front
 /-- Lemma 10.4.1 (companion): substitution preserves formula depth.
 Many-sorted analogue of one-sorted `formulaSubstN_depth`. -/
 theorem msFormulaSubst_depth {L : MSLanguage} [DecidableEq L.SortType]

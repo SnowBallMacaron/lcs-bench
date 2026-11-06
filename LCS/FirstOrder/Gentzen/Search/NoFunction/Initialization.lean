@@ -32,7 +32,6 @@ def sequentVarIndices {L : Language} (seq : Sequent L) : List Nat :=
   (seq.antecedent ++ seq.succedent).flatMap
     (fun A => formulaFreeVarIndices A ++ formulaBoundVarIndices A)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (companion): A strict bound on the input variable indices. -/
 def sequentVarBound {L : Language} (seq : Sequent L) : Nat :=
   (sequentVarIndices seq).foldl Nat.max 0 + 1
@@ -45,13 +44,11 @@ def leastAbsentVar {L : Language} (seq : Sequent L) : Nat :=
   ((List.range (sequentVarBound seq + 1)).find? (fun i => !(vars.contains i))).getD
     (sequentVarBound seq)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem le_foldl_max (xs : List Nat) (b : Nat) : b ≤ xs.foldl Nat.max b := by
   induction xs generalizing b with
   | nil => exact Nat.le_refl _
   | cons x xs ih => exact Nat.le_trans (Nat.le_max_left b x) (ih (max b x))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem mem_le_foldl_max {xs : List Nat} {i : Nat} (hi : i ∈ xs) (b : Nat) :
     i ≤ xs.foldl Nat.max b := by
   induction xs generalizing b with
@@ -61,12 +58,10 @@ theorem mem_le_foldl_max {xs : List Nat} {i : Nat} (hi : i ∈ xs) (b : Nat) :
     · exact Nat.le_trans (Nat.le_max_right b i) (le_foldl_max xs (max b i))
     · exact ih hi (max b x)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem sequentVarIndices_lt_bound {L : Language} (seq : Sequent L) {i : Nat}
     (hi : i ∈ sequentVarIndices seq) : i < sequentVarBound seq :=
   Nat.lt_succ_of_le (mem_le_foldl_max hi 0)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The bounded search returns the least absent variable. -/
 theorem leastAbsentVar_spec {L : Language} (seq : Sequent L) :
     leastAbsentVar seq ∉ sequentVarIndices seq ∧
@@ -158,7 +153,6 @@ def init {L : Language} {seq : Sequent L} (initial : Init seq) :
     SearchState L initial.avail0 :=
   { TERM0 := initial.term0, TERM1 := initial.term0, availNext := 0 }
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): `formulaConstsList F` contains
     only `Term.const` values (never `Term.var`). Structural induction
     on `F` using the same fact for `termConstsList` on `Term L`. -/
@@ -243,7 +237,6 @@ theorem not_var_mem_formulaConstsList {L : Language}
   | all _ A ih => simp only [formulaConstsList]; exact ih
   | ex _ A ih => simp only [formulaConstsList]; exact ih
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): `i ∈ foldl-append` iff `i` is in
     the initial accumulator or in one of the pushed lists. Used by
     `formulaFreeVarIndices_iff_formulaFVN` to peel the `List.ofFn`
@@ -282,7 +275,6 @@ theorem mem_foldl_append_termVar {L : Language} (i : Nat)
         · left; rw [hEq] at hJ; exact List.mem_append_right _ hJ
         · right; exact ⟨j, hTl, hJ⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 5.4.9 (required helper): `i ∈ formulaFreeVarIndices F`
     iff `i ∈ formulaFVN F`. Structural correspondence between the
     computable (List) and declarative (Set) FV enumerations. -/
@@ -370,7 +362,6 @@ theorem formulaFreeVarIndices_iff_formulaFVN {L : Language}
       apply hNotInSingleton
       rw [hIsX]; rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.4.9 (required helper): Every variable term
     produced by `initialTERM0 hNoEq seq` has its index either
     as a free variable of some formula of `seq`, or equal to
@@ -412,7 +403,6 @@ theorem initialTerms_var_index {L : Language}
       obtain ⟨F, _, hC⟩ := hConst
       exact not_var_mem_formulaConstsList F i (hi ▸ hC)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem formulaBoundVarIndices_iff_formulaBVN {L : Language} (F : FormulaN L) (i : Nat) :
     i ∈ formulaBoundVarIndices F ↔ i ∈ formulaBVN F := by
   induction F with
@@ -432,7 +422,6 @@ theorem formulaBoundVarIndices_iff_formulaBVN {L : Language} (F : FormulaN L) (i
       rw [ih]
       exact or_comm
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem sequentVarIndices_mem {L : Language} {seq : Sequent L} {F : FormulaN L}
     (hF : F ∈ seq.antecedent ++ seq.succedent) {i : Nat}
     (hi : i ∈ formulaFVN F ∨ i ∈ formulaBVN F) : i ∈ sequentVarIndices seq := by
@@ -459,7 +448,6 @@ theorem init_available_fresh {L : Language} {seq : Sequent L} (initial : Init se
 
 end SearchState
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The canonical initial list and a supply above the input are admissible. -/
 theorem defaultInit_admissible {L : Language} (seq : Sequent L) :
     admissibleInitialization seq (initialTerms seq)

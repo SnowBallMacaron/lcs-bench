@@ -333,7 +333,6 @@ def permutationSecondAfter : LKLocalFragment permutationSecondInputs
               (.one (.exchangeRight Γ [permExExistsP] permExExistsR permExRga [permExExistsP]) quantified))))))
   contractP
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 7.3.3 (companion): Every additional rule in the first
 replacement segment is structural; the two selected occurrences are excluded. -/
 theorem permutationFirstOtherStructural :
@@ -399,7 +398,6 @@ theorem permutationFirstOtherStructural :
     · change none = some rule at h
       cases h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 7.3.3 (companion): Every additional rule in the second
 replacement segment is structural; the two selected occurrences are excluded. -/
 theorem permutationSecondOtherStructural :

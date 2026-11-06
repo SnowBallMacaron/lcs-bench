@@ -77,7 +77,6 @@ def formulaSymbolK (L : Language) : FormulaSymbol L → Int
 -- Lemma 5.2.4 (companion): formulaK — K extended to formulae
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.2.4 (companion): sum of Int values in a list. -/
 def listIntSum : List Int → Int
   | []      => 0
@@ -199,66 +198,55 @@ def toSymbolList {L : Language} : Formula L → List (FormulaSymbol L)
   | .all i A => FormulaFormationFn.A_i i (toSymbolList A)
   | .ex i A => FormulaFormationFn.E_i i (toSymbolList A)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp]
 theorem toSymbolList_falsum {L : Language} :
     toSymbolList (Formula.falsum (L := L)) = [FormulaSymbol.falsumSym] := rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp]
 theorem toSymbolList_pred0 {L : Language} (P : L.predSymbols) (hP : L.predArity P = 0) :
     toSymbolList (Formula.pred0 P hP) = [FormulaSymbol.predSym P] := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_predN {L : Language} (P : L.predSymbols) (hP : 0 < L.predArity P)
     (ts : Fin (L.predArity P) → Term L) :
     toSymbolList (Formula.predN P hP ts) = [FormulaSymbol.predSym P] ++
       (List.ofFn (fun i => (Term.toSymbolList (ts i)).map FormulaSymbol.termSym)).flatten := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_eq {L : Language} (hL : L.hasEquality = true) (t1 t2 : Term L) :
     toSymbolList (Formula.eq_ hL t1 t2) = [FormulaSymbol.eqSym] ++
       (Term.toSymbolList t1).map FormulaSymbol.termSym ++
       (Term.toSymbolList t2).map FormulaSymbol.termSym := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_conj {L : Language} (A B : Formula L) :
     toSymbolList (Formula.conj A B) = [FormulaSymbol.lParen] ++ toSymbolList A ++
       [FormulaSymbol.connAnd] ++ toSymbolList B ++ [FormulaSymbol.rParen] := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_disj {L : Language} (A B : Formula L) :
     toSymbolList (Formula.disj A B) = [FormulaSymbol.lParen] ++ toSymbolList A ++
       [FormulaSymbol.connOr] ++ toSymbolList B ++ [FormulaSymbol.rParen] := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_impl {L : Language} (A B : Formula L) :
     toSymbolList (Formula.impl A B) = [FormulaSymbol.lParen] ++ toSymbolList A ++
       [FormulaSymbol.connImpl] ++ toSymbolList B ++ [FormulaSymbol.rParen] := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_equiv {L : Language} (A B : Formula L) :
     toSymbolList (Formula.equiv_ A B) = [FormulaSymbol.lParen] ++ toSymbolList A ++
       [FormulaSymbol.connEquiv] ++ toSymbolList B ++ [FormulaSymbol.rParen] := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_neg {L : Language} (A : Formula L) :
     toSymbolList (Formula.neg A) = [FormulaSymbol.connNeg] ++ toSymbolList A := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_all {L : Language} (i : Nat) (A : Formula L) :
     toSymbolList (Formula.all i A) =
       [FormulaSymbol.quantAll, FormulaSymbol.varSym_ i] ++ toSymbolList A := rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp]
 theorem toSymbolList_ex {L : Language} (i : Nat) (A : Formula L) :
     toSymbolList (Formula.ex i A) =

@@ -78,7 +78,6 @@ noncomputable def sequentSubstConst {L : Language}
 -- Substitution helper lemmas (preserved — these are pure formula/term lemmas)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem termSubst_var_comm {L : Language}
     (s t : Term L) (x y z : Nat) (hxy : x ≠ y) (hzx : z ≠ x) :
     termSubst (termSubst s t x) (.var z) y =
@@ -91,7 +90,6 @@ theorem termSubst_var_comm {L : Language}
   | const c => simp [termSubst]
   | func f ts ih => simp only [termSubst]; congr 1; ext i; exact ih i
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem formulaSubst_var_comm {L : Language}
     (A : FormulaN L) (t : Term L) (x y z : Nat) (hxy : x ≠ y) (hzx : z ≠ x)
     (hNB : ¬ formulaBVN A y) :
@@ -123,7 +121,6 @@ theorem formulaSubst_var_comm {L : Language}
     · simp [formulaSubstN, hxw, hyw, ih hA]
 
 -- Term free variables are preserved or mapped under variable substitution.
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem termFV_termSubst_var {L : Language}
     (s : Term L) (y z w : Nat) (hwz : w ≠ z)
     (h : w ∉ termFV s) :
@@ -141,7 +138,6 @@ theorem termFV_termSubst_var {L : Language}
     exact h ⟨i, (ih i (fun hc => h ⟨i, hc⟩)).elim hi⟩
 
 -- isFreeForN for a variable that doesn't appear bound in A.
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem isFreeFor_var_notBV {L : Language}
     (A : FormulaN L) (x z : Nat) (hNoBV : ¬ formulaBVN A z) :
     isFreeForN (.var z) x A := by
@@ -172,7 +168,6 @@ theorem isFreeFor_var_notBV {L : Language}
       exact ⟨fun hmem => hzy hmem.symm, ih (fun h => hNoBV (Or.inl h))⟩
 
 -- isFreeForN preservation under variable substitution.
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem isFreeFor_var_subst {L : Language}
     (A : FormulaN L) (t : Term L) (x y z : Nat) (hxy : x ≠ y) (hzx : z ≠ x)
     (hfree : isFreeForN t x A) (hNB : ¬ formulaBVN A y) (hNoZ : ¬ formulaBVN A z) :
@@ -348,7 +343,6 @@ theorem formulaFV_formulaSubstConst {L : Language}
 
 
 -- BV(A[t/x]) = BV(A)
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem formulaBV_formulaSubst {L : Language} (A : FormulaN L) (t : Term L) (x : Nat) :
     formulaBVN (formulaSubstN A t x) = formulaBVN A := by
 -- BEGIN PROOF
@@ -392,7 +386,6 @@ theorem isFreeForN_var_self {L : Language} (A : FormulaN L) (x : Nat) :
         simp only [termFV] at heq; exact heq.symm), ih⟩
 
 -- Helper: if v ∉ termFV t and v ≠ z, then v ∉ termFV (termSubst t (.var z) y)
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem termFV_termSubst_ne {L : Language}
     (t : Term L) (y z v : Nat) (hNotFree : v ∉ termFV t) (hNeZ : v ≠ z) :
     v ∉ termFV (termSubst t (.var z) y) := by
@@ -408,7 +401,6 @@ theorem termFV_termSubst_ne {L : Language}
     intro ⟨i, hi⟩; exact ih i (fun hm => hNotFree ⟨i, hm⟩) hi
 
 -- Helper: if v ∉ FV(F) and v ≠ z, then v ∉ FV(F[z/y])
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem formulaFV_formulaSubst_ne {L : Language}
     (F : FormulaN L) (y z v : Nat) (hNotFree : v ∉ formulaFVN F) (hNeZ : v ≠ z) :
     v ∉ formulaFVN (formulaSubstN F (.var z) y) := by
@@ -467,7 +459,6 @@ def _root_.LCS.CutElim.LK.FOLKDeductionTree.varNotOccurs {L : Language}
   | _, .twoPremise rule t₁ t₂, z =>
       rule.varNotOccurs z ∧ t₁.varNotOccurs z ∧ t₂.varNotOccurs z
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Passing from a deduction tree to its proof tree preserves bound-variable exclusion. -/
 theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.notBoundIn_toProofTree
     {L : Language} {hL : L.withoutEquality} {s : Sequent L}
@@ -480,7 +471,6 @@ theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.notBoundIn_toProofTree
   | twoPremise rule t₁ t₂ ih₁ ih₂ =>
     exact and_congr Iff.rfl (and_congr (ih₁ hp.1) (ih₂ hp.2))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Passing from a deduction tree to its proof tree preserves variable freshness. -/
 theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.varNotOccurs_toProofTree
     {L : Language} {hL : L.withoutEquality} {s : Sequent L}
@@ -493,7 +483,6 @@ theorem _root_.LCS.CutElim.LK.FOLKDeductionTree.varNotOccurs_toProofTree
   | twoPremise rule t₁ t₂ ih₁ ih₂ =>
     exact and_congr Iff.rfl (and_congr (ih₁ hp.1) (ih₂ hp.2))
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 end LCS.CutElim.Interpolation

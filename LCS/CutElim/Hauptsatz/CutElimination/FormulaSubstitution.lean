@@ -14,7 +14,6 @@ open LCS.FirstOrder.SyntaxN.Substitution
 open LCS.CutElim.Hauptsatz
 open LCS.CutElim.Hauptsatz.Completeness
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem LCS.Finset.image_insert [DecidableEq α] [DecidableEq β]
     (f : α → β) (a : α) (s : LCS.Finset α) :
     LCS.Finset.image f (LCS.Finset.insert a s) =
@@ -38,7 +37,6 @@ namespace LCS.CutElim.Hauptsatz
 -- ===================================================================
 -- Helper: isAtomic preserved under formulaSubstN
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 6.4.5 (required helper): term substitution `[t/y]` preserves
 atomicity of a formula. Used when `substRule` transports the atomic-axiom
 hypothesis across rule substitution. -/

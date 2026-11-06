@@ -75,7 +75,6 @@ def labelAt : {s : Sequent} → InfDeductionTree s → List Nat → Option Seque
   | _, .extend _ _ t, 0 :: p => t.labelAt p
   | _, .extend _ _ _, (_ + 1) :: _ => none
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 @[simp] theorem leaves_bindLeaves (f : (s : Sequent) → InfDeductionTree s)
     {s : Sequent} (t : InfDeductionTree s) :
     (bindLeaves f t).leaves = t.leaves.flatMap (fun s => (f s).leaves) := by
@@ -85,7 +84,6 @@ def labelAt : {s : Sequent} → InfDeductionTree s → List Nat → Option Seque
   | twoPremise _ _ _ ih₁ ih₂ => simp [bindLeaves, leaves, ih₁, ih₂, List.flatMap_append]
   | extend _ _ _ ih => exact ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Grafting below leaves preserves every existing node and its address. -/
 theorem labelAt_bindLeaves_preserves (f : (s : Sequent) → InfDeductionTree s)
     {s : Sequent} (t : InfDeductionTree s) (p : List Nat) (label : Sequent)
@@ -131,7 +129,6 @@ inductive InfBranchStep : Sequent → Sequent → Type where
   | extend (s) (a b) : InfBranchStep s (extendSeq s a b)
   | idle (s) : InfBranchStep s s
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every actual parent-child edge carries its structural branch step. -/
 theorem InfDeductionTree.branchStep_of_labels {root : Sequent}
     (tree : InfDeductionTree root) (p : List Nat) (i : Nat) {s c : Sequent}
@@ -212,7 +209,6 @@ def leafAt : {s : Sequent} → InfDeductionTree s → List Nat → Option Sequen
   | _, .extend _ _ t, 0 :: p => t.leafAt p
   | _, .extend _ _ _, (_ + 1) :: _ => none
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem labelAt_of_leafAt {s label : Sequent} (t : InfDeductionTree s)
     (p : List Nat) (h : t.leafAt p = some label) : t.labelAt p = some label := by
   induction t generalizing p with
@@ -242,14 +238,12 @@ theorem labelAt_of_leafAt {s label : Sequent} (t : InfDeductionTree s)
       | zero => exact ih p h
       | succ => simp [leafAt] at h
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def height : {s : Sequent} → InfDeductionTree s → Nat
   | _, .leaf _ => 0
   | _, .onePremise _ t => t.height + 1
   | _, .twoPremise _ l r => max l.height r.height + 1
   | _, .extend _ _ t => t.height + 1
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem labelAt_length_le_height {s label : Sequent} (t : InfDeductionTree s)
     (p : List Nat) (h : t.labelAt p = some label) : p.length ≤ t.height := by
   induction t generalizing p with
@@ -285,7 +279,6 @@ theorem labelAt_length_le_height {s label : Sequent} (t : InfDeductionTree s)
       | zero => exact Nat.succ_le_succ (ih p h)
       | succ => simp [labelAt] at h
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- Extension retains every existing edge and adds nodes only below leaves. -/
 inductive Extension : {s t : Sequent} → InfDeductionTree s → InfDeductionTree t → Prop where
   | leaf {s} (t : InfDeductionTree s) : Extension (.leaf s) t
@@ -297,7 +290,6 @@ inductive Extension : {s t : Sequent} → InfDeductionTree s → InfDeductionTre
   | intro {s} (a b) {t u : InfDeductionTree (extendSeq s a b)} :
       Extension t u → Extension (.extend a b t) (.extend a b u)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem Extension.refl {s} (t : InfDeductionTree s) : Extension t t := by
   induction t with
   | leaf => exact .leaf _
@@ -305,7 +297,6 @@ theorem Extension.refl {s} (t : InfDeductionTree s) : Extension t t := by
   | twoPremise r _ _ ih₁ ih₂ => exact .two r ih₁ ih₂
   | extend a b _ ih => exact .intro a b ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem Extension.trans {s t u} {a : InfDeductionTree s} {b : InfDeductionTree t}
     {c : InfDeductionTree u} (h₁ : Extension a b) (h₂ : Extension b c) : Extension a c := by
   induction h₁ generalizing u with
@@ -316,7 +307,6 @@ theorem Extension.trans {s t u} {a : InfDeductionTree s} {b : InfDeductionTree t
     | two _ ha hb => exact .two r (ih₁ ha) (ih₂ hb)
   | intro a b h ih => cases h₂ with | intro _ _ h₂ => exact .intro a b (ih h₂)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem extension_bindLeaves (f : (s : Sequent) → InfDeductionTree s)
     {s} (t : InfDeductionTree s) : Extension t (t.bindLeaves f) := by
   induction t with
@@ -325,7 +315,6 @@ theorem extension_bindLeaves (f : (s : Sequent) → InfDeductionTree s)
   | twoPremise r _ _ ih₁ ih₂ => exact .two r ih₁ ih₂
   | extend a b _ ih => exact .intro a b ih
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A new node is either an old node or lies below an old leaf. -/
 theorem Extension.node_or_leaf_prefix {s t} {a : InfDeductionTree s}
     {b : InfDeductionTree t} (h : Extension a b) (p : List Nat) (label : Sequent)
@@ -371,7 +360,6 @@ theorem Extension.node_or_leaf_prefix {s t} {a : InfDeductionTree s}
         · exact Or.inr ⟨0 :: q, suffix, leaf, rfl, hleaf⟩
       | succ => simp [labelAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every internal search-tree node is nonaxiomatic. -/
 def AllInnerOpen : {s : Sequent} → InfDeductionTree s → Prop
   | _, .leaf _ => True
@@ -379,7 +367,6 @@ def AllInnerOpen : {s : Sequent} → InfDeductionTree s → Prop
   | s, .twoPremise _ l r => ¬ isAxiom s ∧ l.AllInnerOpen ∧ r.AllInnerOpen
   | s, .extend _ _ t => ¬ isAxiom s ∧ t.AllInnerOpen
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem allInnerOpen_ofDeductionTree {s} (t : DeductionTree s)
     (h : Search.AllInnerOpen t) : (ofDeductionTree t).AllInnerOpen := by
   induction t with
@@ -387,7 +374,6 @@ theorem allInnerOpen_ofDeductionTree {s} (t : DeductionTree s)
   | onePremise r t ih => exact ⟨h.1, ih h.2⟩
   | twoPremise r l t ih₁ ih₂ => exact ⟨h.1, ih₁ h.2.1, ih₂ h.2.2⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem allInnerOpen_bindLeaves (f : (s : Sequent) → InfDeductionTree s)
     (hf : ∀ s, (f s).AllInnerOpen) {s} (t : InfDeductionTree s)
     (h : t.AllInnerOpen) : (t.bindLeaves f).AllInnerOpen := by
@@ -397,7 +383,6 @@ theorem allInnerOpen_bindLeaves (f : (s : Sequent) → InfDeductionTree s)
   | twoPremise r l t ih₁ ih₂ => exact ⟨h.1, ih₁ h.2.1, ih₂ h.2.2⟩
   | extend a b t ih => exact ⟨h.1, ih h.2⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem leafAt_of_axiom {s label : Sequent} (t : InfDeductionTree s)
     (h : t.AllInnerOpen) (p : List Nat) (hp : t.labelAt p = some label)
     (ha : isAxiom label) : t.leafAt p = some label := by
@@ -428,7 +413,6 @@ theorem leafAt_of_axiom {s label : Sequent} (t : InfDeductionTree s)
       | zero => exact ih h.2 p hp
       | succ => simp [labelAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem leafAt_bindLeaves_of_fixed (f : (s : Sequent) → InfDeductionTree s)
     {s label : Sequent} (t : InfDeductionTree s) (p : List Nat)
     (hp : t.leafAt p = some label) (hf : f label = .leaf label) :
@@ -466,7 +450,6 @@ theorem leafAt_bindLeaves_of_fixed (f : (s : Sequent) → InfDeductionTree s)
       | zero => exact ih p hp
       | succ => simp [leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem labelAt_child_of_leafAt {s label : Sequent} (t : InfDeductionTree s)
     (p : List Nat) (i : Nat) (hp : t.leafAt p = some label) :
     t.labelAt (p ++ [i]) = none := by
@@ -497,7 +480,6 @@ theorem labelAt_child_of_leafAt {s label : Sequent} (t : InfDeductionTree s)
       | zero => exact ih p hp
       | succ => simp [leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Lookup below an old leaf is exactly lookup in that leaf's replacement. -/
 theorem labelAt_bindLeaves_below_leaf (f : (s : Sequent) → InfDeductionTree s)
     {s label : Sequent} (t : InfDeductionTree s) (p suffix : List Nat)
@@ -533,7 +515,6 @@ theorem labelAt_bindLeaves_below_leaf (f : (s : Sequent) → InfDeductionTree s)
       | zero => exact ih p hp
       | succ => simp [leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem leafAt_bindLeaves_below_leaf (f : (s : Sequent) → InfDeductionTree s)
     {s label : Sequent} (t : InfDeductionTree s) (p suffix : List Nat)
     (hp : t.leafAt p = some label) :
@@ -568,7 +549,6 @@ theorem leafAt_bindLeaves_below_leaf (f : (s : Sequent) → InfDeductionTree s)
       | zero => exact ih p hp
       | succ => simp [leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Each new leaf lies below one precise old leaf occurrence. -/
 theorem leafAt_bindLeaves_decompose (f : (s : Sequent) → InfDeductionTree s)
     {s label : Sequent} (t : InfDeductionTree s) (p : List Nat)
@@ -610,7 +590,6 @@ theorem leafAt_bindLeaves_decompose (f : (s : Sequent) → InfDeductionTree s)
         exact ⟨0 :: q, suffix, leaf, rfl, hq, hf⟩
       | succ => simp [bindLeaves, leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- No proper descendant address can lie below a leaf. -/
 theorem leafAt_descendant_eq {s leaf label : Sequent} (t : InfDeductionTree s)
     (p suffix : List Nat) (hp : t.leafAt p = some leaf)
@@ -645,7 +624,6 @@ theorem leafAt_descendant_eq {s leaf label : Sequent} (t : InfDeductionTree s)
       | zero => exact ih p hp hq
       | succ => simp [leafAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Every listed leaf has an actual address. -/
 theorem leafAt_of_mem_leaves {s leaf : Sequent} (t : InfDeductionTree s)
     (h : leaf ∈ t.leaves) : ∃ p, t.leafAt p = some leaf := by
@@ -665,7 +643,6 @@ theorem leafAt_of_mem_leaves {s leaf : Sequent} (t : InfDeductionTree s)
     obtain ⟨p, hp⟩ := ih h
     exact ⟨0 :: p, hp⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A node's immediate predecessor is present and the edge is binary. -/
 theorem labelAt_parent {s label : Sequent} (t : InfDeductionTree s)
     (p : List Nat) (i : Nat) (hp : t.labelAt (p ++ [i]) = some label) :
@@ -709,7 +686,6 @@ theorem labelAt_parent {s label : Sequent} (t : InfDeductionTree s)
       | zero => exact ih p hp
       | succ => simp [labelAt] at hp
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- An addressed leaf occurs in the tree's leaf list. -/
 theorem mem_leaves_of_leafAt {s leaf : Sequent} (t : InfDeductionTree s)
     (p : List Nat) (h : t.leafAt p = some leaf) : leaf ∈ t.leaves := by
@@ -748,28 +724,24 @@ open LCS.Propositional.Semantics
 open LCS.Propositional.Systems.G
 open LCS.Propositional.Systems.G.Search
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem InfDeductionTree.ofDeductionTree_cast {s t : Sequent} (h : s = t)
     (tree : DeductionTree s) :
     ofDeductionTree (h ▸ tree) = h ▸ ofDeductionTree tree := by
   subst h
   rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem InfDeductionTree.bindLeaves_cast (f : (s : Sequent) → InfDeductionTree s)
     {s t : Sequent} (h : s = t) (tree : InfDeductionTree s) :
     bindLeaves f (h ▸ tree) = h ▸ bindLeaves f tree := by
   subst h
   rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem InfDeductionTree.labelAt_cast {s t : Sequent} (h : s = t)
     (tree : InfDeductionTree s) (p : List Nat) :
     (h ▸ tree : InfDeductionTree t).labelAt p = tree.labelAt p := by
   subst h
   rfl
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 @[simp] theorem InfDeductionTree.leafAt_cast {s t : Sequent} (h : s = t)
     (tree : InfDeductionTree s) (p : List Nat) :
     (h ▸ tree : InfDeductionTree t).leafAt p = tree.leafAt p := by

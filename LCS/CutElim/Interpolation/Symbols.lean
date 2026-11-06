@@ -115,7 +115,6 @@ def listFormulaFV {L : Language}
 -- Monotonicity helpers for symbol containment in interpolation
 -- ===================================================================
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 end LCS.CutElim.Interpolation

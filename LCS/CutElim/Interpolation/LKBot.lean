@@ -46,10 +46,8 @@ inductive FOLKBotProofTree {L : Language} (botP : L.predSymbols) (hBotArity : L.
   | twoPremise {prem1 prem2 conc : Sequent L} (rule : FOLKStep2 prem1 prem2 conc) (t1 : FOLKBotProofTree botP hBotArity prem1) (t2 : FOLKBotProofTree botP hBotArity prem2) : FOLKBotProofTree botP hBotArity conc
 
 namespace FOLKBotProofTree
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- Lemma 6.5.2 (companion): Returns the sequent labeling the root
 of the LK_bot proof tree. -/
 def conclusion {s : Sequent L} (_ : FOLKBotProofTree botP hBotArity s) : Sequent L := s
@@ -125,17 +123,14 @@ theorem folkProvable_to_lkBotProvable {L : Language}
     (s : Sequent L) (h : folkProvable s) : lkBotProvable botP hBotArity s := by
   obtain ⟨t⟩ := h; exact ⟨folkToBot botP hBotArity t⟩
 
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem lkBot_onePremise {prem conc : Sequent L}
     (rule : FOLKStep1 prem conc)
     (h : lkBotProvable botP hBotArity prem) :
     lkBotProvable botP hBotArity conc := by
   obtain ⟨t⟩ := h; exact ⟨.onePremise rule t⟩
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem lkBot_twoPremise {p1 p2 conc : Sequent L}
     (rule : FOLKStep2 p1 p2 conc)
     (h1 : lkBotProvable botP hBotArity p1) (h2 : lkBotProvable botP hBotArity p2) :

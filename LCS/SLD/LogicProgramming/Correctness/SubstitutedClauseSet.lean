@@ -212,7 +212,6 @@ theorem toFOClause_QF {L : Language} (hNoEq : L.withoutEquality)
   | pos atom | neg atom =>
       simpa only [FOLiteral.formula, FOLiteralCore.formula] using (FOHornClause.atomToFormulaQF (hNoEq := hNoEq)) atom
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Pointwise-at-fixed-s variant of `sldDerivation_substituted_invariant`.
     Takes a single-assignment satisfaction premise and yields a
     single-assignment satisfaction conclusion. Proof mirrors the original
@@ -233,7 +232,6 @@ theorem sldDerivation_substituted_invariant_pw {L : Language} (hNoEq : L.without
   -- REPAIR(T9-77a): proof pending — migration to extensional bodies/renamed-head steps
   sorry
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 9.5.3: Given a Horn set P and SLD-refutation R, the
     quantifier-free substituted set
     {theta_1(N_0), theta_1(C_1),...,theta_p(C_p)} is unsatisfiable.

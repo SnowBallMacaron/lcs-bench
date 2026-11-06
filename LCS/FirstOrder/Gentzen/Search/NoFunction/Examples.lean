@@ -23,7 +23,6 @@ open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Search.NoFunction
 @[blueprint "chap5__example_5_4_3"]
 def exSearchSeq_5_4_3 : Sequent exampleLangPQ := ⟨[], [exSearchFormula_5_4_3]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem exSearchCross_5_4_3 : crossNoFreeBound exSearchSeq_5_4_3 := by
   intro x ⟨A, hA, hx⟩
   simp only [exSearchSeq_5_4_3, List.nil_append, List.mem_singleton] at hA
@@ -175,7 +174,6 @@ open LCS.FirstOrder.Gentzen LCS.FirstOrder.Gentzen.Search.NoFunction
 @[blueprint "chap5__example_5_4_4"]
 def exSearchSeq_5_4_4 : Sequent exampleLangPQ := ⟨[], [exSearchFormula_5_4_4]⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem exSearchCross_5_4_4 : crossNoFreeBound exSearchSeq_5_4_4 := by
   intro x ⟨A, hA, hx⟩
   simp only [exSearchSeq_5_4_4, List.nil_append, List.mem_singleton] at hA

@@ -85,12 +85,10 @@ def mkSucc (t : Term exAddLang) : Term exAddLang :=
 def zeroTm : Term exAddLang :=
   Term.const ExAddConst.zero
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem termSubstAll_zeroTm (sigma : Nat → Term exAddLang) :
     termSubstAll zeroTm sigma = zeroTm := by
   rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): push structural atom
     substitution through `mkAdd`. -/
 theorem formulaSubstAll_mkAdd (t1 t2 t3 : Term exAddLang)
@@ -112,7 +110,6 @@ theorem formulaSubstAll_mkAdd (t1 t2 t3 : Term exAddLang)
   | 1, _ => rfl
   | 2, _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): push `termSubstAll σ` through `mkSucc`. -/
 theorem termSubstAll_mkSucc (t : Term exAddLang) (σ : Nat → Term exAddLang) :
     termSubstAll (mkSucc t) σ = mkSucc (termSubstAll t σ) := by
@@ -125,7 +122,6 @@ theorem termSubstAll_mkSucc (t : Term exAddLang) (σ : Nat → Term exAddLang) :
   match i, hi with
   | 0, _ => rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): FV of `mkAdd` = union of FVs. -/
 theorem formulaVars_mkAdd (t1 t2 t3 : Term exAddLang) (n : Nat) :
     (mkAdd t1 t2 t3).vars n ↔
@@ -143,7 +139,6 @@ theorem formulaVars_mkAdd (t1 t2 t3 : Term exAddLang) (n : Nat) :
     · exact ⟨⟨1, by decide⟩, h⟩
     · exact ⟨⟨2, by decide⟩, h⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): FV of `mkSucc` = FV of argument. -/
 theorem termVars_mkSucc (t : Term exAddLang) (n : Nat) :
     termVars (mkSucc t) n ↔ termVars t n := by
@@ -156,13 +151,11 @@ theorem termVars_mkSucc (t : Term exAddLang) (n : Nat) :
   · intro h
     exact ⟨⟨0, by decide⟩, h⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): s(0) is ground. -/
 theorem termVars_mkSuccZero (x : Nat) : ¬ termVars (mkSucc zeroTm) x := by
   -- BEGIN PROOF
   rw [termVars_mkSucc]; exact id
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): termVars on `Term.var n`. -/
 theorem termVars_var (n x : Nat) :
     termVars (L := exAddLang) (Term.var n) x ↔ x = n := Iff.rfl
@@ -196,7 +189,6 @@ def exAddGoal : FOHornClause exAddLang (by all_goals rfl) :=
   FOHornClause.goal (hNoEq := by all_goals rfl)
     (LCS.Finset.singleton (mkAdd (mkSucc zeroTm) (Term.var 3) (mkSucc (mkSucc zeroTm))))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper):
     `clauseFV exAddClause_C2.toFOClause` ⊆ {0, 1, 2}. -/
 theorem exAddClause_C2_FV_subset (x : Nat) :
@@ -216,7 +208,6 @@ theorem exAddClause_C2_FV_subset (x : Nat) :
     rw [formulaVars_mkAdd, termVars_mkSucc, termVars_mkSucc] at hV
     rcases hV with h | h | h <;> simp [termVars_var] at h <;> omega
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper):
     `clauseFV exAddClause_C1.toFOClause` ⊆ {0}. -/
 theorem exAddClause_C1_FV_subset (x : Nat) :
@@ -232,7 +223,6 @@ theorem exAddClause_C1_FV_subset (x : Nat) :
   · exact absurd h id
   · simp [termVars_var] at h; exact h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): `0 ∈ clauseFV exAddClause_C2.toFOClause`. -/
 theorem exAddClause_C2_FV_0 :
     (clauseFV (L := exAddLang) (hNoEq := by all_goals rfl)) (exAddClause_C2.toFOClause (hNoEq := by all_goals rfl)) 0 := by
@@ -244,7 +234,6 @@ theorem exAddClause_C2_FV_0 :
       (mkAdd (Term.var 0) (mkSucc (Term.var 1)) (mkSucc (Term.var 2))) 0
     rw [formulaVars_mkAdd]; left; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): `1 ∈ clauseFV exAddClause_C2.toFOClause`. -/
 theorem exAddClause_C2_FV_1 :
     (clauseFV (L := exAddLang) (hNoEq := by all_goals rfl)) (exAddClause_C2.toFOClause (hNoEq := by all_goals rfl)) 1 := by
@@ -256,7 +245,6 @@ theorem exAddClause_C2_FV_1 :
       (mkAdd (Term.var 0) (mkSucc (Term.var 1)) (mkSucc (Term.var 2))) 1
     rw [formulaVars_mkAdd]; right; left; rw [termVars_mkSucc]; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): `2 ∈ clauseFV exAddClause_C2.toFOClause`. -/
 theorem exAddClause_C2_FV_2 :
     (clauseFV (L := exAddLang) (hNoEq := by all_goals rfl)) (exAddClause_C2.toFOClause (hNoEq := by all_goals rfl)) 2 := by
@@ -268,7 +256,6 @@ theorem exAddClause_C2_FV_2 :
       (mkAdd (Term.var 0) (mkSucc (Term.var 1)) (mkSucc (Term.var 2))) 2
     rw [formulaVars_mkAdd]; right; right; rw [termVars_mkSucc]; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): `0 ∈ clauseFV exAddClause_C1.toFOClause`. -/
 theorem exAddClause_C1_FV_0 :
     (clauseFV (L := exAddLang) (hNoEq := by all_goals rfl)) (exAddClause_C1.toFOClause (hNoEq := by all_goals rfl)) 0 := by
@@ -278,7 +265,6 @@ theorem exAddClause_C1_FV_0 :
   · change FOAtomCore.vars (mkAdd (Term.var 0) zeroTm (Term.var 0)) 0
     rw [formulaVars_mkAdd]; left; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper):
     `clauseFV (exAddGoal.bodyFOAtoms.map FOLiteral.neg) x ↔ x = 3`.
     The initial goal's clause-form FV is exactly {3}. -/
@@ -307,7 +293,6 @@ theorem exAddGoal_body_FV_eq_3 (x : Nat) :
         (mkAdd (mkSucc zeroTm) (Term.var 3) (mkSucc (mkSucc zeroTm))) 3
       rw [formulaVars_mkAdd]; right; left; rfl
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper):
     `clauseFV ([mkAdd (s 0) (var 5) (s 0)].map FOLiteral.neg) x ↔ x = 5`.
     This is the current goal of `exAddSLDStep1` after all rho/sigma are
@@ -379,7 +364,6 @@ def exAddSigma1 (n : Nat) : Term exAddLang :=
   else if n = 6 then mkSucc zeroTm
   else Term.var n
 
--- ATTACH-BLOCKER: private declaration
 def exAddPairs1 : List (Term exAddLang × Term exAddLang) :=
   List.ofFn fun i : Fin 3 =>
     (addVec3 (mkSucc zeroTm) (Term.var 3)
@@ -387,7 +371,6 @@ def exAddPairs1 : List (Term exAddLang × Term exAddLang) :=
      addVec3 (Term.var 4) (mkSucc (Term.var 5))
       (mkSucc (Term.var 6)) i)
 
--- ATTACH-BLOCKER: private declaration
 theorem exAddPairs1_eq :
     exAddPairs1 =
       [(mkSucc zeroTm, Term.var 4),
@@ -397,7 +380,6 @@ theorem exAddPairs1_eq :
   rw [List.ofFn_succ, List.ofFn_succ, List.ofFn_succ, List.ofFn_zero]
   rfl
 
--- ATTACH-BLOCKER: private declaration
 theorem exAddSigma1_isPairwiseMGU :
     IsPairwiseMGU exAddSigma1 exAddPairs1 := by
   rw [exAddPairs1_eq]
@@ -565,7 +547,6 @@ noncomputable def exAddSLDStep1 : (FOSLDDerivation (hNoEq := by all_goals rfl)) 
         · exfalso; exact hx exAddClause_C2_FV_2
         · rfl)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Example 9.4.1 (companion helper): The type index of `exAddSLDStep1`
     equals the Finset with the single atom
     `mkAdd (mkSucc zeroTm) (Term.var 5) (mkSucc zeroTm)` as its sole
@@ -628,13 +609,11 @@ def exAddSigma2 (n : Nat) : Term exAddLang :=
   else if n = 7 then mkSucc zeroTm
   else Term.var n
 
--- ATTACH-BLOCKER: private declaration
 def exAddPairs2 : List (Term exAddLang × Term exAddLang) :=
   List.ofFn fun i : Fin 3 =>
     (addVec3 (mkSucc zeroTm) (Term.var 5) (mkSucc zeroTm) i,
      addVec3 (Term.var 7) zeroTm (Term.var 7) i)
 
--- ATTACH-BLOCKER: private declaration
 theorem exAddPairs2_eq :
     exAddPairs2 =
       [(mkSucc zeroTm, Term.var 7),
@@ -644,7 +623,6 @@ theorem exAddPairs2_eq :
   rw [List.ofFn_succ, List.ofFn_succ, List.ofFn_succ, List.ofFn_zero]
   rfl
 
--- ATTACH-BLOCKER: private declaration
 theorem exAddSigma2_isPairwiseMGU :
     IsPairwiseMGU exAddSigma2 exAddPairs2 := by
   rw [exAddPairs2_eq]

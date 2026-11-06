@@ -41,7 +41,6 @@ def setSequentValid {L : Language}
 -- Lemma 7.4.1 (companion def): setSequentFalsifiableIn
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 7.4.1 (companion def): A finset-based sequent (Gamma, Delta) is falsifiable in structure M iff there exists an assignment s such that all formulae in Gamma are satisfied and all formulae in Delta are falsified. This is the contrapositive of finset-based sequent validity restricted to a particular structure. -/
 def setSequentFalsifiableIn {L : Language}
     (M : Structure L)
@@ -134,7 +133,6 @@ theorem g2nnf_core_rule_falsification_preservation
   -- REPAIR(T7-06): proof pending
   sorry
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 7.4.1 (companion theorem): For each G2nnf inference rule satisfying
 its side conditions, if the conclusion sequent is falsifiable in structure M,
 then at least one premise sequent is falsifiable in M.  Quantifier rules carry
@@ -162,7 +160,6 @@ theorem g2nnf_rule_falsification_preservation
 -- List helpers for premise destructuring (used by g2nnf_tree_soundness)
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- In a list of length zero, no element is a member. -/
 theorem list_len_zero_not_mem {α : Type u} (l : List α) (h : l.length = 0) (x : α) :
     ¬ x ∈ l := by
@@ -171,7 +168,6 @@ theorem list_len_zero_not_mem {α : Type u} (l : List α) (h : l.length = 0) (x 
   | nil => intro hm; exact absurd hm List.not_mem_nil
   | cons a t => simp at h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- In a list of length one, membership implies equality with the
 zeroth element. -/
 theorem list_len_one_eq_zero {α : Type u} (l : List α) (h : l.length = 1) (x : α)
@@ -185,7 +181,6 @@ theorem list_len_one_eq_zero {α : Type u} (l : List α) (h : l.length = 1) (x :
       simp at hx; simp; exact hx
     | cons b t' => simp at h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- In a list of length two, membership implies equality with element
 0 or element 1. -/
 theorem list_len_two_eq_zero_or_one {α : Type u} (l : List α) (h : l.length = 2) (x : α)
@@ -209,7 +204,6 @@ theorem list_len_two_eq_zero_or_one {α : Type u} (l : List α) (h : l.length = 
 -- Lemma 7.4.1 (tree level): g2nnf_tree_soundness
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 7.4.1 (companion tree level): The system G2nnf is sound — every conclusion sequent reachable by a G2nnf proof tree is valid. Stated as "not falsifiable in any structure M" for any (Γ, Δ) with a `G2nnfProofTree hL Γ Δ`. Proved by structural induction on the proof tree using the rule-level step `g2nnf_rule_falsification_preservation` at each node: if the conclusion were falsifiable, preservation exhibits a falsifiable premise, and the inductive hypothesis on the subtree indexed by that premise gives a contradiction. The axiom case has no premises, so preservation produces the required contradiction from the empty premise list. This is the form of Def 7.4.3-compatible soundness claimed in §7.4.2 of the textbook. -/
 theorem g2nnf_tree_soundness {L : Language} (hL : L.withoutEquality) [DecidableEq (FormulaN L)]
     (M : Structure L) :

@@ -323,7 +323,6 @@ open LCS.SLD.LogicProgramming
 -- Refutation (iii): decomposed step-by-step (2 steps for :-rich(Z)).
 -- -------------------------------------------------------------------
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iii), init node: goal clause is `[rich(var 1)]`. -/
 noncomputable def exRefutation_iii_init :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_ii
@@ -334,7 +333,6 @@ noncomputable def exRefutation_iii_init :
     exCorrectnessGoalClause2
     (by unfold exCorrectnessGoals_ii; simp))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iii), step 1 (resolve rich(Z) with rich(X):-rocksinger(X)). -/
 noncomputable def exRefutation_iii_step1 :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_ii
@@ -373,7 +371,6 @@ noncomputable def exRefutation_iii_step1 :
             FOHornClause.bodyFOAtoms, FOHornClauseCore.bodyFOAtoms, FOHornClauseCore.body, FOHornClause.fact, FOHornClause.rule, FOHornClause.goal, LCS.Finset.mem_toList, LCS.Finset.mem_ofList, finset_toList_empty, finset_toList_singleton]))
         ex954_iii_hSep1)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iii), step 1 currentGoal collapses to `{rocksinger(var 10)}`. -/
 theorem exRefutation_iii_step1_currentGoal :
     ((((LCS.Finset.ofList
@@ -488,7 +485,6 @@ noncomputable def exRefutation_iii :
 -- indefinite answer Y_1/Y, Y_1/Z).
 -- -------------------------------------------------------------------
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iv), init node: goal clause is `[rich(var 1)]`. -/
 noncomputable def exRefutation_iv_init :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_ii
@@ -499,7 +495,6 @@ noncomputable def exRefutation_iv_init :
     exCorrectnessGoalClause2
     (by unfold exCorrectnessGoals_ii; simp))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iv), step 1 (resolve rich(Z) with rich(X):-rocksinger(X)). -/
 noncomputable def exRefutation_iv_step1 :
     (FOSLDDerivation (hNoEq := exCorrectnessLang_noEq)) (fun c => c ∈ exCorrectnessProgram) exCorrectnessGoals_ii
@@ -538,7 +533,6 @@ noncomputable def exRefutation_iv_step1 :
             FOHornClause.bodyFOAtoms, FOHornClauseCore.bodyFOAtoms, FOHornClauseCore.body, FOHornClause.fact, FOHornClause.rule, FOHornClause.goal, LCS.Finset.mem_toList, LCS.Finset.mem_ofList, finset_toList_empty, finset_toList_singleton]))
         ex954_iv_hSep1)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Ex 9.5.4 (iv), step 1 currentGoal collapses to `{rocksinger(var 10)}`. -/
 theorem exRefutation_iv_step1_currentGoal :
     ((((LCS.Finset.ofList

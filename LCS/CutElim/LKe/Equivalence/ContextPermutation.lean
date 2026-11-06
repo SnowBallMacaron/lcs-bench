@@ -61,11 +61,10 @@ def geqDepth {L : Language} {hL : L.hasEquality = true} :
 -- ===================================================================
 -- Lemma 6.3.2 (internal helper): depth-preserving context permutation
 -- ===================================================================
--- ATTACH-BLOCKER: private declaration
 /-- Removing equally marked occurrences from two permuted lists leaves
 permuted remainders.  The occurrences are positional: this remains valid
 when the marked value occurs more than once. -/
-private theorem geqPerm_cancelMarked {α : Type} {P Q R S : List α} {X : α}
+theorem geqPerm_cancelMarked {α : Type} {P Q R S : List α} {X : α}
     (h : (P ++ [X] ++ Q).Perm (R ++ [X] ++ S)) :
     (P ++ Q).Perm (R ++ S) := by
   have moveFront :
@@ -79,10 +78,9 @@ private theorem geqPerm_cancelMarked {α : Type} {P Q R S : List α} {X : α}
   exact List.Perm.cons_inv
     ((moveFront P Q).trans (h.trans (moveFront R S).symm))
 
--- ATTACH-BLOCKER: private declaration
 /-- Inserting the same formula block at arbitrary splits preserves a
 permutation of the surrounding contexts. -/
-private theorem geqPerm_insertBlock {α : Type} {P Q R S : List α}
+theorem geqPerm_insertBlock {α : Type} {P Q R S : List α}
     (block : List α) (h : (P ++ Q).Perm (R ++ S)) :
     (P ++ block ++ Q).Perm (R ++ block ++ S) := by
   have moveFront :
@@ -164,18 +162,15 @@ theorem geqPermuteContexts_base
       simpa [geqDepth, gProofTreeDepth] using hpd, hpl⟩
 
 section
--- ATTACH-BLOCKER: variable
 variable
     (L : Language) (hL : L.hasEquality = true) (n : Nat) (ih : ∀ (m : Nat), m < n → ∀ {s : Sequent L} (T :
       GEqProofTree hL s), geqDepth T = m → ∀ (Γ' Δ' : List (FormulaN L)), s.antecedent.Perm Γ' →
       s.succedent.Perm Δ' → (∀ (s' : Sequent L), s' ∈ geqLeafSequents T → seqAllAtomicOrQuantified s') → ∃ (T'
       : GEqProofTree hL (Sequent.mk (Γ') (Δ'))), geqDepth T' = geqDepth T ∧ ∀ (s' : Sequent L), s' ∈
       geqLeafSequents T' → seqAllAtomicOrQuantified s')
--- ATTACH-BLOCKER: unknown command Lean.Parser.Command.include
 include ih
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_conjLeft
+theorem geqPermuteContexts_conjLeft
     (Γ' Δ' Γr Δr Λr : List (FormulaN L)) (X Y : FormulaN L) (sub : GEqProofTree hL (Sequent.mk (Γr ++ [X, Y]
       ++ Δr) (Λr))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub →
       seqAllAtomicOrQuantified s') (hΓc : (Γr ++ [X.conj Y] ++ Δr).Perm Γ') (hΔc : (Λr).Perm Δ')
@@ -192,8 +187,7 @@ private theorem geqPermuteContexts_conjLeft
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_disjRight
+theorem geqPermuteContexts_disjRight
     (Γ' Δ' Γr Δr Λr : List (FormulaN L)) (X Y : FormulaN L) (sub : GEqProofTree hL (Sequent.mk (Γr) (Δr ++ [X,
       Y] ++ Λr))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub →
       seqAllAtomicOrQuantified s') (hΓc : (Γr).Perm Γ') (hΔc : (Δr ++ [X.disj Y] ++ Λr).Perm Δ')
@@ -210,8 +204,7 @@ private theorem geqPermuteContexts_disjRight
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_implRight
+theorem geqPermuteContexts_implRight
     (Γ' Δ' Γr Δr Λr : List (FormulaN L)) (X Y : FormulaN L) (sub : GEqProofTree hL (Sequent.mk ([X] ++ Γr)
       ([Y] ++ Δr ++ Λr))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents
       sub → seqAllAtomicOrQuantified s') (hΓc : (Γr).Perm Γ') (hΔc : (Δr ++ [X.impl Y] ++ Λr).Perm Δ')
@@ -231,8 +224,7 @@ private theorem geqPermuteContexts_implRight
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_negLeft
+theorem geqPermuteContexts_negLeft
     (Γ' Δ' Γr Δr Λr : List (FormulaN L)) (X : FormulaN L) (sub : GEqProofTree hL (Sequent.mk (Γr ++ Δr) ([X]
       ++ Λr))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub →
       seqAllAtomicOrQuantified s') (hΓc : (Γr ++ [X.neg] ++ Δr).Perm Γ') (hΔc : (Λr).Perm Δ')
@@ -250,8 +242,7 @@ private theorem geqPermuteContexts_negLeft
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_negRight
+theorem geqPermuteContexts_negRight
     (Γ' Δ' Γr Δr Λr : List (FormulaN L)) (X : FormulaN L) (sub : GEqProofTree hL (Sequent.mk ([X] ++ Γr) (Δr
       ++ Λr))) (hsubdepth : geqDepth sub < n) (hsubleaf : ∀ (s' : Sequent L), s' ∈ geqLeafSequents sub →
       seqAllAtomicOrQuantified s') (hΓc : (Γr).Perm Γ') (hΔc : (Δr ++ [X.neg] ++ Λr).Perm Δ')
@@ -269,8 +260,7 @@ private theorem geqPermuteContexts_negRight
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_allLeft
+theorem geqPermuteContexts_allLeft
     (Γ' Δ' : List (FormulaN L)) (ts : List (Term L)) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L)
       (hne : ts ≠ []) (hfree : ∀ (t : Term L), t ∈ ts → isFreeForN t x X) (sub : GEqProofTree hL (Sequent.mk
       (Γr ++ List.map (fun (t : Term L) => formulaSubstN X t x) ts ++ [FormulaN.all x X] ++ Δr) (Λr)))
@@ -294,8 +284,7 @@ private theorem geqPermuteContexts_allLeft
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_allRight
+theorem geqPermuteContexts_allRight
     (permFresh : ∀ (y : Nat) {Γ Δ Γ' Δ' : List (FormulaN L)}, Γ.Perm Γ' → Δ.Perm Δ' → (∀ (F : FormulaN L), F ∈
       Γ ++ Δ → ¬y ∈ formulaFVN F) → ∀ (F : FormulaN L), F ∈ Γ' ++ Δ' → ¬y ∈ formulaFVN F) (Γ' Δ' : List
       (FormulaN L)) (y : Nat) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L) (hfresh : ∀ (F :
@@ -320,8 +309,7 @@ private theorem geqPermuteContexts_allRight
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_exLeft
+theorem geqPermuteContexts_exLeft
     (permFresh : ∀ (y : Nat) {Γ Δ Γ' Δ' : List (FormulaN L)}, Γ.Perm Γ' → Δ.Perm Δ' → (∀ (F : FormulaN L), F ∈
       Γ ++ Δ → ¬y ∈ formulaFVN F) → ∀ (F : FormulaN L), F ∈ Γ' ++ Δ' → ¬y ∈ formulaFVN F) (Γ' Δ' : List
       (FormulaN L)) (y : Nat) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L) (hfresh : ∀ (F :
@@ -346,8 +334,7 @@ private theorem geqPermuteContexts_exLeft
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: private declaration
-private theorem geqPermuteContexts_exRight
+theorem geqPermuteContexts_exRight
     (Γ' Δ' : List (FormulaN L)) (ts : List (Term L)) (Γr Δr Λr : List (FormulaN L)) (x : Nat) (X : FormulaN L)
       (hne : ts ≠ []) (hfree : ∀ (t : Term L), t ∈ ts → isFreeForN t x X) (sub : GEqProofTree hL (Sequent.mk
       (Γr) (Δr ++ List.map (fun (t : Term L) => formulaSubstN X t x) ts ++ [FormulaN.ex x X] ++ Λr)))
@@ -371,7 +358,6 @@ private theorem geqPermuteContexts_exRight
     omega
   · simpa [geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_permOne
     (permFresh : ∀ (y : Nat) {Γ Δ Γ' Δ' : List (FormulaN L)}, Γ.Perm Γ' → Δ.Perm Δ' → (∀ (F : FormulaN L), F ∈
       Γ ++ Δ → ¬y ∈ formulaFVN F) → ∀ (F : FormulaN L), F ∈ Γ' ++ Δ' → ¬y ∈ formulaFVN F) (Γ' Δ' : List
@@ -401,7 +387,6 @@ theorem geqPermuteContexts_permOne
   | exRight ts Γr Δr Λr x X hne hfree =>
     exact geqPermuteContexts_exRight L hL n ih Γ' Δ' ts _ Δr Λr x X hne hfree sub hsubdepth hsubleaf hΓc hΔc
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_permTwo
     (Γ' Δ' : List (FormulaN L))
     : ∀ {prem1 prem2 conc : Sequent L} (rule : GentzenStep2Ext prem1 prem2 conc) (sub1 : GEqProofTree hL
@@ -465,7 +450,6 @@ theorem geqPermuteContexts_permTwo
       simp only [geqLeafSequents, List.mem_append] at hs'
       exact hs'.elim (hq1l s') (hq2l s')
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_eqRefl
     (Γ' Δ' : List (FormulaN L)) (t : Term L) (Γr Δr : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk
       (Γr ++ [FormulaN.eq_ hL t t]) (Δr))) (hΓ : (Γr).Perm Γ') (hΔ : (Δr).Perm Δ') (hdepth : geqDepth
@@ -485,7 +469,6 @@ theorem geqPermuteContexts_eqRefl
     rw [hqd]
   · simpa [p, geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_eqFuncCong
     (Γ' Δ' : List (FormulaN L)) (f : L.funSymbols) (ss ts : Fin (L.funArity f) → Term L) (Γr Δr : List
       (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γr ++ [eqCongruenceImplFunc L hL f ss ts]) (Δr))) (hΓ
@@ -506,7 +489,6 @@ theorem geqPermuteContexts_eqFuncCong
     rw [hqd]
   · simpa [p, geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_eqPredCong
     (Γ' Δ' : List (FormulaN L)) (P : L.predSymbols) (ss ts : Fin (L.predArity P) →
       Term L) (Γr Δr : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γr ++ [eqCongruenceImplPred L hL
@@ -526,7 +508,6 @@ theorem geqPermuteContexts_eqPredCong
     rw [hqd]
   · simpa [p, geqLeafSequents] using hql
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 theorem geqPermuteContexts_eqGeneral
     (Γ' Δ' axioms : List (FormulaN L)) (hne : axioms ≠ []) (haxioms : ∀ (A : FormulaN L), A ∈ axioms →
       isEqAxiomInstance hL A) (Γr Δr : List (FormulaN L)) (sub : GEqProofTree hL (Sequent.mk (Γr ++ axioms)
@@ -549,7 +530,6 @@ theorem geqPermuteContexts_eqGeneral
 
 end
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Independent permutations of the two contexts of a G=-proof are
 admissible without adding an inference level.  The construction recursively
 rebuilds every G and equality inference.  It also transports the

@@ -48,7 +48,6 @@ namespace LCS.Herbrand.NNFHauptsatz.Theorem
 open LCS.Herbrand.NNFHauptsatz.G2nnfProofTree
 open LCS.Herbrand.NNFHauptsatz.G2nnfRule
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- Exact target occurrences witnessing that the moved quantifier is closer
 to the root and a lower-schema descendant occurs inside its exact premise.
 The two paths compose without any rule-value equality search. -/
@@ -88,7 +87,6 @@ structure G2nnfLocalExchangeOrderCertificate {L : Language} {hL : L.withoutEqual
 
 namespace G2nnfLocalExchangeOrderCertificate
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Case-indexed expected multiplicity retained by the exported order
 certificate. -/
 def expectedOtherFrontierCount {L : Language} {hL : L.withoutEquality}

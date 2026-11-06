@@ -28,7 +28,6 @@ open LCS.CutElim.CompletenessBridge
 open LCS.FirstOrder.Equality
 namespace geqProof_to_lkeNoEssentialCuts
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_contractLeft_head {L : Language}
       (A : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -38,7 +37,6 @@ noncomputable def lkeAtomic_contractLeft_head {L : Language}
     exact ⟨.onePremise (.contractLeft A Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_contractRight_end {L : Language}
       (A : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -48,7 +46,6 @@ noncomputable def lkeAtomic_contractRight_end {L : Language}
     exact ⟨.onePremise (.contractRight A Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_exchangeLeft_adj {L : Language}
       (Γ : List (FormulaN L)) (A B : FormulaN L)
@@ -59,7 +56,6 @@ noncomputable def lkeAtomic_exchangeLeft_adj {L : Language}
     exact ⟨.onePremise (.exchangeLeft Γ A B Δ Λ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_exchangeRight_adj {L : Language}
       (Γ Δ : List (FormulaN L)) (A B : FormulaN L)
@@ -71,7 +67,6 @@ noncomputable def lkeAtomic_exchangeRight_adj {L : Language}
 
 
   -- Equality transport for LKeAtomicProofTree
-  -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 
 noncomputable def lkeAtomic_of_eq {L : Language} {s1 s2 : Sequent L}
       (heq : s1 = s2) (h : LKeAtomicProofTree s1) :
@@ -79,7 +74,6 @@ noncomputable def lkeAtomic_of_eq {L : Language} {s1 s2 : Sequent L}
 
 
   -- Float an element from inside a left list to the front
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_floatLeftPast {L : Language}
       (pre mid post : List (FormulaN L)) (Λ : List (FormulaN L))
@@ -105,7 +99,6 @@ noncomputable def lkeAtomic_floatLeftPast {L : Language}
 
 
   -- Sink an element from front past a segment
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_sinkLeftPast {L : Language}
       (pre mid post : List (FormulaN L)) (Λ : List (FormulaN L))
@@ -129,7 +122,6 @@ noncomputable def lkeAtomic_sinkLeftPast {L : Language}
 
 
   -- Float an element from inside a right list to the end
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_floatRightPast {L : Language}
       (pre mid post : List (FormulaN L)) (Γ : List (FormulaN L))
@@ -153,7 +145,6 @@ noncomputable def lkeAtomic_floatRightPast {L : Language}
 
 
   -- Sink an element from the end past a segment
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_sinkRightPast {L : Language}
       (pre mid post : List (FormulaN L)) (Γ : List (FormulaN L))
@@ -178,7 +169,6 @@ noncomputable def lkeAtomic_sinkRightPast {L : Language}
   termination_by structural mid
 
 
-  -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 
 /-- Split at the first occurrence, computing both list segments. -/
   -- Weaken right by prepending before current succedent
@@ -190,7 +180,6 @@ noncomputable def lkeAtomic_sinkRightPast {L : Language}
 
 
   -- Logical rule helpers
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 noncomputable def lkeAtomic_andLeftL_head {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
       (h : LKeAtomicProofTree (Sequent.mk (A :: Γ) Δ)) :
@@ -199,7 +188,6 @@ noncomputable def lkeAtomic_andLeftL_head {L : Language}
     exact ⟨.onePremise (.andLeftL A B Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_andLeftR_head {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -209,7 +197,6 @@ noncomputable def lkeAtomic_andLeftR_head {L : Language}
     exact ⟨.onePremise (.andLeftR A B Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_andRight_end {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -221,7 +208,6 @@ noncomputable def lkeAtomic_andRight_end {L : Language}
     exact ⟨.twoPremise (.andRight A B Γ Δ) t1 t2, ⟨trivial, hcf1, hcf2⟩⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_orLeft_head {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -233,7 +219,6 @@ noncomputable def lkeAtomic_orLeft_head {L : Language}
     exact ⟨.twoPremise (.orLeft A B Γ Δ) t1 t2, ⟨trivial, hcf1, hcf2⟩⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_orRightL_end {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -243,7 +228,6 @@ noncomputable def lkeAtomic_orRightL_end {L : Language}
     exact ⟨.onePremise (.orRightL A B Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_orRightR_end {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -253,7 +237,6 @@ noncomputable def lkeAtomic_orRightR_end {L : Language}
     exact ⟨.onePremise (.orRightR A B Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_implLeft_head {L : Language}
       (A B : FormulaN L) (Γ Δ Λ Θ : List (FormulaN L))
@@ -265,7 +248,6 @@ noncomputable def lkeAtomic_implLeft_head {L : Language}
     exact ⟨.twoPremise (.implLeft A B Γ Δ Λ Θ) t1 t2, ⟨trivial, hcf1, hcf2⟩⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_implRight_head {L : Language}
       (A B : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -275,7 +257,6 @@ noncomputable def lkeAtomic_implRight_head {L : Language}
     exact ⟨.onePremise (.implRight A B Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_negLeft_head {L : Language}
       (A : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -285,7 +266,6 @@ noncomputable def lkeAtomic_negLeft_head {L : Language}
     exact ⟨.onePremise (.negLeft A Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_negRight_head {L : Language}
       (A : FormulaN L) (Γ Δ : List (FormulaN L))
@@ -295,7 +275,6 @@ noncomputable def lkeAtomic_negRight_head {L : Language}
     exact ⟨.onePremise (.negRight A Γ Δ) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_allLeft_head {L : Language}
       (t_term : Term L) (x : Nat) (A : FormulaN L)
@@ -307,7 +286,6 @@ noncomputable def lkeAtomic_allLeft_head {L : Language}
     exact ⟨.onePremise (.allLeft t_term x A Γ Δ hfree) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_allRight_end {L : Language}
       (y : Nat) (x : Nat) (A : FormulaN L)
@@ -322,7 +300,6 @@ noncomputable def lkeAtomic_allRight_end {L : Language}
     exact ⟨.onePremise (.allRight y x A Γ Δ hfresh hfreeFor) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_exLeft_head {L : Language}
       (y : Nat) (x : Nat) (A : FormulaN L)
@@ -337,7 +314,6 @@ noncomputable def lkeAtomic_exLeft_head {L : Language}
     exact ⟨.onePremise (.exLeft y x A Γ Δ hfresh hfreeFor) t, hcf⟩
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 noncomputable def lkeAtomic_exRight_end {L : Language}
       (t_term : Term L) (x : Nat) (A : FormulaN L)
@@ -350,7 +326,6 @@ noncomputable def lkeAtomic_exRight_end {L : Language}
 
 
   -- Contract left list helper
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_contractLeftList {L : Language}
       (pfx lst : List (FormulaN L)) (Δ : List (FormulaN L))
@@ -376,7 +351,6 @@ noncomputable def lkeAtomic_contractLeftList {L : Language}
 
 
   -- Contract right list helper
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_contractRightList {L : Language}
       (pfx lst : List (FormulaN L)) (Γ : List (FormulaN L))
@@ -406,7 +380,6 @@ noncomputable def lkeAtomic_contractRightList {L : Language}
   -- shape (Γ ++ [∀x.A] ++ Δ ⟹ Λ) by induction on ts, peeling one term at a
   -- time: apply the single-term allLeft to tHead, then contract the two
   -- resulting ∀x.A's using the structural helpers.
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_allLeftN {L : Language}
       (ts : List (Term L)) (Γ Δ Λ : List (FormulaN L))
@@ -470,7 +443,6 @@ noncomputable def lkeAtomic_allLeftN {L : Language}
 
 
   -- k-term ∃:right helper: dual of `lkeAtomic_allLeftN` on the succedent.
-  -- ATTACH-BLOCKER: termination suffix
 
 noncomputable def lkeAtomic_exRightN {L : Language}
       (ts : List (Term L)) (Γ Δ Λ : List (FormulaN L))
@@ -533,7 +505,6 @@ noncomputable def lkeAtomic_exRightN {L : Language}
   termination_by structural ts
 
 
-  -- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 
 /-- Discharge one equality-axiom instance while preserving atomic cuts. -/
   noncomputable def removeAxiom {L : Language} (hL : L.hasEquality = true)
@@ -545,7 +516,6 @@ noncomputable def lkeAtomic_exRightN {L : Language}
     sorry
 
 
-  -- ATTACH-BLOCKER: termination suffix
 /-- Discharge the appended equality axioms, from right to left. -/
   noncomputable def removeAxioms {L : Language} (hL : L.hasEquality = true)
       (axioms : List (FormulaN L))
@@ -563,7 +533,6 @@ noncomputable def lkeAtomic_exRightN {L : Language}
   termination_by structural axioms
 
 
-  -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 noncomputable def convertOne {L : Language} {prem conc : Sequent L}
       (rule : GentzenStep1Ext prem conc) (ih : LKeAtomicProofTree prem) :
       LKeAtomicProofTree conc := by
@@ -654,7 +623,6 @@ noncomputable def convertOne {L : Language} {prem conc : Sequent L}
     | exRight ts Γ Δ Λ x A hne hfree =>
       exact lkeAtomic_exRightN ts Γ Δ Λ x A hne hfree ih
 
-  -- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 
 noncomputable def convertTwo {L : Language} {prem₁ prem₂ conc : Sequent L}
       (rule : GentzenStep2Ext prem₁ prem₂ conc)

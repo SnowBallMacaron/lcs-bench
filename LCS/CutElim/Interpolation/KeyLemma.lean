@@ -24,7 +24,6 @@ open LCS.CutElim.LK
 open LCS.CutElim.LKe
 open LCS.CutElim.LKe.Equivalence
 open LCS.FirstOrder.Gentzen.Hintikka
--- ATTACH-BLOCKER: variable
 variable {L : Language} {botP : L.predSymbols} {hBotArity : L.predArity botP = 0}
 
 -- ===================================================================
@@ -43,7 +42,6 @@ theorem interpolation_key_lemma {L : Language} (hL : L.withoutEquality)
     (p : SequentPartition s) :
     ∃ C : FormulaN L, IsInterpolant botP hBotArity p C 
 
--- ATTACH-BLOCKER: section variables: helper requires front context
 /-- The LK-provability reading of Lemma 6.5.2. -/
 theorem interpolation_key_lemma_lk {L : Language} (hL : L.withoutEquality)
     (botP : L.predSymbols) (hBotArity : L.predArity botP = 0)

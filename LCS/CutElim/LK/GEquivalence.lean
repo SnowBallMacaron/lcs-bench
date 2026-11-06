@@ -809,7 +809,6 @@ where
 
 end
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.2.1 (companion, G-tree to cut-free LK algorithm): Every
 indexed `GProofTreeExt` (under the §5.4.8 standing assumption) can be
 converted to a cut-free FOLKProofTree with the same conclusion. This
@@ -822,7 +821,6 @@ theorem gProofTree_to_folkCutFree {L : Language}
   let result := convert_g_to_folkCutFree.convert t
   exact ⟨result.val, result.property⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.2.1 (companion, G to cut-free LK): If a sequent is
 G-provable (under the §5.4.8 standing assumption, `sequentProvableExt`),
 then it is LK-provable without cut. This is one of the two conjuncts
@@ -837,7 +835,6 @@ theorem gProvable_folkCutFreeProvable {L : Language}
 -- ===================================================================
 -- Theorem 6.2.1: folk_g_equivalence
 -- ===================================================================
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Theorem 6.2.1 (companion, bidirectional equivalence): Over a language
 without equality, a sequent satisfying the §6.1 sequent-level free/bound
 convention is LK-provable if and only if it is G-provable. The convention
@@ -872,7 +869,6 @@ noncomputable def convert_folk_to_g {L : Language} [Countable (Term L)]
     (folk_g_equivalence hL seq hCross).mp hfolk
   exact Classical.choice hg
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The tree computed by the G-to-LK conversion is cut-free. -/
 theorem convert_g_to_folkCutFree_isCutFree {L : Language}
     [DecidableEq L.predSymbols] [DecidableEq L.funSymbols] [DecidableEq L.constSymbols]

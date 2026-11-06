@@ -115,7 +115,6 @@ noncomputable def growRightOneProp {L : Language} {supply : TermStream L}
   | .all _ _ => (SearchTree.leaf leaf records, st)
   | .ex _ _ => (SearchTree.leaf leaf records, st)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 5.4.9 (companion, discharge — leaf-level): Mirror of
     `term_isFreeForN_body_all_of_Inv_Sub` for the existential body. -/
 theorem SearchState.term_isFreeForN_body_ex_of_Inv_Sub {L : Language} {supply : TermStream L}

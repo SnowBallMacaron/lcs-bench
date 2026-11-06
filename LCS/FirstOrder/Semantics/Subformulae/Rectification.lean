@@ -111,14 +111,12 @@ open LCS.FirstOrder.Semantics.Substitution (coincidenceLemma)
 open LCS.Propositional.Syntax
 open LCS.Propositional.Semantics
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): Apply a variable renaming to a term. -/
 def termVarMap {L : Language} (sigma : Nat → Nat) : Term L → Term L
   | .var i => .var (sigma i)
   | .const c => .const c
   | .func f ts => .func f (fun j => termVarMap sigma (ts j))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): Update a function at a single point. -/
 def funUpdate (f : Nat → Nat) (i : Nat) (v : Nat) : Nat → Nat :=
   fun x => if x = i then v else f x
@@ -153,7 +151,6 @@ def rectifyAux {L : Language} : FormulaN L → (Nat → Nat) → Nat → Formula
     let (A', n') := rectifyAux A sigma' (n + 1)
     (.ex n A', n')
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): max over a finite function. -/
 def finMax (n : Nat) (f : Fin n → Nat) : Nat :=
   match n with
@@ -161,7 +158,6 @@ def finMax (n : Nat) (f : Fin n → Nat) : Nat :=
   | n + 1 => Nat.max (f ⟨n, Nat.lt_succ_of_le (Nat.le_refl n)⟩)
     (finMax n (fun i => f ⟨i.val, Nat.lt_of_lt_of_le i.isLt (Nat.le_succ n)⟩))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): Maximum variable index in a term (0 if no
 variables). -/
 def termMaxVar {L : Language} : Term L → Nat
@@ -272,7 +268,6 @@ theorem formulaFVN_le_maxVarN {L : Language} (A : FormulaN L) :
 -- Lemma 5.3.4: Rectification of full first-order formulae
 -- ===================================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): A counter-based traversal of a full first-order formula,
 renaming each quantifier to a fresh index and returning the next unused counter. -/
 def rectifyAuxF {L : Language} : Formula L → (Nat → Nat) → Nat → Formula L × Nat
@@ -306,7 +301,6 @@ def rectifyAuxF {L : Language} : Formula L → (Nat → Nat) → Nat → Formula
     let (A', n') := rectifyAuxF A sigma' (n + 1)
     (.ex n A', n')
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Lemma 5.3.4 (companion): Maximum variable index appearing in a full first-order formula,
 including quantifier indices; zero for falsum and rank-zero predicates. -/
 def formulaMaxVarF {L : Language} : Formula L → Nat

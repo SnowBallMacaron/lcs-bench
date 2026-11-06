@@ -68,7 +68,6 @@ namespace TreeDomain
 def descendants (T : TreeDomain) (p : T.Node) : Set T.Node :=
   fun n => T.isNode n ∧ Reachable T p n
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- If p is a node and c is reachable from p, then c is a node -/
 theorem reachable_isNode (T : TreeDomain) (p c : T.Node)
     (hp : T.isNode p) (hr : Reachable T p c) : T.isNode c := by
@@ -78,7 +77,6 @@ theorem reachable_isNode (T : TreeDomain) (p c : T.Node)
   | step p' c' d' hch _hrc ih =>
     exact ih (T.childrenAreNodes p' c' hp hch)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Pigeonhole for tree: if p has infinite descendants, some child of p
     has infinite descendants -/
 theorem exists_child_infinite_desc (T : TreeDomain) (p : T.Node)
@@ -136,7 +134,6 @@ theorem konig_lemma (T : TreeDomain)
       n = p ∨ ∃ c, T.children p c ∧ Reachable T c n) :
     ∃ path : Nat → T.Node, T.InfinitePath path 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Concatenate two paths in the same tree domain. -/
 theorem Reachable.trans {T : TreeDomain} {a b c : T.Node}
     (hab : Reachable T a b) (hbc : Reachable T b c) : Reachable T a c := by

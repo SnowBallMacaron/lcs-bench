@@ -119,14 +119,12 @@ structure Admissible {L : Language} (sigma : Substitution L) (A : FormulaN L) : 
   supportNotBound : ∀ x, support sigma x → x ∉ formulaBVN A
   freeFor : ∀ x, support sigma x → isFreeForN (sigma x) x A
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Restrict a substitution to the variables actually free in the recursive
 child formula; outside that finite syntactic list the map is the identity. -/
 def restrictToFormula {L : Language} (sigma : Substitution L) (A : FormulaN L) :
     Substitution L :=
   fun x => if x ∈ formulaFreeVarIndices A then sigma x else .var x
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Immediate syntactic children used in the formula substitution clauses.
 A quantified child is its original body, not a term-instantiated subformula. -/
 def formulaChildren {L : Language} : FormulaN L → List (FormulaN L)

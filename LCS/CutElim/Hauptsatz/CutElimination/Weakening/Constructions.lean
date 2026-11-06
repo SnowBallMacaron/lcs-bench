@@ -14,7 +14,6 @@ open LCS.CutElim.Hauptsatz
 open LCS.CutElim.Hauptsatz.Completeness
 namespace LCS.CutElim.Hauptsatz
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 theorem LCS.Finset.insert_comm [DecidableEq α] (a b : α) (s : LCS.Finset α) :
     LCS.Finset.insert a (LCS.Finset.insert b s) =
     LCS.Finset.insert b (LCS.Finset.insert a s) := by
@@ -27,7 +26,6 @@ theorem LCS.Finset.insert_comm [DecidableEq α] (a b : α) (s : LCS.Finset α) :
   · rintro (rfl | rfl | h) <;> simp_all
   · rintro (rfl | rfl | h) <;> simp_all
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Inserting into the first set commutes with taking its union. -/
 theorem LCS.Finset.insert_union [DecidableEq α] (a : α) (s t : LCS.Finset α) :
     LCS.Finset.insert a (LCS.Finset.union s t) =
@@ -38,7 +36,6 @@ theorem LCS.Finset.insert_union [DecidableEq α] (a : α) (s t : LCS.Finset α) 
 
 namespace G1nnfRule
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Extending the antecedent preserves a rule's side conditions provided
 the inserted formula avoids the eigenvariable of a universal-right or
 existential-left rule. Non-eigenvariable rules need no extra hypothesis. -/
@@ -58,7 +55,6 @@ theorem sideConditions_insert_left {L : Language}
     simp_all
 
 -- END PROOF
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Extending the succedent preserves a rule's side conditions provided
 the inserted formula avoids the eigenvariable of a universal-right or
 existential-left rule. Non-eigenvariable rules need no extra hypothesis. -/
@@ -78,7 +74,6 @@ theorem sideConditions_insert_right {L : Language}
     simp_all
 
 -- END PROOF
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Extending the antecedent preserves a legal rule application when the
 inserted formula is in NNF and avoids the eigenvariable of a universal-right
 or existential-left rule. The NNF hypothesis is necessary because the
@@ -105,7 +100,6 @@ theorem applicationConditions_insert_left {L : Language}
         G1nnfFinsetSequent.IsNNF.insert_left hNNF hAC.2
 
 -- END PROOF
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Extending the succedent preserves a legal rule application when the
 inserted formula is in NNF and avoids the eigenvariable of a universal-right
 or existential-left rule. The NNF hypothesis is necessary because the
@@ -132,7 +126,6 @@ theorem applicationConditions_insert_right {L : Language}
         G1nnfFinsetSequent.IsNNF.insert_right hNNF hAC.2
 
 -- END PROOF
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A zero-premise application can be weakened on the left by extending the
 context stored inside its axiom rule. The returned conclusion equality records
 that the actual axiom conclusion, rather than its ignored ambient contexts, was
@@ -196,7 +189,6 @@ theorem applicationConditions_axiom_insert_left {L : Language}
   | exRight _ _ _ => simp [premises] at hAxiom
 
 -- END PROOF
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A zero-premise application can be weakened on the right by extending the
 context stored inside its axiom rule. The returned conclusion equality records
 that the actual axiom conclusion, rather than its ignored ambient contexts, was
@@ -269,7 +261,6 @@ end G1nnfRule
 -- ===================================================================
 -- Weakening: weakenTreeLeft — insert a formula into the antecedent
 -- ===================================================================
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Internal helper: structural weakening on the left of a G1nnf
 proof tree. Given a proof of Γ → Δ, produces a proof of
 (insert C Γ) → Δ by pushing `insert C` through each rule's context
@@ -418,7 +409,6 @@ noncomputable def G1nnfProofTree.weakenTreeLeft {L : Language} {hL : L.withoutEq
     | exLeft _ _ _ => simp [G1nnfRule.premises] at hPrem
     | exRight _ _ _ => simp [G1nnfRule.premises] at hPrem
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Structural weakening on the right: given a proof of Γ → Δ,
 produce a proof of Γ → (insert C Δ). Symmetric to weakenTreeLeft. -/
 noncomputable def G1nnfProofTree.weakenTreeRight {L : Language} {hL : L.withoutEquality}

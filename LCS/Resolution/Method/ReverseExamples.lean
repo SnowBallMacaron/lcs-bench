@@ -342,7 +342,6 @@ theorem ex438D_refutes (P Q R : Nat) (hPQ : P ≠ Q) (hQR : Q ≠ R) :
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Replace only the displayed conclusion; retain the premise displays. -/
 def ProofDisplay.withRoot (S : ClauseSequent) : ProofDisplay → ProofDisplay
   | .leaf _ => .leaf S
@@ -354,7 +353,6 @@ def ProofDisplay.withRoot (S : ClauseSequent) : ProofDisplay → ProofDisplay
 
 open ResolutionTree
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The display operation follows exactly the weakening and inference choices
 of the constructive reverse conversion. -/
 def combineConversionDisplays (A : ResolutionTree) (L : Literal)
@@ -363,7 +361,6 @@ def combineConversionDisplays (A : ResolutionTree) (L : Literal)
   else if newInputs (A.eraseLiteral L) S = LCS.Finset.empty then first.withRoot S
   else .fork S first second
 
--- ATTACH-BLOCKER: termination suffix
 def conversionDisplay (T : ResolutionTree) : ProofDisplay :=
   match T with
   | .axiom_ _ => .leaf T.inputs
@@ -479,13 +476,11 @@ theorem ex438D_toGCNF (P Q R : Nat) (hPQ : P ≠ Q) (hPR : P ≠ R) (hQR : Q ≠
     proofDisplay ((ex438D P Q R).toGCNF (ex438T2 P Q R).conclusion
       (ex438D_refutes P Q R hPQ hQR) (ex438T2 P Q R).ordinary) = proofDisplay (ex438T2 P Q R) 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Count axiom occurrences in a fully labeled proof display. -/
 def ProofDisplay.leafCount : ProofDisplay → Nat
   | .leaf _ => 1
   | .fork _ left right => left.leafCount + right.leafCount
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 def ProofDisplay.nodeCount : ProofDisplay → Nat
   | .leaf _ => 1
   | .fork _ left right => 1 + left.nodeCount + right.nodeCount

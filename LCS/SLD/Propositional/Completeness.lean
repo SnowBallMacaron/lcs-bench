@@ -91,7 +91,6 @@ def linearize_yields_sld_refutation
 
 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The requested atom is stored at the actual first transition.
 The positive step bound rules out a zero-step trace. -/
 @[blueprint "chap9__theorem_9_3_1"]

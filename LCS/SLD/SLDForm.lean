@@ -16,12 +16,10 @@ open LCS.Resolution.GCNF
 
 -- ========= Definition 9.2.1: Horn clauses and related predicates =========
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Polarity kernel on the resolution carrier, including the empty clause. -/
 def atMostOnePositive (C : Clause) : Prop :=
   ∀ P Q, Literal.pos P ∈ C → Literal.pos Q ∈ C → P = Q
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- All-negative resolution clauses, including the empty final goal. -/
 @[blueprint "chap9__definition_9_2_1"]
 def allNegative (C : Clause) : Prop :=
@@ -62,7 +60,6 @@ def isAxiomNodeWithB (P : Nat) : {S : ClauseSequent} → GCNFProofTree S → Boo
 
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: isAxiomNodeWithB soundness. -/
 theorem isAxiomNodeWithB_sound (P : Nat) :
     {S : ClauseSequent} → (T : GCNFProofTree S) →
@@ -262,7 +259,6 @@ def exFirstGCNFProof : GCNFProofTree (ClauseSequent.ofList exHornClauseSet) := b
   · simp [LCS.Finset.Subset, G2, ClauseSequent.ofList,
       LCS.Finset.mem_ofList, or_imp, forall_and] <;> native_decide
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A primitive GCNF derivation with explicit local premise-order choices.
     Paths identify nodes of the kernel; swapping changes only their display. -/
 @[blueprint "chap9__example_9_2_1"]
@@ -393,7 +389,6 @@ def exSLDFormProof : OrderedGCNFProof (ClauseSequent.ofList exHornClauseSet) whe
           LCS.Finset.mem_ofList, or_imp, forall_and] <;> native_decide
     exact result
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: Bool-valued check that all literals in a clause are negative.
     Used to verify that no clause in As is a definite clause. -/
 def allNegativeB (C : Clause) : Bool :=
@@ -416,7 +411,6 @@ theorem allNegativeB_spec (C : Clause) (h : allNegativeB C = true) :
 
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- A finite search for a complementary singleton pair in a sequent label. -/
 def axiomLabelB (S : ClauseSequent) : Bool :=
   S.val.any fun C => C.val.any fun l =>
@@ -425,7 +419,6 @@ def axiomLabelB (S : ClauseSequent) : Bool :=
         decide (Clause.single (.neg P) ∈ S)
     | .neg _ => false
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- The label search recognizes contextual axioms. -/
 theorem axiomLabelB_sound (S : ClauseSequent) (h : axiomLabelB S = true) :
     S.isTrivial := by
@@ -439,7 +432,6 @@ theorem axiomLabelB_sound (S : ClauseSequent) (h : axiomLabelB S = true) :
 
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- All-negative ordinary goals pass the finite polarity test. -/
 theorem allNegativeB_of_goal {C : Clause} (h : isGoalClause C) :
     allNegativeB C = true := by
@@ -463,7 +455,6 @@ def isSLDForm_goalSplitB (Q : Nat) : {S : ClauseSequent} → GCNFProofTree S →
       | .rule _ _ B' _ _ _ _ _ _ innerRight _ _ _ _ =>
         (B' == Literal.pos Q) && isAxiomNodeWithB Q innerRight)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Finite SLD-form check: inspect both children, exempt trivial labels from
     the local rule condition, and test the exact cancellation and goal branches. -/
 def isSLDFormB : {S : ClauseSequent} → GCNFProofTree S → Bool
@@ -502,7 +493,6 @@ def isSLDFormB : {S : ClauseSequent} → GCNFProofTree S → Bool
             decide (C = G)
           else true)))
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: Bool literal negativity check implies isNegLit. -/
 theorem isNegLit_of_bool (l : Literal)
     (h : (match l with | .neg _ => true | _ => false) = true) :
@@ -512,7 +502,6 @@ theorem isNegLit_of_bool (l : Literal)
   | neg _ => trivial
   | pos _ => simp at h
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: isSLDForm_goalSplitB soundness. -/
 theorem isSLDForm_goalSplitB_sound (Q : Nat) :
     {S : ClauseSequent} → (T : GCNFProofTree S) →
@@ -533,7 +522,6 @@ theorem isSLDForm_goalSplitB_sound (Q : Nat) :
           simp only [Bool.and_eq_true, beq_iff_eq] at hRule
           exact ⟨hRule.1, isAxiomNodeWithB_sound Q right hRule.2⟩
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Helper: isSLDFormB soundness — if the Bool check passes, the Prop holds. -/
 theorem isSLDFormB_sound :
     {S : ClauseSequent} → (T : GCNFProofTree S) →

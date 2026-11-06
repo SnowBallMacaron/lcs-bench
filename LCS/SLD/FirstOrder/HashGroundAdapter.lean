@@ -30,7 +30,6 @@ open LCS.FOResolution.Method
 open LCS.FOResolution.Method.Soundness
 open LCS.FOResolution.Method.Completeness
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Structural lowering of a hash-language atom. -/
 def hashLowerAtom {L : Language} (hNoEq : L.withoutEquality) (k : Nat) :
     FOAtom (HashLanguage L) hNoEq → FOAtom L hNoEq
@@ -39,14 +38,12 @@ def hashLowerAtom {L : Language} (hNoEq : L.withoutEquality) (k : Nat) :
   | .eq_ hL lhs rhs =>
       .eq_ hL (hashLowerTerm k lhs) (hashLowerTerm k rhs)
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Atom finite-set lowering is the exact image of structural lowering. -/
 noncomputable def hashLowerAtomFinset {L : Language} (hNoEq : L.withoutEquality)  (k : Nat)
     (S : LCS.Finset (FOAtom (HashLanguage L) hNoEq)) :
     LCS.Finset (FOAtom L hNoEq) :=
   LCS.Finset.image ((hashLowerAtom (hNoEq := by all_goals exact hNoEq)) k) S
 
--- ATTACH-BLOCKER: unsupported untagged abbrev
 /-- The goal index computed by one ground transcript step. -/
 noncomputable abbrev GroundSLDStep.nextGoal {L : Language} (hNoEq : L.withoutEquality)
     {D : List (FOHornClause L hNoEq)}
@@ -59,7 +56,6 @@ noncomputable abbrev GroundSLDStep.nextGoal {L : Language} (hNoEq : L.withoutEqu
         (step.clause.bodyFOAtoms.map
           ((FOAtomCore.subst (hNoEq := by all_goals exact hNoEq) Term.var)))))
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A one-step direct adaptation result.  Its derivation is indexed by the
     exact lowering of the hash transcript's next goal, and it records the
     exact base source clause recovered from mapped-program membership. -/
@@ -82,7 +78,6 @@ structure HashAdaptedGroundStep {L : Language} (hNoEq : L.withoutEquality)
         (some ((hashLowerAtom (hNoEq := by all_goals exact hNoEq))
           ((hashFreshEvenVar (hNoEq := by all_goals exact hNoEq)) D goals) step.Ak))
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- Direct adaptation of a whole ground transcript.  The result remains
     indexed by the exact lowering of the transcript's terminal goal and
     records the chronological first selected atom. -/
@@ -101,7 +96,6 @@ structure HashAdaptedGroundTranscript {L : Language} (hNoEq : L.withoutEquality)
         (t.firstSelectedAtom.map
           ((hashLowerAtom (hNoEq := by all_goals exact hNoEq)) ((hashFreshEvenVar (hNoEq := by all_goals exact hNoEq)) D goals)))
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- An initialized direct hash-ground run.  The initial hash substitution
     is lowered rigidly at the single globally fresh even variable, and the
     resulting derivation never leaves the base language. -/
@@ -138,7 +132,6 @@ structure HashAdaptedGroundRun {L : Language} (hNoEq : L.withoutEquality)
       t.firstSelectedAtom.map
         ((hashLowerAtom (hNoEq := by all_goals exact hNoEq)) ((hashFreshEvenVar (hNoEq := by all_goals exact hNoEq)) D goals))
 
--- ATTACH-BLOCKER: unsupported untagged structure
 /-- A direct adapter result specialized to an actual empty-goal
     refutation in the base language. -/
 structure HashAdaptedGroundRefutation {L : Language} (hNoEq : L.withoutEquality)

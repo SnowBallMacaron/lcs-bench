@@ -101,7 +101,6 @@ inductive RootToNodePath {L : Language} {hL : L.withoutEquality} [DecidableEq (F
       RootToNodePath
         (G2nnfDeductionTreeCore.twoPremise rule hAdmit hPrem hSC sub1 sub2) node
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Transport only the root indices of an exact path. -/
 noncomputable def RootToNodePath.castRoot
     {L : Language} {hL : L.withoutEquality} [DecidableEq (FormulaN L)]
@@ -151,7 +150,6 @@ def RootToNodePath.trans {L : Language} {hL : L.withoutEquality} [DecidableEq (F
     .rightPremise rule hAdmit hPrem hSC sub1 sub2
       (path.trans second)
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Replace the exact target occurrence of a root-to-node path by another
 tree with the same sequent index.  Every outer application and every
 off-path sibling is reused definitionally. -/

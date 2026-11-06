@@ -269,7 +269,6 @@ end Abbreviations
 -- ========= Lemma 3.2.1: Parenthesis Balance and Prefix Properties =========
 
 -- Helper: generalized foldl accumulator shift for left paren counting
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem leftParen_foldl_acc (s : PropString) (acc : Nat) :
     List.foldl (fun a c => match c with | .lParen => a + 1 | _ => a) acc s =
     acc + s.foldl (fun a c => match c with | .lParen => a + 1 | _ => a) 0 := by
@@ -291,7 +290,6 @@ theorem leftParen_foldl_acc (s : PropString) (acc : Nat) :
     | rParen => exact ih acc
 
 -- Helper: generalized foldl accumulator shift for right paren counting
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem rightParen_foldl_acc (s : PropString) (acc : Nat) :
     List.foldl (fun a c => match c with | .rParen => a + 1 | _ => a) acc s =
     acc + s.foldl (fun a c => match c with | .rParen => a + 1 | _ => a) 0 := by
@@ -312,7 +310,6 @@ theorem rightParen_foldl_acc (s : PropString) (acc : Nat) :
     | falsum => exact ih acc
     | lParen => exact ih acc
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem leftParenCount_append (s1 s2 : PropString) :
     PropString.leftParenCount (s1 ++ s2) =
     PropString.leftParenCount s1 + PropString.leftParenCount s2 := by
@@ -320,7 +317,6 @@ theorem leftParenCount_append (s1 s2 : PropString) :
   simp only [PropString.leftParenCount, List.foldl_append]
   rw [leftParen_foldl_acc]
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem rightParenCount_append (s1 s2 : PropString) :
     PropString.rightParenCount (s1 ++ s2) =
     PropString.rightParenCount s1 + PropString.rightParenCount s2 := by
@@ -334,7 +330,6 @@ theorem rightParenCount_append (s1 s2 : PropString) :
 -- Helper: toStr is never empty
 
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Every PropFormula has equal left and right parenthesis counts in its
     string representation. -/
 theorem propFormula_balanced_parens (A : PropFormula) :
@@ -411,7 +406,6 @@ by
 
 
 -- Helper: if a ++ b = c ++ d and a.length ≤ c.length, then a <+: c
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem prefix_of_append_eq {a b c d : PropString}
     (h : a ++ b = c ++ d) (hlen : a.length ≤ c.length) : a <+: c := by
 -- BEGIN PROOF
@@ -422,7 +416,6 @@ theorem prefix_of_append_eq {a b c d : PropString}
   exact htak ▸ List.take_prefix a.length c
 
 -- Helper: if a ++ b = c ++ d and c.length ≤ a.length, then a = c ++ rest
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 theorem split_past_prefix {a b c d : PropString}
     (h : a ++ b = c ++ d) (hlen : c.length ≤ a.length) :
     ∃ rest, a = c ++ rest ∧ rest ++ b = d := by

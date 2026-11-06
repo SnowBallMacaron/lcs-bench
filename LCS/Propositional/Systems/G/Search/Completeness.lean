@@ -116,7 +116,6 @@ theorem search_falsifying_extraction (s : Sequent)
 -- Local definitions matching SignedFormulae.lean types, defined here to
 -- avoid a circular import (SignedFormulae -> Infinite -> Search).
 
--- ATTACH-BLOCKER: unsupported untagged inductive
 /-- A direction in a deduction tree: left or right at a two-premise node. -/
 inductive PathDir' where
   | left : PathDir'

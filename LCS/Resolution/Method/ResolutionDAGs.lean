@@ -400,7 +400,6 @@ noncomputable def mk_resolve (D1 D2 : ResolutionDAG) (L : Literal)
         · exact absurd (List.cons.inj ht_eq).1 (by omega)
         · exact absurd (List.cons.inj ht_eq).1 (by omega))
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The root label of mk_resolve is the resolvent. -/
 theorem rootLabel_resolve (D1 D2 : ResolutionDAG) (L : Literal)
     (hL : L ∈ D1.rootLabel) (hLc : Literal.conjugate L ∈ D2.rootLabel) :
@@ -413,7 +412,6 @@ theorem rootLabel_resolve (D1 D2 : ResolutionDAG) (L : Literal)
   unfold mk_resolve_dag mk_resolve_tree mk_resolve_label
   simp [rootLabel]
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- The leaves of mk_axiom C come from S iff S C. -/
 theorem leavesFrom_axiom (C : Clause) (S : ClauseSequent) :
     (mk_axiom C).leavesFrom S ↔ C ∈ S := by
@@ -553,7 +551,6 @@ def treeStepCount : ResolutionTree → Nat
   | .axiom_ _ => 0
   | .resolve T1 T2 _ => 1 + T1.treeStepCount + T2.treeStepCount
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- A well-formed resolution tree yields a finite resolution DAG, together
     with its exact root label. -/
 noncomputable def toResolutionDAGWithLabel : (T : ResolutionTree) →
@@ -567,7 +564,6 @@ noncomputable def toResolutionDAGWithLabel : (T : ResolutionTree) →
       rw [ResolutionDAG.rootLabel_resolve, D1.property, D2.property]
       rfl⟩
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Tree-to-DAG conversion requires a genuine pivot at every internal node. -/
 noncomputable def toResolutionDAG (T : ResolutionTree) (h : T.IsWellFormed) : ResolutionDAG :=
   (T.toResolutionDAGWithLabel h).val

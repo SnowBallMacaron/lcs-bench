@@ -90,7 +90,6 @@ inductive PartialRec : Nat → Type where
 -- Definition 7.7.1 — Composition (function layer)
 -- ============================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 7.7.6 (companion def): Collect Option results from all Fin m positions into a single Option (Fin m -> Nat), returning none if any position is none. -/
 def collectOptionResults {m : Nat} (results : Fin m → Option Nat)
     : Option (Fin m → Nat) :=
@@ -206,7 +205,6 @@ end PrimRec
 
 namespace minimize
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 7.7.5 (companion def): Fuel-bounded search starting at the given
 y. Returns the first zero encountered, requiring every value from that starting
 index through the returned index to be defined. Returns none on timeout or an
@@ -249,7 +247,6 @@ theorem domainIff (n : Nat) (g : PartialNaryFunc (n + 1))
         ∀ z, z ≤ y → ∃ v,
           g (fun i => if h : i.val < n then args ⟨i.val, h⟩ else z) = some v 
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 7.7.5 (companion def): Finite evaluator approximant, searching
 from zero for at most fuel steps. A timeout is only an approximation to the
 unbounded graph; an undefined intermediate value also returns none. -/
@@ -271,7 +268,6 @@ end minimize
 -- Definition 7.7.6 — Partial Recursive Functions (eval + isTotal)
 -- ============================================================
 
--- ATTACH-BLOCKER: dependency: retained front declaration references this helper
 /-- Definition 7.7.6 (companion def): Helper for evaluating primitive recursion on partial functions, recursing on the Nat y value directly. Uses pre-evaluated f and g functions to avoid mutual recursion issues. -/
 def primRecPartial {n : Nat} (evalF : PartialNaryFunc n)
     (evalG : PartialNaryFunc (n + 2))
@@ -287,7 +283,6 @@ def primRecPartial {n : Nat} (evalF : PartialNaryFunc n)
 
 namespace PartialRec
 
--- ATTACH-BLOCKER: field-notation: dotted helper requires front namespace
 /-- Definition 7.7.6 (companion def): Evaluates a PartialRec term with a fuel bound: base delegates to BaseFunc.eval (wrapped in some), comp uses strict compose, primRec uses primitive recursion lifted to Option, min uses minimize.approx with the given fuel. Uses structural recursion on the PartialRec term. -/
 def eval (pr : PartialRec n) (fuel : Nat)
     : PartialNaryFunc n :=
