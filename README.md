@@ -7,8 +7,9 @@ Science: Foundations of Automatic Theorem Proving* (second edition):
 propositional logic, first-order logic, Gentzen systems (LK / LKe), cut
 elimination, resolution, Herbrand's theorem, and SLD resolution.
 
-The benchmark dataset generated from this library is hosted separately on
-Kaggle.
+The benchmark dataset generated from this library, with the DefEq checker and
+the evaluation harness, is hosted separately on Kaggle:
+https://www.kaggle.com/datasets/macaroonotz/lcs-bench
 
 ## Build
 
